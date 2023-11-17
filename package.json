@@ -13,5 +13,10 @@
 		"svelte": "^4.0.5",
 		"vite": "^4.4.2"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"node-sass": "^9.0.0",
+		"sass": "^1.69.5",
+		"svelte-preprocess": "^5.1.0"
+	}
 }
