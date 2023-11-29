@@ -1,95 +1,75 @@
 <script>
-  import { getContext, onDestroy, onMount } from "svelte";
+  import { getContext } from "svelte";
+  import { 
+    width, 
+    height, 
+    pixelRatio, 
+    nodeSize, 
+    plotWidth, 
+    gap, 
+    padding 
+  } from "$lib/store/canvas"
+  import Pokemon from "$lib/components/Pokemon.svelte";
 
-  export let size = 100
-  export let x = 0
-  export let y = 0
-  export let basis
-  export let productList = []
-  export let designList = []
+  export let node
 
-  let canvasContext = getContext("canvas")
+  const { 
+    isBlock, 
+    sortBy, 
+    xScale, 
+    groupedNodes, 
+    radMaxStacks,
+    radBarPos 
+  } = getContext("layout")
 
-  onMount(() => canvasContext.add(draw))
-  onDestroy(() => canvasContext.remove(draw))
+  $: pos = getPos(node, $isBlock, $sortBy, $xScale, $groupedNodes, radMaxStacks, $radBarPos, $width, $height, $pixelRatio, $plotWidth, $gap, $padding)
 
-  function draw(ctx) {
-    drawCenter(ctx)
-    drawBasis(ctx)
-    drawProducts(ctx)
-    // drawDesign(ctx)
-    // drawShades(ctx)
-  }
 
-  function drawCenter(ctx) {
-    ctx.beginPath()
-    ctx.arc(x, y, 4, 0, 2*Math.PI, false)
-    fill(ctx, 'black')
-  }
-
-  function drawBasis(ctx) {
-    if (basis === 'digital') {
-      drawPolygon(ctx, +x, +y, 4, size*.64, Math.PI/4)
-    }
-    else if (basis === 'print') {
-      drawPolygon(ctx, +x, +y, 8, size*.54, 45*Math.PI/360)
-    }
-    else if (basis === 'consulting') {
-      drawCircle(ctx, +x, +y, size/2)
-    }
-
-    stroke(ctx, 'black')
+  function getPos(node, isBlock, sortBy, xScale, groupedNodes, radMaxStacks, radBarPos) {
+    return isBlock
+      ? getBlcPos(node)
+      : getRadPos(node, sortBy, xScale, groupedNodes, radMaxStacks, radBarPos)
   }
 
 
-  function drawProducts(ctx) {
-    if (productList.includes('video')) {
-      const width = size * 22.87/100
-      const height = size * 22.39/100
+  function getRadPos(node, sortBy, xScale, groupedNodes, maxStacks, barPos) {
+    const category = node[sortBy]
+
+    let radians = xScale(category)
+
+    // Get occurrence of this node in the group of nodes with the same category
+    const catNodes = groupedNodes.get(category)
+    const nodeIndex = catNodes.findIndex(d => d.id === node.id)
+    const barIndex = Math.floor(nodeIndex / maxStacks)
+    const stackIndex = nodeIndex % maxStacks
+    
+    radians += barPos(barIndex)
+
+    const radius = 200 + stackIndex * $nodeSize/1.5
+
+    const x = (Math.cos(radians) * radius + $width/2) * $pixelRatio
+    const y = (Math.sin(radians) * radius + $height/2) * $pixelRatio
       
-      ctx.beginPath()
+    return { x, y, rotation: radians }
+  }
 
-    }
+  function getBlcPos({ i }) {
+    // Calculate the number of squares per row
+    const squaresPerRow = Math.floor(($plotWidth + $gap) / ($nodeSize + $gap))
+
+    // Calculate the row and column indices for the given i
+    const rowIndex = Math.floor(i / squaresPerRow)
+    const colIndex = i % squaresPerRow
+
+    // Calculate the x and y positions
+    const x = colIndex * ($nodeSize + $gap) + $nodeSize/2 + $padding.left
+    const y = rowIndex * ($nodeSize + $gap) + $nodeSize/2 + $padding.top
+
+    return { x, y }
   }
 
 
-  function drawPolygon(ctx, centerX, centerY, sides, radius, startAngle=0) {
-    // Calculate the angle between each side of the polygon
-    const angle = 2*Math.PI / sides
-
-    // Move to the initial point on the circumference
-    const startX = centerX + radius * Math.cos(startAngle)
-    const startY = centerY + radius * Math.sin(startAngle)
-
-    ctx.beginPath()
-    ctx.moveTo(startX, startY)
-
-    for (let i = 1; i <= sides; i++) {
-      const x = centerX + radius * Math.cos(startAngle + angle * i)
-      const y = centerY + radius * Math.sin(startAngle + angle * i)
-      ctx.lineTo(x, y)
-    }
-
-    ctx.closePath()
-  }
-
-
-  function drawCircle(ctx, centerX, centerY, radius) {
-    ctx.beginPath()
-    ctx.arc(centerX, centerY, radius, 0, 2*Math.PI)
-  }
-
-
-  function fill(ctx, color) {
-    ctx.fillStyle = color
-    ctx.fill()
-  }
-
-
-  function stroke(ctx, stroke, width=1) {
-    ctx.strokeStyle = stroke
-    ctx.lineWidth = width
-    ctx.stroke()
-  }
 
 </script>
+
+<Pokemon {...pos} />

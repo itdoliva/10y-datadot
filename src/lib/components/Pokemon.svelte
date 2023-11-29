@@ -5,19 +5,19 @@
 
   export let x = 0
   export let y = 0
-  export let rotation = false
+  export let rotation = undefined
 
   const canvasContext = getContext("canvas")
+  const layoutContext = getContext("layout")
 
   onMount(() => canvasContext.add(draw))
   onDestroy(() => canvasContext.remove(draw))
 
-  function rotateIfNeeded(px, py) {
-    if (rotation === false) {
-      return [ px, py ]
-    }
 
-    return rotateAroundPoint(px, py, x, y, rotation)
+  function rotateIfNeeded(px, py) {
+    return rotation === undefined
+      ? [ px, py ]
+      : rotateAroundPoint(px, py, x, y, rotation)
   }
 
 
