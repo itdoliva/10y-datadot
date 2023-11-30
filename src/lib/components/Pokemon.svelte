@@ -1,17 +1,17 @@
 <script>
   import { getContext, onDestroy, onMount } from "svelte";
   import { nodeSize } from "$lib/store/canvas"
-  import getRegPolyPoints from "$lib/drawers/getRegPolyPoints.js"
   import fill from "$lib/drawers/fill"
   import stroke from "$lib/drawers/stroke"
-  import rotateAroundPoint from "$lib/utility/rotateAroundPoint.js"
+  import getRegPolyPoints from "$lib/drawers/getRegPolyPoints.js"
+  import rotateAroundPoint from "$lib/helpers/rotateAroundPoint.js"
 
   export let node
   export let x = 0
   export let y = 0
   export let rotation = undefined
 
-  const lw = 3.5 // line width
+  const lw = 1.5 // line width
 
   const canvasContext = getContext("canvas")
   const layoutContext = getContext("layout")
@@ -19,7 +19,7 @@
   onMount(() => canvasContext.add(draw))
   onDestroy(() => canvasContext.remove(draw))
 
-  $: basisPoints = node.basis !== 'consulting' && getRegPolyPoints(x, y, $nodeSize, node.basis === 'digital' ? 4 : 8)
+  $: basisPoints = node.basis !== 'consulting' && getRegPolyPoints(x, y, $nodeSize, node.basis === 'digital' ? 4 : 6)
 
 
   const rotateIfNeeded = ([ px, py ]) => rotation === undefined || (px === x && py === y)
@@ -177,45 +177,45 @@
 
     }
 
-    // // PRODUCTS
-    // if (node.products.includes('anima/video')) {
-    //   ctx.beginPath()
-    //   ctx.arc(x, y, $nodeSize/6, 0, 2 * Math.PI)
-    //   stroke(ctx, 'black', lw)
+    // PRODUCTS
+    if (node.products.includes('anima/video')) {
+      ctx.beginPath()
+      ctx.arc(x, y, $nodeSize/6, 0, 2 * Math.PI)
+      stroke(ctx, 'black', lw)
 
-    //   // Get triangle points
-    //   const points = [
-    //     [x, y],
-    //     [x + $nodeSize*.12, y + $nodeSize*.2252],
-    //     [x - $nodeSize*.12, y + $nodeSize*.2252],
-    //   ]
+      // Get triangle points
+      const points = [
+        [x, y],
+        [x + $nodeSize*.12, y + $nodeSize*.2252],
+        [x - $nodeSize*.12, y + $nodeSize*.2252],
+      ]
 
-    //   ctx.beginPath()
-    //   linePoints(ctx, points)
-    //   fill(ctx, 'black')
-    // }
+      ctx.beginPath()
+      linePoints(ctx, points)
+      fill(ctx, 'black')
+    }
 
-    // if (node.products.includes('publicacao')) {
-    //   // Get center square points
-    //   const cPoints = getRegPolyPoints(x, y, $nodeSize/3.1, 4)
+    if (node.products.includes('publicacao')) {
+      // Get center square points
+      const cPoints = getRegPolyPoints(x, y, $nodeSize/3, 4)
 
-    //   ctx.beginPath()
-    //   linePoints(ctx, cPoints)
-    //   fill(ctx, 'black')
-    //   stroke(ctx, 'black', lw)
+      ctx.beginPath()
+      linePoints(ctx, cPoints)
+      fill(ctx, 'black')
+      stroke(ctx, 'black', lw)
 
-    //   // Get upper square points
-    //   const uPoints = [
-    //     [x + $nodeSize/6.2, y - $nodeSize*.15],
-    //     [x + $nodeSize/6.2, y - $nodeSize*.32],
-    //     [x - $nodeSize/6.2, y - $nodeSize*.32],
-    //     [x - $nodeSize/6.2, y - $nodeSize*.15],
-    //   ]
+      // Get upper square points
+      const uPoints = [
+        [x + $nodeSize/6, y - $nodeSize*.15],
+        [x + $nodeSize/6, y - $nodeSize*.32],
+        [x - $nodeSize/6, y - $nodeSize*.32],
+        [x - $nodeSize/6, y - $nodeSize*.15],
+      ]
 
-    //   ctx.beginPath()
-    //   linePoints(ctx, uPoints)
-    //   stroke(ctx, 'black', lw)
-    // }
+      ctx.beginPath()
+      linePoints(ctx, uPoints)
+      stroke(ctx, 'black', lw)
+    }
   }
 
 

@@ -3,7 +3,6 @@
   import { 
     width, 
     height, 
-    pixelRatio, 
     nodeSize, 
     plotWidth, 
     gap, 
@@ -22,7 +21,7 @@
     radBarPos 
   } = getContext("layout")
 
-  $: pos = getPos(node, $isBlock, $sortBy, $xScale, $groupedNodes, radMaxStacks, $radBarPos, $width, $height, $pixelRatio, $plotWidth, $gap, $padding)
+  $: pos = getPos(node, $isBlock, $sortBy, $xScale, $groupedNodes, radMaxStacks, $radBarPos, $width, $height, $plotWidth, $gap, $padding)
 
 
   function getPos(node, isBlock, sortBy, xScale, groupedNodes, radMaxStacks, radBarPos) {
@@ -45,10 +44,10 @@
     
     radians += barPos(barIndex)
 
-    const radius = 200 + stackIndex * $nodeSize/1.5
+    const radius = 200 + stackIndex * ($nodeSize + $gap)
 
-    const x = (Math.cos(radians) * radius + $width/2) * $pixelRatio
-    const y = (Math.sin(radians) * radius + $height/2) * $pixelRatio
+    const x = (Math.cos(radians) * radius + $width/2)
+    const y = (Math.sin(radians) * radius + $height/2)
       
     return { x, y, rotation: radians }
   }
