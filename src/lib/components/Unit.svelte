@@ -72,4 +72,4 @@
 
 </script>
 
-<Pokemon {...pos} />
+<Pokemon {node} {...pos} />

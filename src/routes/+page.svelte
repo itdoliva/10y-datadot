@@ -6,6 +6,8 @@
   export let data
 
   nodes.set(data.nodes)
+
+  console.log($nodes)
 </script>
 
 <App />

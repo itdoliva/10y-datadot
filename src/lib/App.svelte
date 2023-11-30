@@ -7,7 +7,6 @@
 
   let isBlock = false
   let sortBy = 'year'
-
 </script>
 
 <svelte:window

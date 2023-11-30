@@ -8,7 +8,7 @@ export const nodes = writable([])
 export const nNodes = derived(nodes, $nodes => $nodes.length);
 
 export const gap = derived(pixelRatio, ($pixelRatio) => {
-  return 5 * $pixelRatio
+  return 18 * $pixelRatio
 });
 
 export const nodeSize = derived(([ width, pixelRatio ]), ([ $width, $pixelRatio ]) => {

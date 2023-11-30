@@ -6,6 +6,7 @@
   let canvas
   let ctx
 
+
   onMount(() => {
     ctx = canvas.getContext('2d')
     render()
