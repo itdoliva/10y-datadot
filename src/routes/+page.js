@@ -4,9 +4,9 @@ const productCats = [
   'relatorio',
   'apresentacao',
   'site-institucional',
-  'infografico',
   'site-editorial', 
-  'dashboard'
+  'dashboard',
+  'infografico',
 ]
 
 const designCats = [
@@ -76,13 +76,17 @@ export function load() {
     const month = Math.floor(Math.random()*12)
     const date = new Date(year, month, 1)
 
+    const products = []
+    products.push(productCats.slice(productCats.length-2)[Math.random() < .5 ? 0 : 1])
+    products.push(productCats.slice(0, productCats.length-2)[Math.random() < .5 ? 0 : 1])
+
     nodes.push({ 
       id: i, 
       year,
       basis: getCategories(bases, false),
-      products: getCategories(productCats),
       designs: getCategories(designCats),
       goals: getCategories(goals),
+      products
     })
   }
 

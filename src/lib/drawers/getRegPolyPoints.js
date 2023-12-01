@@ -7,7 +7,7 @@ export default function getRegPolyPoints(cx, cy, size, sides, theta=0) {
   const startAngle = Math.PI/sides + theta
 
   // Calculate the angle between each side of the polygon
-  const angle = 2 * Math.PI / sides + theta
+  const angle = 2 * Math.PI / sides
 
   for (let i=0; i<sides; i++) {
     const x = cx + radius * Math.cos(startAngle + (angle * i));

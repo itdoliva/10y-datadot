@@ -216,6 +216,88 @@
       linePoints(ctx, uPoints)
       stroke(ctx, 'black', lw)
     }
+
+    if (node.products.includes('relatorio')) {
+      // Get center square points
+      const points = getRegPolyPoints(x, y, $nodeSize/3, 4, Math.PI/4)
+
+      ctx.beginPath()
+      linePoints(ctx, points)
+      fill(ctx, 'black')
+    }
+
+    if (node.products.includes('apresentacao')) {
+      ctx.beginPath()
+      ctx.arc(x, y, $nodeSize/6, 0, 2*Math.PI)
+      stroke(ctx, 'black', lw)
+    }
+
+    if (node.products.includes('site-institucional')) {
+      // Square
+      const sPoints = getRegPolyPoints(x, y, $nodeSize/3, 4)
+      
+      ctx.beginPath()
+      linePoints(ctx, sPoints)
+      stroke(ctx, 'black', lw)
+
+      // Triangle
+      sPoints.splice(3, 1)
+
+      ctx.beginPath()
+      linePoints(ctx, sPoints)
+      fill(ctx, 'black')
+    }
+
+    if (node.products.includes('infografico')) {
+      // Outer triangle
+      const oPoints = [
+        [x, y],
+        [x+$nodeSize/2, y+$nodeSize/2],
+        [x-$nodeSize/2, y+$nodeSize/2],
+      ]
+
+      // Inner triangle
+      const iPoints = [
+        [x, y+$nodeSize/3],
+        [x+$nodeSize*.16, y+$nodeSize/2],
+        [x-$nodeSize*.16, y+$nodeSize/2],
+      ]
+
+      ctx.beginPath()
+      linePoints(ctx, oPoints)
+      stroke(ctx, 'black', lw)
+
+      ctx.beginPath()
+      linePoints(ctx, iPoints)
+      fill(ctx, 'black')
+    }
+
+    if (node.products.includes('site-editorial')) {
+      const t0 = -Math.PI/4 + (rotation ? rotation + Math.PI/2 : 0)
+      const t1 = Math.PI/2 + Math.PI/4 + (rotation ? rotation + Math.PI/2 : 0)
+
+      ctx.beginPath()
+      ctx.arc(x, y, $nodeSize/6, t0, t1)
+      fill(ctx, 'black')
+
+      ctx.beginPath()
+      ctx.arc(x, y, $nodeSize/6, 0, 2*Math.PI)
+      stroke(ctx, 'black', lw)
+    }
+
+    if (node.products.includes('dashboard')) {
+      const t0 = Math.PI + (rotation ? rotation + Math.PI/2 : 0)
+      const t1 = 2*Math.PI + (rotation ? rotation + Math.PI/2 : 0)
+
+      const [ px, py ] = rotateIfNeeded([x ,y+$nodeSize/2])
+      ctx.beginPath()
+      ctx.arc(px, py, $nodeSize/2, t0, t1)
+      stroke(ctx, 'black', lw)
+
+      ctx.beginPath()
+      ctx.arc(px, py, $nodeSize/6, t0, t1)
+      fill(ctx, 'black')
+    }
   }
 
 
