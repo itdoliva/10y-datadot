@@ -1,36 +1,3 @@
-const productCats = [
-  'anima/video',
-  'publicacao',
-  'relatorio',
-  'apresentacao',
-  'site-institucional',
-  'site-editorial', 
-  'dashboard',
-  'infografico',
-]
-
-const designCats = [
-  'ilustracao',
-  'editorial',
-  'motion',
-  'servicos',
-  'ui'
-]
-
-const bases = [
-  'digital',
-  'print',
-  'consulting'
-]
-
-const goals = [
-  'educacional',
-  'informacional',
-  'impacto',
-  'institucional',
-  'editorial'
-]
-
 function getNCats() {
   const num = Math.random()
   if (num < .4) {
@@ -50,20 +17,23 @@ function getNCats() {
 
 function getCategories(catList, multi=true) {
   if (!multi) {
-    return catList[Math.floor(Math.random() * catList.length)]
+    return catList[Math.floor(Math.random() * catList.length)].name
   } 
   else {
     const list = [...catList]
     const values = []
     for (let i=0; i<getNCats(); i++) {
       const index = Math.floor(Math.random() * list.length)
-      values.push(list.splice(index, 1)[0])
+      values.push(list.splice(index, 1)[0].name)
     }
     return values
   }
 }
 
-export function load() {
+export async function load({ fetch }) {
+  const { products, designs, channels, goals} = await fetch("/categories.json")
+    .then(d => d.json())
+
   const nNodes = 387
 
   const firstDt = new Date(2014, 0, 1)
@@ -73,20 +43,18 @@ export function load() {
 
   for (let i = 0; i < nNodes; i++) {
     const year = firstDt.getFullYear() + Math.floor(Math.random()*10)
-    const month = Math.floor(Math.random()*12)
-    const date = new Date(year, month, 1)
 
-    const products = []
-    products.push(productCats.slice(productCats.length-2)[Math.random() < .5 ? 0 : 1])
-    products.push(productCats.slice(0, productCats.length-2)[Math.random() < .5 ? 0 : 1])
+    const prodList = []
+    prodList.push(products.slice(products.length-2)[Math.random() < .5 ? 0 : 1].name)
+    prodList.push(products.slice(0, products.length-2)[Math.random() < .5 ? 0 : 1].name)
 
     nodes.push({ 
       id: i, 
       year,
-      basis: getCategories(bases, false),
-      designs: getCategories(designCats),
+      basis: getCategories(channels, false),
+      designs: getCategories(designs),
       goals: getCategories(goals),
-      products
+      products: prodList
     })
   }
 

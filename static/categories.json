@@ -1,0 +1,34 @@
+{
+  "products": [
+    {"id": 0, "name": "anima/video", "alias": "Animação | Vídeo"},
+    {"id": 1, "name": "publicacao", "alias": "Publicação"},
+    {"id": 2, "name": "relatorio", "alias": "Relatório"},
+    {"id": 3, "name": "apresentacao", "alias": "Apresentação"},
+    {"id": 4, "name": "site-institucional", "alias": "Site Institucional"},
+    {"id": 5, "name": "site-editorial'", "alias": "Site Editorial"},
+    {"id": 6, "name": "dashboard", "alias": "Dashboard"},
+    {"id": 7, "name": "infografico", "alias": "Infográfico"}
+  ],
+
+  "designs": [
+    {"id": 0, "name": "ilustracao", "alias": "Ilustração"},
+    {"id": 1, "name": "editorial", "alias": "Editorial"},
+    {"id": 2, "name": "motion", "alias": "Motion Graphics"},
+    {"id": 3, "name": "servicos", "alias": "Design de Serviços"},
+    {"id": 4, "name": "ui", "alias": "User Interface"}
+  ],
+
+  "channels": [
+    {"id": 0, "name": "digital", "alias": "Digital"},
+    {"id": 1, "name": "print", "alias": "Print"},
+    {"id": 2, "name": "consulting", "alias": "Consultoria"}
+  ],
+
+  "goals": [
+    {"id": 0, "name": "educacional", "alias": "Educacional"},
+    {"id": 1, "name": "informacional", "alias": "Informacional"},
+    {"id": 2, "name": "impacto", "alias": "Impacto Positivo"},
+    {"id": 3, "name": "institucional", "alias": "Institucional"},
+    {"id": 4, "name": "editorial", "alias": "Editorial"}
+  ]
+}
