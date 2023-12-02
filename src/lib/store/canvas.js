@@ -22,7 +22,11 @@ export const nodeSize = derived(([ width, pixelRatio ]), ([ $width, $pixelRatio 
   }
   // Large Desktops
   return 25
-});
+})
+
+export const colorHeight = derived((nodeSize), ($nodeSize) => {
+  return $nodeSize * 1.25
+})
 
 
 export const plotWidth = derived([width, nodeSize, gap, nNodes, pixelRatio], ([$width, $nodeSize, $gap, $nNodes, $pixelRatio]) => {

@@ -31,8 +31,10 @@ function getCategories(catList, multi=true) {
 }
 
 export async function load({ fetch }) {
-  const { products, designs, channels, goals} = await fetch("/categories.json")
+  const categories = await fetch("/categories.json")
     .then(d => d.json())
+
+  const { products, designs, channels, goals} = categories
 
   const nNodes = 387
 
@@ -60,6 +62,7 @@ export async function load({ fetch }) {
 
   return {
     nodes,
-    dates: [ firstDt, lastDt ]
+    dates: [ firstDt, lastDt ],
+    categories
   }
 }

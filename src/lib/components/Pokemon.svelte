@@ -1,10 +1,12 @@
 <script>
   import { getContext, onDestroy, onMount } from "svelte";
-  import { nodeSize } from "$lib/store/canvas"
+  import { nodeSize, colorHeight } from "$lib/store/canvas"
+  import { categories } from "$lib/store/categories"
   import fill from "$lib/drawers/fill"
   import stroke from "$lib/drawers/stroke"
   import getRegPolyPoints from "$lib/drawers/getRegPolyPoints.js"
   import rotateAroundPoint from "$lib/helpers/rotateAroundPoint.js"
+  import getColorShape from "$lib/drawers/getColorShapePoints"
 
   export let node
   export let x = 0
@@ -22,10 +24,19 @@
   $: basisPoints = node.basis !== 'consulting' && getRegPolyPoints(x, y, $nodeSize, node.basis === 'digital' ? 4 : 6)
 
 
-  const rotateIfNeeded = ([ px, py ]) => rotation === undefined || (px === x && py === y)
-    ? [ px, py ]
-    : rotateAroundPoint(px, py, x, y, rotation + Math.PI/2) // Add 90 deg since 0 deg is horizontal
+  function rotateIfNeeded([ px, py ], theta=0) {
+    if ((rotation === undefined && theta === 0) || (px === x && py === y)) {
+      return [ px, py ]
+    }
 
+    let angle = theta
+    
+    if (rotation !== undefined) {
+      angle += rotation + Math.PI/2 // Add 90 deg since 0 deg is horizontal
+    }
+
+    return rotateAroundPoint(px, py, x, y, angle)
+  }
 
   function linePoints(ctx, points, close=true) {
     for (let i=0; i<points.length; i++) {
@@ -56,6 +67,7 @@
     drawBackElements(ctx)
     drawBasis(ctx)
     drawFrontElements(ctx)
+    drawColoredShapes(ctx)
   }
 
 
@@ -297,6 +309,26 @@
       ctx.beginPath()
       ctx.arc(px, py, $nodeSize/6, t0, t1)
       fill(ctx, 'black')
+    }
+  }
+
+  function drawColoredShapes(ctx) {
+    for (let i=0; i<node.goals.length; i++) {
+      const goal = $categories.goals.find(d => d.name === node.goals[i])
+      const { points, angle } = getColorShape(x, y, $colorHeight, goal.id)
+
+      ctx.globalCompositeOperation = 'multiply'
+      ctx.beginPath()
+      for (let j=0; j<points.length; j++) {
+        const cur = points[j]
+        const nextI = (j+1)%(points.length)
+        const next = points[nextI]
+
+        ctx.bezierCurveTo(...rotateIfNeeded(cur.a1, angle), ...rotateIfNeeded(next.a2, angle), ...rotateIfNeeded(next.p, angle))
+      }
+      ctx.fillStyle = goal.color
+      ctx.fill()
+      ctx.globalCompositeOperation = 'source-over'
     }
   }
 

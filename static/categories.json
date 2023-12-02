@@ -25,10 +25,10 @@
   ],
 
   "goals": [
-    {"id": 0, "name": "educacional", "alias": "Educacional"},
-    {"id": 1, "name": "informacional", "alias": "Informacional"},
-    {"id": 2, "name": "impacto", "alias": "Impacto Positivo"},
-    {"id": 3, "name": "institucional", "alias": "Institucional"},
-    {"id": 4, "name": "editorial", "alias": "Editorial"}
+    {"id": 0, "name": "educacional", "alias": "Educacional", "color": "#B0DAFF"},
+    {"id": 1, "name": "informacional", "alias": "Informacional", "color": "#B6FFC7"},
+    {"id": 2, "name": "impacto", "alias": "Impacto Positivo", "color": "#BAB0FF"},
+    {"id": 3, "name": "institucional", "alias": "Institucional", "color": "#FFF3B8"},
+    {"id": 4, "name": "editorial", "alias": "Editorial", "color": "#FFE2C0"}
   ]
 }
