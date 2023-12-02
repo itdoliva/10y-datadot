@@ -16,13 +16,12 @@
 />
 
 {#if $plotWidth > 0}
-  <Canvas>
-    <Layout bind:isBlock bind:sortBy>
-        {#each $nodes as node (node.id)}
-          <Unit {node} />
-        {/each}
-    </Layout>
-  </Canvas>
+<Layout bind:isBlock bind:sortBy>
+  <Canvas key="main" />
+  {#each $nodes as node (node.id)}
+    <Unit {node} />
+  {/each}
+</Layout>
 {/if}
 
 <button 

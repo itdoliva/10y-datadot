@@ -8,13 +8,12 @@
   export let isBlock
   export let sortBy
 
+  const canvasContexts = {}
   const radMaxStacks = 10
 
   const _isBlock = writable(isBlock)
   const _sortBy = writable(sortBy)
   
-  const _groupedNodes = writable(groupNodes(isBlock, sortBy))
-
   $: sortIds(sortBy)
 
   $: $_isBlock = isBlock
@@ -58,7 +57,11 @@
     })
   }
 
+
   $: context = {
+    canvasContexts,
+    addCanvasContext: (key, ctx) => canvasContexts[key] = ctx,
+
     isBlock: _isBlock,
     sortBy: _sortBy,
     xScale: xScale_d,

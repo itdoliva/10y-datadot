@@ -15,11 +15,10 @@
 
   const lw = 1.5 // line width
 
-  const canvasContext = getContext("canvas")
-  const layoutContext = getContext("layout")
+  const { canvasContexts } = getContext("layout")
 
-  onMount(() => canvasContext.add(draw))
-  onDestroy(() => canvasContext.remove(draw))
+  onMount(() => canvasContexts.main.add(draw))
+  onDestroy(() => canvasContexts.main.remove(draw))
 
   $: basisPoints = node.basis !== 'consulting' && getRegPolyPoints(x, y, $nodeSize, node.basis === 'digital' ? 4 : 6)
 

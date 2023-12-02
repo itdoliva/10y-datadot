@@ -1,27 +1,34 @@
 <script>
-  import { width, height, plotWidth, pixelRatio } from "$lib/store/canvas"
-  import { onMount, setContext } from 'svelte'
-  
+  import { width, height, pixelRatio } from "$lib/store/canvas"
+  import { onMount, setContext, getContext } from 'svelte'
+
+  export let key
+
   const toDraw = []
+
   let canvas
   let ctx
 
+  const { addCanvasContext } = getContext('layout')
 
   onMount(() => {
     ctx = canvas.getContext('2d')
+
+    addCanvasContext(key, { 
+      ctx, 
+      add: fn => toDraw.push(fn), 
+      remove: fn => {
+        const index = toDraw.indexOf(fn)
+        if (index > -1) {
+          toDraw.splice(index, 1)
+        }
+      }
+    })
+
     resize()
     render()
   })
 
-  setContext('canvas', {
-    add: fn => toDraw.push(fn),
-    remove: fn => {
-      const index = toDraw.indexOf(fn)
-      if (index > -1) {
-        toDraw.splice(index, 1)
-      }
-    } 
-  })
 
   function resize() {
     canvas.setAttribute('width', $width * $pixelRatio)
@@ -32,6 +39,7 @@
     ctx.resetTransform()
     ctx.scale($pixelRatio, $pixelRatio)
   }
+
 
   function render() {
     requestAnimationFrame(render)
@@ -44,3 +52,11 @@
 <svelte:window on:resize={resize}/>
 <canvas bind:this={canvas}/>
 <slot />
+
+<style>
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+</style>
