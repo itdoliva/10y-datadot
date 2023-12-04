@@ -17,14 +17,14 @@ function getNCats() {
 
 function getCategories(catList, multi=true) {
   if (!multi) {
-    return catList[Math.floor(Math.random() * catList.length)].name
+    return catList[Math.floor(Math.random() * catList.length)].id
   } 
   else {
     const list = [...catList]
     const values = []
     for (let i=0; i<getNCats(); i++) {
       const index = Math.floor(Math.random() * list.length)
-      values.push(list.splice(index, 1)[0].name)
+      values.push(list.splice(index, 1)[0].id)
     }
     return values
   }
@@ -47,18 +47,20 @@ export async function load({ fetch }) {
     const year = firstDt.getFullYear() + Math.floor(Math.random()*10)
 
     const prodList = []
-    prodList.push(products.slice(products.length-2)[Math.random() < .5 ? 0 : 1].name)
-    prodList.push(products.slice(0, products.length-2)[Math.random() < .5 ? 0 : 1].name)
+    prodList.push(products.slice(products.length-2)[Math.random() < .5 ? 0 : 1].id)
+    prodList.push(products.slice(0, products.length-2)[Math.floor(Math.random()*(products.length-2))].id)
 
     nodes.push({ 
       id: i, 
       year,
-      basis: getCategories(channels, false),
+      channel: getCategories(channels, false),
       designs: getCategories(designs),
       goals: getCategories(goals),
       products: prodList
     })
   }
+
+  console.log({nodes})
 
   return {
     nodes,

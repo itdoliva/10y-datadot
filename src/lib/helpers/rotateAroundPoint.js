@@ -1,4 +1,7 @@
 export default function rotateAroundPoint(x, y, cx, cy, theta) {
+  if (theta === 0 || (x === cx && y === cy)) {
+    return [ x , y ]
+  }
   // Translate the point to the origin
   const translatedX = x - cx;
   const translatedY = y - cy;

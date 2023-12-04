@@ -1,12 +1,18 @@
 <script>
   import { getContext, onDestroy, onMount } from "svelte";
   import { nodeSize, colorHeight } from "$lib/store/canvas"
-  import { categories } from "$lib/store/categories"
   import fill from "$lib/drawers/fill"
   import stroke from "$lib/drawers/stroke"
   import getRegPolyPoints from "$lib/drawers/getRegPolyPoints.js"
   import rotateAroundPoint from "$lib/helpers/rotateAroundPoint.js"
   import getColorShape from "$lib/drawers/getColorShapePoints"
+  import { 
+    categories,
+    goals,
+    channels,
+    designs,
+    products
+  } from "$lib/store/categories"
 
   export let node
   export let x = 0
@@ -17,325 +23,310 @@
 
   const { canvasContexts } = getContext("layout")
 
-  onMount(() => canvasContexts.main.add(draw))
-  onDestroy(() => canvasContexts.main.remove(draw))
-
-  $: basisPoints = node.basis !== 'consulting' && getRegPolyPoints(x, y, $nodeSize, node.basis === 'digital' ? 4 : 6)
+  onMount(() => draw(canvasContexts))
+  // onDestroy(() => canvasContexts.main.remove(draw))
 
 
-  function rotateIfNeeded([ px, py ], theta=0) {
-    if ((rotation === undefined && theta === 0) || (px === x && py === y)) {
-      return [ px, py ]
-    }
+  function draw({ main, goals }) {
+    main.add(drawBackElements)
+    main.add(drawChannel)
+    main.add(drawFrontElements)
+    goals.add(drawGoals)
+
+  }
+
+  $: center = [ x, y ]
+  // $: basisPoints = node.basis !== 'consulting' && getRegPolyPoints(x, y, $nodeSize, node.basis === 'digital' ? 4 : 6)
+
+
+  function rotate(arr, theta=0) {
+    // Rotates an array of points [x1, y1, x2, y2, ...] around the center
+    // based on rotation and provided theta
 
     let angle = theta
     
     if (rotation !== undefined) {
-      angle += rotation + Math.PI/2 // Add 90 deg since 0 deg is horizontal
+      angle += rotation + Math.PI/2 // Add 90 deg since 0 deg is horizontal in radial layout
     }
 
-    return rotateAroundPoint(px, py, x, y, angle)
+    const rotated = []
+    for (let i=0; i<arr.length/2; i++) {
+      const pair = arr.slice(i*2, i*2+2)
+      rotated.push(...rotateAroundPoint(...pair, x, y, angle))
+    }
+
+    return rotated
   }
 
-  function linePoints(ctx, points, close=true) {
+
+  function translate(arr) {
+    // Translate given array of a point [x1, y1, x2, y2, ...] to the center of the unit
+    return arr.map((d, i) => d + center[i%2])
+  }
+
+
+  function transform(arr) {
+    // Transform a give array of points [[x1, x2], [x1, x2]...]
+    if (Array.isArray(arr[0])) {
+      return arr.map(p => rotate(translate(p)))
+    }
+    return rotate(translate(arr))
+  }
+
+
+  function linkEdges(ctx, points, close=true) {
+    // Draw a path on the given context
     for (let i=0; i<points.length; i++) {
-      ctx[i === 0 ? 'moveTo' : 'lineTo'](...rotateIfNeeded(points[i]))
+      const cmd = i === 0 ? 'moveTo' : 'lineTo'
+      const [ px, py ] = points[i]
+      ctx[cmd](px, py)
     }
 
-    if (close) {
-      ctx.closePath()
-    }
+    if (close) ctx.closePath()
   }
 
 
-  // BASIS
-  function drawBasis(ctx) {
+  function makeChannel(ctx) {
     ctx.beginPath()
 
-    node.basis === 'consulting'
-      ? ctx.arc(x, y, $nodeSize/2, 0, 2 * Math.PI)
-      : linePoints(ctx, basisPoints)
+    // Consulting (circle)
+    if (node.channel === 2) {
+      return ctx.arc(x, y, $channels.consulting, 0, 2*Math.PI)
+    }
 
+    // Digital or Print (regular polygon)
+    const points = transform($channels[node.channel === 0 ? 'digital' : 'print'])
+    linkEdges(ctx, points)
+  }
+
+
+  function drawChannel(ctx) {
+    makeChannel(ctx)
     fill(ctx, 'white')
     stroke(ctx, 'black', lw)
+  }
 
+  function drawDesignIllustration(ctx) {
+    const { lines } = $designs.illustration
+
+    for (let line of lines) {
+      ctx.beginPath()
+      linkEdges(ctx, transform(line), false)
+      stroke(ctx, 'black', lw)
+    }
   }
 
 
-  function draw(ctx) {
-    drawBackElements(ctx)
-    drawBasis(ctx)
-    drawFrontElements(ctx)
-    drawColoredShapes(ctx)
+  function drawDesignEditorial(ctx) {
+    const { shapes } = $designs.editorial
+
+    for (let shape of shapes) {
+      ctx.beginPath()
+      linkEdges(ctx, transform(shape))
+      stroke(ctx, 'black', lw)
+    }
   }
 
 
-  function drawBackElements(ctx) {
-    // DESIGNS
-    if (node.designs.includes('ilustracao')) {
-      // Common proportion to reduce amount of calculations
-      const cProp = $nodeSize*(.5+.34) 
+  function drawDesignService(ctx) {
+    const { lines, circle } = $designs.service
 
-      const topEdge = [x, y - $nodeSize*(.5+.48)]
-      const leftEdge = [x - cProp, y + cProp]
-      const rightEdge = [x + cProp, y + cProp]
-      const bottomEdge = [x, y + $nodeSize]
-
-      const edges = [ topEdge, leftEdge, rightEdge, bottomEdge ]
-
-      for (let i=0; i<edges.length; i++) {
-        const points = [ 
-          [ x, y ], 
-          edges[i] 
-        ]
-
-        ctx.beginPath()
-        linePoints(ctx, points, false)
-        stroke(ctx, 'black', lw)
-      }
+    for (let line of lines) {
+      ctx.beginPath()
+      linkEdges(ctx, transform(line), false)
+      stroke(ctx, 'black', lw)
     }
 
-    if (node.designs.includes('editorial')) {
-      const cp1 = $nodeSize*.33
-      
-      // Triangle points
-      const tPoints = [
-        [x, y],
-        [x - cp1, y - $nodeSize*.83],
-        [x + cp1, y - $nodeSize*.83],
-      ]
+    ctx.beginPath()
+    ctx.arc(...transform(circle.pos), circle.radius, 0, 2*Math.PI)
+    stroke(ctx, 'black', lw/2)
+  }
 
-      // Square points
-      const sPoints = [
-        [x - cp1, y + $nodeSize/2],
-        [x + cp1, y + $nodeSize/2],
-        [x + cp1, y + $nodeSize*(.5+.16)],
-        [x - cp1, y + $nodeSize*(.5+.16)],
-      ]
 
-      const shapes = [ tPoints, sPoints ]
-      for (let i=0; i<shapes.length; i++) {
-        ctx.beginPath()
-        linePoints(ctx, shapes[i])
-        stroke(ctx, 'black', lw)
-      }
+  function drawDesignUI(ctx) {
+    const { lines } = $designs.ui
+
+    for (let line of lines) {
+      ctx.beginPath()
+      linkEdges(ctx, transform(line), false)
+      stroke(ctx, 'black', lw)
     }
+  }
 
-    if (node.designs.includes('servicos')) {
-      const hlinePoints = [
-        [x-$nodeSize*.8, y+$nodeSize*.33],
-        [x+$nodeSize*.86, y+$nodeSize*.33],
-      ]
 
-      const dlinePoints = [
-        [x-$nodeSize*.48, y+$nodeSize*.85],
-        [x+$nodeSize*.87, y-$nodeSize*.5],
-      ]
+  function drawDesignMotion(ctx) {
+    const { line, circle } = $designs.motion
 
-      const lines = [hlinePoints, dlinePoints]
-      for (let i=0; i<lines.length; i++) {
-        ctx.beginPath()
-        linePoints(ctx, lines[i], false)
-        stroke(ctx, 'black', lw)
-      }
+    ctx.beginPath()
+    linkEdges(ctx, transform(line), false)
+    stroke(ctx, 'black', lw)
+
+    ctx.beginPath()
+    ctx.arc(...transform(circle.pos), circle.radius, 0, 2*Math.PI)
+    fill(ctx, 'white')
+    stroke(ctx, 'black', lw)
+  }
+
+
+  function drawProductVideo(ctx) {
+    const { triangle, circle } = $products.video
+
+    ctx.beginPath()
+    ctx.arc(...transform(circle.pos), circle.radius, 0, 2 * Math.PI)
+    stroke(ctx, 'black', lw)
+
+    ctx.beginPath()
+    linkEdges(ctx, transform(triangle))
+    fill(ctx, 'black')
+  }
+
+
+  function drawProductPublication(ctx) {
+    const { shapes } = $products.publication
+
+    ctx.beginPath()
+    linkEdges(ctx, transform(shapes[0]))
+    fill(ctx, 'black')
+    stroke(ctx, 'black', lw)
+
+    ctx.beginPath()
+    linkEdges(ctx, transform(shapes[1]))
+    stroke(ctx, 'black', lw)
+  }
+
+
+  function drawProductReport(ctx) {
+    const { square } = $products.report
+
+    ctx.beginPath()
+    linkEdges(ctx, transform(square))
+    fill(ctx, 'black')
+  }
+
+
+  function drawProductPresentation(ctx) {
+    const { circle } = $products.presentation
+
+    ctx.beginPath()
+    ctx.arc(...transform(circle.pos), circle.radius, 0, 2*Math.PI)
+    stroke(ctx, 'black', lw)
+  }
+
+
+  function drawProductSiteInstitutional(ctx) {
+    const { triangle, square } = $products.siteInstitutional
+
+    ctx.beginPath()
+    linkEdges(ctx, transform(square))
+    stroke(ctx, 'black', lw)
+
+    ctx.beginPath()
+    linkEdges(ctx, transform(triangle))
+    fill(ctx, 'black')
+  }
+
+
+  function drawProductInfographic(ctx) {
+    const { shapes } = $products.infographic
+
+    ctx.save()
+    makeChannel(ctx)
+    ctx.clip()
+
+    ctx.beginPath()
+    linkEdges(ctx, transform(shapes[0]))
+    stroke(ctx, 'black', lw)
+
+    makeChannel(ctx)
+    ctx.beginPath()
+    linkEdges(ctx, transform(shapes[1]))
+    fill(ctx, 'black')
+
+    ctx.restore()
+  }
+
+
+  function drawProductSiteEditorial(ctx) {
+    const { circle } = $products.siteEditorial
+
+    const t0 = -Math.PI/4 + (rotation ? rotation + Math.PI/2 : 0)
+    const t1 = Math.PI/2 + Math.PI/4 + (rotation ? rotation + Math.PI/2 : 0)
+
+    ctx.beginPath()
+    ctx.arc(x, y, circle.radius, t0, t1)
+    fill(ctx, 'black')
+
+    ctx.beginPath()
+    ctx.arc(x, y, circle.radius, 0, 2*Math.PI)
+    stroke(ctx, 'black', lw)
+  }
+
+
+  function drawProductDashboard(ctx) {
+    const { circles } = $products.dashboard
+
+    const [ px, py ] = transform(circles[0].pos)
+
+    const t0 = Math.PI + (rotation ? rotation + Math.PI/2 : 0)
+    const t1 = 2*Math.PI + (rotation ? rotation + Math.PI/2 : 0)
+    
+    ctx.save()
+    makeChannel(ctx)
+    ctx.clip()
+
+    ctx.beginPath()
+    ctx.arc(px, py, circles[0].radius, t0, t1)
+    stroke(ctx, 'black', lw)
+
+    ctx.beginPath()
+    ctx.arc(px, py, circles[1].radius, t0, t1)
+    fill(ctx, 'black')
+
+    ctx.restore()
+  }
+
+
+  function drawGoals(ctx) {
+    for (let id of node.goals) {
+      const goalPoints = $goals[id].map(translate)
 
       ctx.beginPath()
-      ctx.arc(...rotateIfNeeded([x+$nodeSize*.15, y]), $nodeSize/2, 0, 2*Math.PI)
-      stroke(ctx, 'black', lw/2)
-    }
+      for (let i=0; i<goalPoints.length; i++) {
+        const cur = goalPoints[i]
+        const next = goalPoints[(i+1)%(goalPoints.length)]
 
-    if (node.designs.includes('ui')) {
-      const cprop1= $nodeSize*.83
-      
-      // Upper line points
-      const uline = [
-        [x-cprop1, y-$nodeSize*.5],
-        [x+$nodeSize*.5, y+cprop1],
-      ]
+        const bezierParams = rotate([
+          ...cur.slice(2, 4), 
+          ...next.slice(4, 6),
+          ...next.slice(0, 2)
+        ])
 
-      // Lower line points
-      const lline = [
-        [x-cprop1, y-$nodeSize*.17],
-        [x+$nodeSize*.17, y+cprop1],
-      ]
-
-      const lines = [uline, lline]
-      for (let i=0; i<lines.length; i++) {
-        ctx.beginPath()
-        linePoints(ctx, lines[i], false)
-        stroke(ctx, 'black', lw)
+        ctx.bezierCurveTo(...bezierParams)
       }
+
+      ctx.fillStyle = $categories.goals.find(d => d.id === id).color
+      ctx.fill()
     }
+  }
+
+  function drawBackElements(ctx) {
+    node.designs.includes(0) && drawDesignIllustration(ctx)
+    node.designs.includes(1) && drawDesignEditorial(ctx)
+     node.designs.includes(3) && drawDesignService(ctx)
+    node.designs.includes(4) && drawDesignUI(ctx)
   }
 
   function drawFrontElements(ctx) {
-    // DESIGNS
-    if (node.designs.includes('motion')) {
-      const points = [
-        [x-$nodeSize*.17, y+$nodeSize*.83],
-        [x+$nodeSize*.83, y-$nodeSize*.17],
-      ]
+    node.designs.includes(2) && drawDesignMotion(ctx)
 
-      ctx.beginPath()
-      linePoints(ctx, points, false)
-      stroke(ctx, 'black', lw)
-
-      ctx.beginPath()
-      ctx.arc(x+$nodeSize*.33, y+$nodeSize*.33, $nodeSize*.33/2, 0, 2*Math.PI)
-      fill(ctx, 'white')
-      stroke(ctx, 'black', lw)
-      
-
-    }
-
-    // PRODUCTS
-    if (node.products.includes('anima/video')) {
-      ctx.beginPath()
-      ctx.arc(x, y, $nodeSize/6, 0, 2 * Math.PI)
-      stroke(ctx, 'black', lw)
-
-      // Get triangle points
-      const points = [
-        [x, y],
-        [x + $nodeSize*.12, y + $nodeSize*.2252],
-        [x - $nodeSize*.12, y + $nodeSize*.2252],
-      ]
-
-      ctx.beginPath()
-      linePoints(ctx, points)
-      fill(ctx, 'black')
-    }
-
-    if (node.products.includes('publicacao')) {
-      // Get center square points
-      const cPoints = getRegPolyPoints(x, y, $nodeSize/3, 4)
-
-      ctx.beginPath()
-      linePoints(ctx, cPoints)
-      fill(ctx, 'black')
-      stroke(ctx, 'black', lw)
-
-      // Get upper square points
-      const uPoints = [
-        [x + $nodeSize/6, y - $nodeSize*.15],
-        [x + $nodeSize/6, y - $nodeSize*.32],
-        [x - $nodeSize/6, y - $nodeSize*.32],
-        [x - $nodeSize/6, y - $nodeSize*.15],
-      ]
-
-      ctx.beginPath()
-      linePoints(ctx, uPoints)
-      stroke(ctx, 'black', lw)
-    }
-
-    if (node.products.includes('relatorio')) {
-      // Get center square points
-      const points = getRegPolyPoints(x, y, $nodeSize/3, 4, Math.PI/4)
-
-      ctx.beginPath()
-      linePoints(ctx, points)
-      fill(ctx, 'black')
-    }
-
-    if (node.products.includes('apresentacao')) {
-      ctx.beginPath()
-      ctx.arc(x, y, $nodeSize/6, 0, 2*Math.PI)
-      stroke(ctx, 'black', lw)
-    }
-
-    if (node.products.includes('site-institucional')) {
-      // Square
-      const sPoints = getRegPolyPoints(x, y, $nodeSize/3, 4)
-      
-      ctx.beginPath()
-      linePoints(ctx, sPoints)
-      stroke(ctx, 'black', lw)
-
-      // Triangle
-      sPoints.splice(3, 1)
-
-      ctx.beginPath()
-      linePoints(ctx, sPoints)
-      fill(ctx, 'black')
-    }
-
-    if (node.products.includes('infografico')) {
-      // Outer triangle
-      const oPoints = [
-        [x, y],
-        [x+$nodeSize/2, y+$nodeSize/2],
-        [x-$nodeSize/2, y+$nodeSize/2],
-      ]
-
-      // Inner triangle
-      const iPoints = [
-        [x, y+$nodeSize/3],
-        [x+$nodeSize*.16, y+$nodeSize/2],
-        [x-$nodeSize*.16, y+$nodeSize/2],
-      ]
-
-      ctx.beginPath()
-      linePoints(ctx, oPoints)
-      stroke(ctx, 'black', lw)
-
-      ctx.beginPath()
-      linePoints(ctx, iPoints)
-      fill(ctx, 'black')
-    }
-
-    if (node.products.includes('site-editorial')) {
-      const t0 = -Math.PI/4 + (rotation ? rotation + Math.PI/2 : 0)
-      const t1 = Math.PI/2 + Math.PI/4 + (rotation ? rotation + Math.PI/2 : 0)
-
-      ctx.beginPath()
-      ctx.arc(x, y, $nodeSize/6, t0, t1)
-      fill(ctx, 'black')
-
-      ctx.beginPath()
-      ctx.arc(x, y, $nodeSize/6, 0, 2*Math.PI)
-      stroke(ctx, 'black', lw)
-    }
-
-    if (node.products.includes('dashboard')) {
-      const t0 = Math.PI + (rotation ? rotation + Math.PI/2 : 0)
-      const t1 = 2*Math.PI + (rotation ? rotation + Math.PI/2 : 0)
-
-      const [ px, py ] = rotateIfNeeded([x ,y+$nodeSize/2])
-      ctx.beginPath()
-      ctx.arc(px, py, $nodeSize/2, t0, t1)
-      stroke(ctx, 'black', lw)
-
-      ctx.beginPath()
-      ctx.arc(px, py, $nodeSize/6, t0, t1)
-      fill(ctx, 'black')
-    }
+    node.products.includes(0) && drawProductVideo(ctx)
+    node.products.includes(1) && drawProductPublication(ctx)
+    node.products.includes(2) && drawProductReport(ctx)
+    node.products.includes(3) && drawProductPresentation(ctx)
+    node.products.includes(4) && drawProductSiteInstitutional(ctx)
+    node.products.includes(5) && drawProductSiteEditorial(ctx)
+    node.products.includes(6) && drawProductDashboard(ctx)
+    node.products.includes(7) && drawProductInfographic(ctx)
   }
-
-  function drawColoredShapes(ctx) {
-    for (let i=0; i<node.goals.length; i++) {
-      const goal = $categories.goals.find(d => d.name === node.goals[i])
-      const { points, angle } = getColorShape(x, y, $colorHeight, goal.id)
-
-      ctx.globalCompositeOperation = 'multiply'
-      ctx.beginPath()
-      for (let j=0; j<points.length; j++) {
-        const cur = points[j]
-        const nextI = (j+1)%(points.length)
-        const next = points[nextI]
-
-        ctx.bezierCurveTo(...rotateIfNeeded(cur.a1, angle), ...rotateIfNeeded(next.a2, angle), ...rotateIfNeeded(next.p, angle))
-      }
-      ctx.fillStyle = goal.color
-      ctx.fill()
-      ctx.globalCompositeOperation = 'source-over'
-    }
-  }
-
-
-
-
-
-
-
 
 </script>

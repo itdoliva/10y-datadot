@@ -3,6 +3,8 @@
   import { onMount, setContext, getContext } from 'svelte'
 
   export let key
+  export let composition = 'source-over'
+  export let mixBlendMode = 'normal'
 
   const toDraw = []
 
@@ -38,6 +40,8 @@
 
     ctx.resetTransform()
     ctx.scale($pixelRatio, $pixelRatio)
+
+    ctx.globalCompositeOperation = composition
   }
 
 
@@ -50,7 +54,11 @@
 </script>
 
 <svelte:window on:resize={resize}/>
-<canvas bind:this={canvas}/>
+<canvas 
+  class={key} 
+  style:mix-blend-mode={mixBlendMode}
+  bind:this={canvas} 
+/>
 <slot />
 
 <style>

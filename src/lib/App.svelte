@@ -18,6 +18,7 @@
 {#if $plotWidth > 0}
 <Layout bind:isBlock bind:sortBy>
   <Canvas key="main" />
+  <Canvas key="goals" composition='multiply' mixBlendMode='multiply'/>
   {#each $nodes as node (node.id)}
     <Unit {node} />
   {/each}
