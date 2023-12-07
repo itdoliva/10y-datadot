@@ -60,8 +60,6 @@ export async function load({ fetch }) {
     })
   }
 
-  console.log({nodes})
-
   return {
     nodes,
     dates: [ firstDt, lastDt ],

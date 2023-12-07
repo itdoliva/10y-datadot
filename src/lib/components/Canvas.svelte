@@ -16,6 +16,10 @@
   onMount(() => {
     ctx = canvas.getContext('2d')
 
+    ctx.stroke_ = stroke
+    ctx.fill_ = fill
+    ctx.linkEdges = linkEdges
+
     addCanvasContext(key, { 
       ctx, 
       add: fn => toDraw.push(fn), 
@@ -30,6 +34,28 @@
     resize()
     render()
   })
+
+  function stroke(color='black', width=1) {
+    ctx.strokeStyle = color
+    ctx.lineWidth = width
+    ctx.stroke()
+  }
+
+  function fill(color='black') {
+    ctx.fillStyle = color
+    ctx.fill()
+  }
+
+  function linkEdges(points, close=true) {
+    // Draw a path on the given context
+    for (let i=0; i<points.length; i++) {
+      const cmd = i === 0 ? 'moveTo' : 'lineTo'
+      const [ px, py ] = points[i]
+      ctx[cmd](px, py)
+    }
+
+    if (close) ctx.closePath()
+  }
 
 
   function resize() {

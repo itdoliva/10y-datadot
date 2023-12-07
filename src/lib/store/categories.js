@@ -1,7 +1,7 @@
 import { writable, derived } from "svelte/store";
 import * as d3 from 'd3'
 import { nodeSize, colorHeight } from "$lib/store/canvas"
-import getRegPolyPoints from "$lib/drawers/getRegPolyPoints";
+import getRegPolyPoints from "$lib/helpers/getRegPolyPoints";
 import rotateAroundPoint from "$lib/helpers/rotateAroundPoint";
 
 export const categories = writable({})
@@ -177,7 +177,8 @@ export const siteInstitutional = derived(props, $p => {
   const square = getRegPolyPoints(0, 0, $p[33], 4)
 
   // Triangle
-  const triangle = [...square].splice(3, 1)
+  const triangle = [...square]
+  triangle.splice(3, 1)
 
   return { triangle, square }
 })
