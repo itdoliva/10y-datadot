@@ -2,8 +2,7 @@
   import { setContext } from "svelte";
   import { writable, derived } from "svelte/store";
   import * as d3 from "d3";
-  import { nodes } from "$lib/store/canvas";
-  import getScale from "$lib/helpers/getScale"
+  import { width, height, nNodes, nodes, figureWidth, figureHeight, nodeSize, gap } from "$lib/store/canvas";
 
   export let isBlock
   export let sortBy
@@ -19,36 +18,7 @@
   $: $_isBlock = isBlock
   $: $_sortBy = sortBy
 
-
-  // General Variables
-  const xScale_d = derived(([_isBlock, _sortBy]), ([$isBlock, $sortBy]) => {
-    return getScale('x', $isBlock, $sortBy)
-  })
-
-  const groupedNodes_d = derived(([_isBlock, _sortBy]), ([$isBlock, $sortBy]) => {
-    return groupNodes($isBlock, $sortBy)
-  })
-
-
-  // Radial Specific
-  const nBars_d = derived(([_isBlock, groupedNodes_d]), ([$isBlock, $groupedNodes]) => {
-    const nBars = !$isBlock && ~~(d3.max([...$groupedNodes.values()], d => d.length) / radMaxStacks)
-    return nBars
-  })
-
-
-  const barPosScale_d = derived(([_isBlock, nBars_d, xScale_d]), ([$isBlock, $nBars, $xScale]) => {
-    return !$isBlock && d3.scaleBand()
-      .domain(d3.range(0, $nBars, 1))
-      .range([0, $xScale.bandwidth()])
-  })
-
-
   // Functions
-  function groupNodes(isBlock, sortBy) {
-    return !isBlock && d3.group($nodes, d => d[sortBy])
-  }
-
   function sortIds(sortBy) {
     nodes.update(oldNodes => {
       return oldNodes
@@ -57,23 +27,115 @@
     })
   }
 
+  
+  const getPos_d = derived([_isBlock, _sortBy, nNodes, nodeSize, gap, figureWidth, figureHeight], 
+  ([$isBlock, $sortBy, $nNodes, $nodeSize, $gap, $figureWidth, $figureHeight]) => {
+    // --------------- //
+    // Blocked Layout
+    // --------------- //
+    if ($isBlock) {
+      const aspectRatio = $figureWidth / $figureHeight
+      let rows = Math.ceil(Math.sqrt($nNodes / aspectRatio))
+      let columns = Math.ceil(aspectRatio * rows)
+
+      let blockWidth = columns * ($nodeSize + $gap) - $gap
+      while (blockWidth > $figureWidth) {
+        columns--
+        blockWidth = columns * ($nodeSize + $gap) - $gap
+        rows = Math.ceil($nNodes / columns)
+      }
+
+      const blockHeight = Math.ceil($nNodes / columns) * ($nodeSize + $gap) - $gap
+
+
+      const padding = {
+        left: ($figureWidth - blockWidth)/2,
+        top: ($figureHeight - blockHeight)/2
+      }
+
+      return ({ i }) => {
+        // Calculate the row and column indices for the given i
+        const iCol = Math.floor(i % columns)
+        const iRow = Math.floor(i / columns)
+
+        const x = iCol * ($nodeSize + $gap) + $nodeSize/2 + padding.left
+        const y = iRow * ($nodeSize + $gap) + $nodeSize/2 + padding.top
+
+        return { x, y }
+      }
+    }
+
+    // --------------- //
+    // Radial Layout
+    // --------------- //
+    else {
+      const groupedNodes = d3.group($nodes, d => d[$sortBy])
+
+      const domain = $sortBy === 'year'
+        ? d3.range(2014, 2024, 1)
+        : [ 0, 1 ]
+
+      const xScale = d3.scaleBand()
+        .domain(domain)
+        .range([ 0, 2*Math.PI ])
+        .paddingInner(.2)
+        .paddingOuter(.1)
+
+      const nBars = ~~(d3.max([...groupedNodes.values()], d => d.length) / radMaxStacks)
+      const barPosScale = d3.scaleBand()
+        .domain(d3.range(0, nBars, 1))
+        .range([0, xScale.bandwidth()])
+
+      return (node) => {
+        // Get category of sector
+        const category = node[$sortBy]
+
+        // Get occurrence of this node in the group of nodes with the same category
+        const catNodes = groupedNodes.get(category)
+        const nodeIndex = catNodes.findIndex(d => d.id === node.id)
+        const barIndex = Math.floor(nodeIndex / radMaxStacks)
+        const stackIndex = nodeIndex % radMaxStacks
+
+        const radians = xScale(category) + barPosScale(barIndex)
+        const radius = 200 + stackIndex * ($nodeSize + $gap)
+        
+        const x = Math.cos(radians) * radius + $figureWidth/2
+        const y = Math.sin(radians) * radius + $figureHeight/2
+
+        return { x, y, rotation: radians }
+      }
+    }
+  })
+
+
+
+
 
   $: context = {
     canvasContexts,
     addCanvasContext: (key, ctx) => canvasContexts[key] = ctx,
 
-    isBlock: _isBlock,
-    sortBy: _sortBy,
-    xScale: xScale_d,
-    groupedNodes: groupedNodes_d,
-
-    radMaxStacks,
-    radTotalBars: nBars_d,
-    radBarPos: barPosScale_d
+    getPos: getPos_d,
   }
 
   $: setContext('layout', context)
 
 </script>
 
-<slot />
+
+<div 
+  class="wrapper"
+  bind:clientWidth={$figureWidth}
+  bind:clientHeight={$figureHeight}
+>
+  {#if $figureWidth > 150}
+    <slot />
+  {/if}
+</div>
+
+<style>
+  .wrapper {
+    width: 100%;
+    height: 100%;
+  }
+</style>

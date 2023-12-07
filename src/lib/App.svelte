@@ -1,5 +1,5 @@
 <script>
-  import { width, height, pixelRatio, nodes, nodeSize, gap, plotWidth, padding } from "$lib/store/canvas";
+  import { width, height, pixelRatio, nodes } from "$lib/store/canvas";
 
   import Canvas from "$lib/components/Canvas.svelte";
   import Unit from "$lib/components/Unit.svelte";
@@ -15,7 +15,6 @@
   bind:devicePixelRatio={$pixelRatio} 
 />
 
-{#if $plotWidth > 0}
 <Layout bind:isBlock bind:sortBy>
   <Canvas key="main" />
   <Canvas key="goals" composition='multiply' mixBlendMode='multiply'/>
@@ -23,7 +22,6 @@
     <Unit {node} />
   {/each}
 </Layout>
-{/if}
 
 <button 
   style:position='fixed'
