@@ -2,7 +2,17 @@
   import { setContext } from "svelte";
   import { writable, derived } from "svelte/store";
   import * as d3 from "d3";
-  import { figureWidth, figureHeight } from "$lib/store/canvas";
+  import { 
+    figureWidth, 
+    figureHeight, 
+    cameraOffset, 
+    dragStart, 
+    isDragging, 
+    initialPinchDistance, 
+    zoom, 
+    lastZoom, 
+    zoomSensitivity 
+  } from "$lib/store/canvas";
   import { nodes, nNodes, nodeSize, gap } from "$lib/store/nodes";
 
   export let isBlock
@@ -109,9 +119,6 @@
   })
 
 
-
-
-
   $: context = {
     canvasContexts,
     addCanvasContext: (key, ctx) => canvasContexts[key] = ctx,
@@ -121,6 +128,83 @@
 
   $: setContext('layout', context)
 
+
+  // Event Handlers
+  // Gets the relevant location from a mouse or single touch event
+  function getEventLocation(e) {
+    if (e.touches && e.touches.length == 1) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY }
+    }
+    else if (e.clientX && e.clientY) {
+      return { x: e.clientX, y: e.clientY }        
+    }
+  }
+
+  function onPointerDown(e) {
+    const { x, y } = getEventLocation(e)
+    dragStart.set(x - $cameraOffset.x, y - $cameraOffset.y)
+    isDragging.set(true)
+  }
+
+
+  function onPointerUp(e) {
+      isDragging.set(false)
+      initialPinchDistance.set(null)
+      lastZoom.set($zoom)
+  }
+
+
+  function onPointerMove(e) {
+    if ($isDragging) {
+      const { x, y } = getEventLocation(e)
+      cameraOffset.set(x - $dragStart.x, y - $dragStart.y)
+    }
+  }
+
+
+  function adjustZoom({ deltaY }, zoomFactor) {
+    if ($isDragging) {
+      return
+    }
+
+    if (deltaY) {
+      const zoomAmount = deltaY * $zoomSensitivity
+      zoom.updateK(-zoomAmount)
+    }
+    else if (zoomFactor) {
+      zoom.setK(zoomFactor*$lastZoom)
+    }
+  }
+
+
+  function handleTouch(e, singleTouchHandler) {
+    if (e.touches.length == 1 ) {
+      singleTouchHandler(e)
+    }
+    else if (e.type == "touchmove" && e.touches.length == 2) {
+      isDragging.set(false)
+      handlePinch(e)
+    }
+  }
+
+
+  function handlePinch(e) {
+    e.preventDefault()
+    
+    const touch1 = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+    const touch2 = { x: e.touches[1].clientX, y: e.touches[1].clientY }
+    
+    // This is distance squared, but no need for an expensive sqrt as it's only used in ratio
+    const currentDistance = (touch1.x - touch2.x)**2 + (touch1.y - touch2.y)**2
+    
+    if ($initialPinchDistance == null) {
+      initialPinchDistance.set(currentDistance)
+    }
+    else {
+      adjustZoom(null, currentDistance/$initialPinchDistance )
+    }
+  }
+
 </script>
 
 
@@ -128,6 +212,13 @@
   class="wrapper"
   bind:clientWidth={$figureWidth}
   bind:clientHeight={$figureHeight}
+  on:mousedown={onPointerDown}
+  on:mouseup={onPointerUp}
+  on:mousemove={onPointerMove}
+  on:wheel={adjustZoom}
+  on:touchstart={e => handleTouch(e, onPointerDown)}
+  on:touchend={e => handleTouch(e, onPointerUp)}
+  on:touchmove={e => handleTouch(e, onPointerMove)}
 >
   {#if $figureWidth > 100}
     <slot />

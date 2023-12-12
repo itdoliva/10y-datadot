@@ -24,6 +24,7 @@
     products
   } from "$lib/store/categories"
 
+  import { isDragging } from "$lib/store/canvas"
 	import rotateAroundPoint from '$lib/helpers/rotateAroundPoint'
   import Path from "$lib/components/atoms/Path.svelte";
 
@@ -149,7 +150,8 @@
   <Path canvas="main" makePath={productSiteEditorial($products.siteEditorial, { transform, getRotation })} />
 {/if}
 
-<!-- {#each node.goals as id}
-  <Path canvas="goals" makePath={goal($goals[id], { transform, getFillStyle: () => $categories.goals.find(d => d.id === id).color })} />
-{/each} -->
-
+<!-- {#if !$isDragging}
+  {#each node.goals as id}
+    <Path canvas="goals" makePath={goal($goals[id], { transform, getFillStyle: () => $categories.goals.find(d => d.id === id).color })} />
+  {/each}
+{/if} -->

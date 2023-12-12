@@ -1,5 +1,5 @@
 <script>
-  import { width, height, pixelRatio } from "$lib/store/canvas"
+  import { width, height, pixelRatio, cameraOffset, zoom, isDragging } from "$lib/store/canvas"
   import { onMount, getContext } from 'svelte'
 
   export let key
@@ -65,7 +65,7 @@
     canvas.style.height = $height + 'px'
 
     ctx.resetTransform()
-    ctx.scale($pixelRatio, $pixelRatio)
+    ctx.scale($zoom, $zoom)
 
     ctx.globalCompositeOperation = composition
   }
@@ -73,7 +73,12 @@
 
   function render() {
     requestAnimationFrame(render)
+
+    ctx.resetTransform()
     ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.translate($cameraOffset.x, $cameraOffset.y)
+    ctx.scale($zoom, $zoom)
+    ctx.translate(-$cameraOffset.x, -$cameraOffset.y)
     toDraw.forEach(fn => fn(ctx))
   }
 
