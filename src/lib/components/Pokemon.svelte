@@ -149,7 +149,7 @@
   <Path canvas="main" makePath={productSiteEditorial($products.siteEditorial, { transform, getRotation })} />
 {/if}
 
-{#each node.goals as id}
+<!-- {#each node.goals as id}
   <Path canvas="goals" makePath={goal($goals[id], { transform, getFillStyle: () => $categories.goals.find(d => d.id === id).color })} />
-{/each}
+{/each} -->
 

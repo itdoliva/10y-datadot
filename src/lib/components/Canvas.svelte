@@ -1,6 +1,6 @@
 <script>
-  import { width, height, pixelRatio } from "$lib/store/canvas"
-  import { onMount, setContext, getContext } from 'svelte'
+  import { width, height, figureWidth, figureHeight, pixelRatio } from "$lib/store/canvas"
+  import { onMount, getContext } from 'svelte'
 
   export let key
   export let composition = 'source-over'

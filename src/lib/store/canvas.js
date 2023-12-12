@@ -10,14 +10,11 @@ export const figureHeight = writable(100);
 export const nodes = writable([])
 export const nNodes = derived(nodes, $nodes => $nodes.length);
 
-export const gap = derived(pixelRatio, ($pixelRatio) => {
-  return 18
-});
 
-export const nodeSize = derived(([ width, pixelRatio ]), ([ $width, $pixelRatio ]) => {
+export const nodeSize = derived(([ width ]), ([ $width ]) => {
   // Mobile
   if ($width <= 768) {
-    return 60
+    return 25
   }
   // Desktops
   if ($width <= 1800) {
@@ -26,6 +23,10 @@ export const nodeSize = derived(([ width, pixelRatio ]), ([ $width, $pixelRatio 
   // Large Desktops
   return 25
 })
+
+export const gap = derived(nodeSize, ($nodeSize) => {
+  return .9*$nodeSize
+});
 
 export const colorHeight = derived((nodeSize), ($nodeSize) => {
   return $nodeSize * 1.25

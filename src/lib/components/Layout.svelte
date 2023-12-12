@@ -128,7 +128,7 @@
   bind:clientWidth={$figureWidth}
   bind:clientHeight={$figureHeight}
 >
-  {#if $figureWidth > 150}
+  {#if $figureWidth > 100}
     <slot />
   {/if}
 </div>
