@@ -1,6 +1,6 @@
 import { writable, derived } from "svelte/store";
 import * as d3 from 'd3'
-import { nodeSize, colorHeight } from "$lib/store/canvas"
+import { nodeSize, colorHeight } from "$lib/store/nodes"
 import getRegPolyPoints from "$lib/helpers/getRegPolyPoints";
 import rotateAroundPoint from "$lib/helpers/rotateAroundPoint";
 

@@ -2,7 +2,8 @@
   import { setContext } from "svelte";
   import { writable, derived } from "svelte/store";
   import * as d3 from "d3";
-  import { width, height, nNodes, nodes, figureWidth, figureHeight, nodeSize, gap } from "$lib/store/canvas";
+  import { figureWidth, figureHeight } from "$lib/store/canvas";
+  import { nodes, nNodes, nodeSize, gap } from "$lib/store/nodes";
 
   export let isBlock
   export let sortBy

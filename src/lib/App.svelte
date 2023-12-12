@@ -1,5 +1,6 @@
 <script>
-  import { width, height, pixelRatio, nodes } from "$lib/store/canvas";
+  import { width, height, pixelRatio } from "$lib/store/canvas";
+  import { nodes } from "$lib/store/nodes";
 
   import Canvas from "$lib/components/Canvas.svelte";
   import Unit from "$lib/components/Unit.svelte";

@@ -1,5 +1,5 @@
 <script>
-  import { width, height, figureWidth, figureHeight, pixelRatio } from "$lib/store/canvas"
+  import { width, height, pixelRatio } from "$lib/store/canvas"
   import { onMount, getContext } from 'svelte'
 
   export let key
