@@ -1,5 +1,5 @@
 <script>
-  import { width, height, pixelRatio, cameraOffset, zoom, isDragging } from "$lib/store/canvas"
+  import { width, height, pixelRatio, cameraOffset, zoom } from "$lib/store/canvas"
   import { onMount, getContext } from 'svelte'
 
   export let key
@@ -78,9 +78,9 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.translate($cameraOffset.x, $cameraOffset.y)
     ctx.scale($zoom, $zoom)
-    ctx.translate(-$cameraOffset.x, -$cameraOffset.y)
     toDraw.forEach(fn => fn(ctx))
   }
+
 
 </script>
 
