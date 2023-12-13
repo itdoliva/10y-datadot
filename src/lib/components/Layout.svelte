@@ -21,26 +21,51 @@
 
   const _isBlock = writable(isBlock)
   const _sortBy = writable(sortBy)
-  
+
+
   $: sortIds(sortBy)
 
   $: $_isBlock = isBlock
   $: $_sortBy = sortBy
 
-  // $: console.log({ x: $cameraOffset.x, y: $cameraOffset.y })
+  $: $_isBlock, resetZoom()
+
 
   onMount(() => {
-    const zoomBehavior = d3.zoom()
-      .on("zoom", ({ transform }) => {
-        cameraOffset.set(transform.x, transform.y)
-        zoom.setK(transform.k)
-      })
-      .on("start", () => isDragging.set(true))
-      .on("end", () => isDragging.set(false))
+    d3.select(wrapper).call(zoomBehaviour)
+  })  
 
+  // Zoom functions
+  const zoomBehaviour = d3.zoom()
+    .on("start", onZoomStart)
+    .on("zoom", zoomed)
+    .on("end", onZoomEnd)
+  
+
+  function resetZoom() {
     d3.select(wrapper)
-      .call(zoomBehavior)
-  })
+      .transition()
+      .duration(1000)
+      .ease(d3.easeCubicInOut)
+      .call(zoomBehaviour.transform, d3.zoomIdentity)
+  }
+
+
+  function zoomed({ transform }) {
+    cameraOffset.set(transform.x, transform.y)
+    zoom.setK(transform.k)
+  }
+
+
+  function onZoomStart() {
+    isDragging.set(true)
+  }
+
+
+  function onZoomEnd() {
+    isDragging.set(false)
+  }
+
 
   // Functions
   function sortIds(sortBy) {
