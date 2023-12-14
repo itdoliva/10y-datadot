@@ -1,5 +1,4 @@
 import { derived, writable } from "svelte/store";
-import { tweened } from "svelte/motion";
 import { cubicInOut } from "svelte/easing";
 
 export const width = writable(100)
@@ -20,7 +19,12 @@ export const cameraOffsetY = writable(0)
 
 export const cameraOffset = derived(([ cameraOffsetX , cameraOffsetY, pixelRatio ]), 
 ([ $cameraOffsetX, $cameraOffsetY, $pixelRatio ]) => {
-  return { x: $cameraOffsetX*$pixelRatio, y: $cameraOffsetY*$pixelRatio }
+  return { 
+    x_: $cameraOffsetX,
+    y_: $cameraOffsetY,
+    x: $cameraOffsetX*$pixelRatio, 
+    y: $cameraOffsetY*$pixelRatio 
+  }
 })
 
 cameraOffset.set = (x, y) => {

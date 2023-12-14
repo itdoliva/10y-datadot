@@ -3,6 +3,8 @@
   import { writable, derived } from "svelte/store";
   import * as d3 from "d3";
   import { 
+    width,
+    height,
     figureWidth, 
     figureHeight, 
     cameraOffset, 
@@ -10,6 +12,7 @@
     isDragging
   } from "$lib/store/canvas";
   import { nodes, nNodes, nodeSize, gap } from "$lib/store/nodes";
+  import getBlockConfig from "$lib/helpers/getBlockConfig"
 
   export let isBlock
   export let sortBy
@@ -18,40 +21,69 @@
 
   const canvasContexts = {}
   const radMaxStacks = 10
+  const innerRadius = 180
+
+  const zoomBehaviour = d3.zoom()
+    .on("start", onZoomStart)
+    .on("zoom", zoomed)
+    .on("end", onZoomEnd)
+
 
   const _isBlock = writable(isBlock)
   const _sortBy = writable(sortBy)
+  const _translateExtent = writable(null)
+  const _scaleExtent = writable(null)
 
 
   $: sortIds(sortBy)
 
   $: $_isBlock = isBlock
-  $: $_sortBy = sortBy
-
   $: $_isBlock, resetZoom()
-
+  $: $_sortBy = sortBy
+  $: updateExtents($_isBlock, $width, $height, $figureWidth, $figureHeight)
+  // $: console.log({ extent: zoomBehaviour.extent(), translateExtent: zoomBehaviour.translateExtent() })
 
   onMount(() => {
-    d3.select(wrapper).call(zoomBehaviour)
+    d3.select(wrapper)
+      .call(zoomBehaviour)
+      .on("wheel", event => event.preventDefault())
   })  
 
-  // Zoom functions
-  const zoomBehaviour = d3.zoom()
-    .on("start", onZoomStart)
-    .on("zoom", zoomed)
-    .on("end", onZoomEnd)
-  
 
-  function resetZoom() {
+  // Zoom functions
+  function updateExtents(isBlock, ww, wh, fw, fh) {
+    const extentX = [0, fw]
+    const extentY = [0, fh]
+    const extent = extentX.map((_, i) => [ extentX[i], extentY[i] ])
+    zoomBehaviour.extent(extent)
+
+    if (ww < 768 && !isBlock) {
+      zoomBehaviour.scaleExtent([.3, 1])
+    }
+    else {
+      zoomBehaviour.scaleExtent([1, 1])
+    }
+  }
+
+
+  function resetZoom(duration=1000) {
     d3.select(wrapper)
       .transition()
-      .duration(1000)
+      .duration(duration)
       .ease(d3.easeCubicInOut)
       .call(zoomBehaviour.transform, d3.zoomIdentity)
   }
 
 
   function zoomed({ transform }) {
+    console.log({ 
+      k: +transform.k.toFixed(1), 
+      x: +transform.x.toFixed(1), 
+      y: +transform.y.toFixed(1), 
+    }, {
+      extent: zoomBehaviour.extent(),
+      translateExtent: zoomBehaviour.translateExtent(),
+    })
     cameraOffset.set(transform.x, transform.y)
     zoom.setK(transform.k)
   }
@@ -83,24 +115,27 @@
     // Blocked Layout
     // --------------- //
     if ($isBlock) {
-      const aspectRatio = $figureWidth / $figureHeight
-      let rows = Math.ceil(Math.sqrt($nNodes / aspectRatio))
-      let columns = Math.ceil(aspectRatio * rows)
 
-      let blockWidth = columns * ($nodeSize + $gap) - $gap
-      while (blockWidth > $figureWidth) {
-        columns--
-        blockWidth = columns * ($nodeSize + $gap) - $gap
-        rows = Math.ceil($nNodes / columns)
+      const { columns, blockWidth, blockHeight } = getBlockConfig($nNodes, $nodeSize, $gap, $figureWidth, $figureHeight)
+
+      const padding = {}
+      padding.left = ($figureWidth - blockWidth)/2
+
+      let tExtentY
+      if (blockHeight < $figureHeight) {
+        padding.top = ($figureHeight - blockHeight)/2
+        tExtentY = [0, $figureHeight]
+      }
+      else {
+        padding.top = $nodeSize
+        tExtentY = [0, blockHeight + 2*$nodeSize]
       }
 
-      const blockHeight = Math.ceil($nNodes / columns) * ($nodeSize + $gap) - $gap
+      // Adjust zoom
+      const tExtentX = [0, $figureWidth]
+      zoomBehaviour.translateExtent(tExtentX.map((_, i) => [ tExtentX[i], tExtentY[i] ]))
+      resetZoom(0)
 
-
-      const padding = {
-        left: ($figureWidth - blockWidth)/2,
-        top: ($figureHeight - blockHeight)/2
-      }
 
       return ({ i }) => {
         // Calculate the row and column indices for the given i
@@ -124,16 +159,41 @@
         ? d3.range(2014, 2024, 1)
         : [ 0, 1 ]
 
+      const innerPad = .15
       const xScale = d3.scaleBand()
         .domain(domain)
         .range([ 0, 2*Math.PI ])
-        .paddingInner(.2)
-        .paddingOuter(.1)
+        .paddingInner(innerPad)
+        .paddingOuter(innerPad/2)
 
       const nBars = ~~(d3.max([...groupedNodes.values()], d => d.length) / radMaxStacks)
       const barPosScale = d3.scaleBand()
         .domain(d3.range(0, nBars, 1))
         .range([0, xScale.bandwidth()])
+
+      const padding = {
+        left: $figureWidth/2,
+        top: $figureHeight/2
+      }
+
+    
+      const layoutSize = 2*(innerRadius + radMaxStacks * ($nodeSize + $gap))
+      let tExtentX = [0, $figureWidth]
+      let tExtentY = [0, $figureHeight]
+
+      if (layoutSize > $figureWidth) {
+        const exceed = layoutSize - $figureWidth
+        tExtentX = [-exceed/2, $figureWidth+exceed/2]
+      }
+
+      if (layoutSize > $figureHeight) {
+        const exceed = layoutSize - $figureHeight
+        tExtentY = [-exceed/2, $figureHeight+exceed/2]
+      }
+
+      // Adjust zoom
+      zoomBehaviour.translateExtent(tExtentX.map((_, i) => [ tExtentX[i], tExtentY[i] ]))
+      resetZoom(0)
 
       return (node) => {
         // Get category of sector
@@ -146,10 +206,10 @@
         const stackIndex = nodeIndex % radMaxStacks
 
         const radians = xScale(category) + barPosScale(barIndex)
-        const radius = 200 + stackIndex * ($nodeSize + $gap)
+        const radius = innerRadius + stackIndex * ($nodeSize + $gap)
         
-        const x = Math.cos(radians) * radius + $figureWidth/2
-        const y = Math.sin(radians) * radius + $figureHeight/2
+        const x = Math.cos(radians) * radius + padding.left
+        const y = Math.sin(radians) * radius + padding.top
 
         return { x, y, rotation: radians }
       }
@@ -160,7 +220,6 @@
   $: context = {
     canvasContexts,
     addCanvasContext: (key, ctx) => canvasContexts[key] = ctx,
-
     getPos: getPos_d,
   }
 
@@ -172,8 +231,8 @@
 
 
 <div 
-  bind:this={wrapper}
   class="wrapper"
+  bind:this={wrapper}
   bind:clientWidth={$figureWidth}
   bind:clientHeight={$figureHeight}
 >
