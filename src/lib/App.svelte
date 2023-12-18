@@ -6,8 +6,13 @@
   import Unit from "$lib/components/Unit.svelte";
   import Layout from "$lib/components/Layout.svelte";
 
-  let isBlock = false
+  let layout = 'radial'
   let sortBy = 'year'
+
+  function switchLayout() {
+    console.log('switch')
+    layout = layout === 'radial' ? 'block' : 'radial'
+  }
 </script>
 
 <svelte:window
@@ -16,7 +21,7 @@
   bind:devicePixelRatio={$pixelRatio} 
 />
 
-<Layout bind:isBlock bind:sortBy>
+<Layout bind:layout bind:sortBy>
   <Canvas key="main" />
   <Canvas key="goals" composition='multiply' mixBlendMode='multiply'/>
   {#each $nodes as node (node.id)}
@@ -28,7 +33,7 @@
   style:position='fixed'
   style:top="12px"
   style:right="12px"
-  on:click={() => isBlock = !isBlock}
+  on:click={switchLayout}
 >
-  {isBlock ? 'Block' : 'Radial'}
+  {layout.toUpperCase()}
 </button>

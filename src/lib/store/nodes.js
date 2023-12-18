@@ -25,3 +25,12 @@ export const gap = derived(nodeSize, ($nodeSize) => {
 export const colorHeight = derived((nodeSize), ($nodeSize) => {
   return $nodeSize * 1.25
 })
+
+
+export function sortIds(sortBy) {
+  nodes.update(oldNodes => {
+    return oldNodes
+      .sort((a, b) => a[sortBy] - b[sortBy])
+      .map((item, i) => ({ ...item, i }))
+  })
+}

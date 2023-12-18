@@ -92,6 +92,7 @@
 
 </script>
 
+{#if x !== undefined && y !== undefined}
 <!-- BEHIND BASIS -->
 {#if node.designs.includes(0)}
   <Path canvas="main" makePath={designIllustration($designs.illustration, { transform })} />
@@ -156,3 +157,4 @@
     <Path canvas="goals" makePath={goal($goals[id], { transform, getFillStyle: () => $categories.goals.find(d => d.id === id).color })} />
   {/each}
 {/if} -->
+{/if}

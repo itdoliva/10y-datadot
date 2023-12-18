@@ -1,47 +1,54 @@
 <script>
-  import { onMount, setContext } from "svelte";
+  import { onMount, beforeUpdate, setContext } from "svelte";
+  import { tweened } from "svelte/motion";
   import { writable, derived } from "svelte/store";
   import * as d3 from "d3";
+  import { gsap } from "gsap"
   import { 
     width,
     height,
     figureWidth, 
     figureHeight, 
-    cameraOffset, 
-    zoom, 
-    isDragging
   } from "$lib/store/canvas";
-  import { nodes, nNodes, nodeSize, gap } from "$lib/store/nodes";
+  import { zoomBehaviour } from "$lib/store/zoom";
+  import { nodes, nNodes, nodeSize, gap, sortIds } from "$lib/store/nodes";
   import getBlockConfig from "$lib/helpers/getBlockConfig"
+  import getRadialConfig from "$lib/helpers/getRadialConfig"
 
-  export let isBlock
+  export let layout
   export let sortBy
 
   let wrapper
 
   const canvasContexts = {}
+
+
+
+  // Radial layout
   const radMaxStacks = 10
   const innerRadius = 180
 
-  const zoomBehaviour = d3.zoom()
-    .on("start", onZoomStart)
-    .on("zoom", zoomed)
-    .on("end", onZoomEnd)
+  // Transition duration
+  const duration = 1000
 
+  const blockParams = {}
+  blockParams.colEntranceUpTo = duration/1000 * .2
+  blockParams.fullColEntranceDuration = duration/1000 - blockParams.colEntranceUpTo
 
-  const _isBlock = writable(isBlock)
+  // Stores
   const _sortBy = writable(sortBy)
-  const _translateExtent = writable(null)
-  const _scaleExtent = writable(null)
+  
+  const _layout = writable(layout)
+  const _state = writable('idle')
+  const _ticker = tweened(0, { duration })
+  const _config = writable()
+  const _padding = writable()
 
 
   $: sortIds(sortBy)
+  $: $_layout, resetZoom()
+  $: updateExtents($_layout, $width, $height, $figureWidth, $figureHeight)
 
-  $: $_isBlock = isBlock
-  $: $_isBlock, resetZoom()
-  $: $_sortBy = sortBy
-  $: updateExtents($_isBlock, $width, $height, $figureWidth, $figureHeight)
-  // $: console.log({ extent: zoomBehaviour.extent(), translateExtent: zoomBehaviour.translateExtent() })
 
   onMount(() => {
     d3.select(wrapper)
@@ -50,14 +57,25 @@
   })  
 
 
+  beforeUpdate(() => {
+    if($_state != 'idle') {
+      return
+    }
+
+    if ($_layout != layout) {
+      switchLayout(layout)
+    }
+  })
+
+
   // Zoom functions
-  function updateExtents(isBlock, ww, wh, fw, fh) {
+  function updateExtents(layout, ww, wh, fw, fh) {
     const extentX = [0, fw]
     const extentY = [0, fh]
     const extent = extentX.map((_, i) => [ extentX[i], extentY[i] ])
     zoomBehaviour.extent(extent)
 
-    if (ww < 768 && !isBlock) {
+    if (ww < 768 && layout === 'radial') {
       zoomBehaviour.scaleExtent([.3, 1])
     }
     else {
@@ -75,144 +93,122 @@
   }
 
 
-  function zoomed({ transform }) {
-    console.log({ 
-      k: +transform.k.toFixed(1), 
-      x: +transform.x.toFixed(1), 
-      y: +transform.y.toFixed(1), 
-    }, {
-      extent: zoomBehaviour.extent(),
-      translateExtent: zoomBehaviour.translateExtent(),
+  // Layouts
+  function blockLayout(nNodes, nodeSize, gap, fw, fh) {
+    const { 
+      rows,
+      columns,
+      padding,
+      extent,
+    } = getBlockConfig(nNodes, nodeSize, gap, fw, fh)
+
+    // The below calculations support block entrance animation
+    const length = 100
+    const dist = Array.from({ length }, d3.randomInt(columns))
+    const bin = d3.bin().thresholds(d3.range(columns))
+    const density = bin(dist).map(d => d.length/length)
+    const maxDensity = d3.max(density)
+    const normalizedDensity = density.map(d => +(d/maxDensity).toFixed(1))
+
+    const timeStepByRow = +(blockParams.fullColEntranceDuration / rows).toFixed(4)
+
+    _padding.set(padding)
+    _config.set({
+      rows,
+      columns,
+      columnDensities: normalizedDensity,
+      timeStepByRow
     })
-    cameraOffset.set(transform.x, transform.y)
-    zoom.setK(transform.k)
+
+    // Adjust zoom
+    zoomBehaviour.translateExtent(extent)
+    resetZoom(0)
+
+    return ({ i }) => {
+      // Calculate the row and column indices for the given i
+      const column = Math.floor(i % columns)
+      const row = Math.floor(i / columns)
+
+      const x = column * (nodeSize + gap) + nodeSize/2
+      const y = row * (nodeSize + gap) + nodeSize/2
+
+      return { x, y, data: { row, column } }
+    }
   }
 
 
-  function onZoomStart() {
-    isDragging.set(true)
-  }
+  function radialLayout(nodes, nodeSize, gap, sortBy, fw, fh) {
+    const {
+      padding,
+      extent,
+      grouped,
+      sectorRadiansScale,
+      pileRadiansScale
+    } = getRadialConfig(nodes, nodeSize, gap, sortBy, innerRadius, radMaxStacks, fw, fh)
 
-
-  function onZoomEnd() {
-    isDragging.set(false)
-  }
-
-
-  // Functions
-  function sortIds(sortBy) {
-    nodes.update(oldNodes => {
-      return oldNodes
-        .sort((a, b) => a[sortBy] - b[sortBy])
-        .map((item, i) => ({ ...item, i }))
+    _padding.set(padding)
+    _config.set({
+      grouped,
+      sectorRadiansScale,
+      pileRadiansScale,
+      innerRadius,
+      maxStacks: radMaxStacks
     })
+
+    // Adjust zoom
+    zoomBehaviour.translateExtent(extent)
+    resetZoom(0)
+
+    return (node) => {
+      // Get category of sector
+      const catValue = node[sortBy]
+
+      // Get occurrence of this node in the group of nodes with the same catValue
+      const catNodes = grouped.get(catValue)
+      const nodeIndex = catNodes.findIndex(d => d.id === node.id)
+      const pileIndex = Math.floor(nodeIndex / radMaxStacks)
+      const stackIndex = nodeIndex % radMaxStacks
+
+      const radiansOffset = catNodes.diffPiles * pileRadiansScale.bandwidth()/2
+      const radians = sectorRadiansScale(catValue) + pileRadiansScale(pileIndex) + radiansOffset
+
+      const radius = innerRadius + stackIndex * (nodeSize + gap)
+      
+      const x = Math.cos(radians) * radius
+      const y = Math.sin(radians) * radius
+
+      return { x, y, rotation: radians, data: { radius, radians } }
+    }
+  }
+
+
+  function switchLayout(newLayout) {
+    const tl = gsap.timeline()
+
+    tl.add(() => {
+      _state.set('exit')
+      _ticker.set(0, { duration: 0 })
+      _ticker.set(1)
+    })
+
+    tl.add(() => {
+      _layout.set(newLayout)
+      _state.set('entrance')
+      _ticker.set(0, { duration: 0 })
+      _ticker.set(1)
+    }, `+=${duration/1000}`)
+
+    tl.add(() => _state.set('idle'), `+=${duration/1000}`)
   }
 
   
-  const getPos_d = derived([_isBlock, _sortBy, nNodes, nodeSize, gap, figureWidth, figureHeight], 
-  ([$isBlock, $sortBy, $nNodes, $nodeSize, $gap, $figureWidth, $figureHeight]) => {
-    // --------------- //
-    // Blocked Layout
-    // --------------- //
-    if ($isBlock) {
-
-      const { columns, blockWidth, blockHeight } = getBlockConfig($nNodes, $nodeSize, $gap, $figureWidth, $figureHeight)
-
-      const padding = {}
-      padding.left = ($figureWidth - blockWidth)/2
-
-      let tExtentY
-      if (blockHeight < $figureHeight) {
-        padding.top = ($figureHeight - blockHeight)/2
-        tExtentY = [0, $figureHeight]
-      }
-      else {
-        padding.top = $nodeSize
-        tExtentY = [0, blockHeight + 2*$nodeSize]
-      }
-
-      // Adjust zoom
-      const tExtentX = [0, $figureWidth]
-      zoomBehaviour.translateExtent(tExtentX.map((_, i) => [ tExtentX[i], tExtentY[i] ]))
-      resetZoom(0)
-
-
-      return ({ i }) => {
-        // Calculate the row and column indices for the given i
-        const iCol = Math.floor(i % columns)
-        const iRow = Math.floor(i / columns)
-
-        const x = iCol * ($nodeSize + $gap) + $nodeSize/2 + padding.left
-        const y = iRow * ($nodeSize + $gap) + $nodeSize/2 + padding.top
-
-        return { x, y }
-      }
+  const getPos_d = derived([_layout, _sortBy, nNodes, nodeSize, gap, figureWidth, figureHeight], 
+  ([$layout, $sortBy, $nNodes, $nodeSize, $gap, $figureWidth, $figureHeight]) => {
+    if ($layout === 'block') {
+      return blockLayout($nNodes, $nodeSize, $gap, $figureWidth, $figureHeight)
     }
-
-    // --------------- //
-    // Radial Layout
-    // --------------- //
-    else {
-      const groupedNodes = d3.group($nodes, d => d[$sortBy])
-
-      const domain = $sortBy === 'year'
-        ? d3.range(2014, 2024, 1)
-        : [ 0, 1 ]
-
-      const innerPad = .15
-      const xScale = d3.scaleBand()
-        .domain(domain)
-        .range([ 0, 2*Math.PI ])
-        .paddingInner(innerPad)
-        .paddingOuter(innerPad/2)
-
-      const nBars = ~~(d3.max([...groupedNodes.values()], d => d.length) / radMaxStacks)
-      const barPosScale = d3.scaleBand()
-        .domain(d3.range(0, nBars, 1))
-        .range([0, xScale.bandwidth()])
-
-      const padding = {
-        left: $figureWidth/2,
-        top: $figureHeight/2
-      }
-
-    
-      const layoutSize = 2*(innerRadius + radMaxStacks * ($nodeSize + $gap))
-      let tExtentX = [0, $figureWidth]
-      let tExtentY = [0, $figureHeight]
-
-      if (layoutSize > $figureWidth) {
-        const exceed = layoutSize - $figureWidth
-        tExtentX = [-exceed/2, $figureWidth+exceed/2]
-      }
-
-      if (layoutSize > $figureHeight) {
-        const exceed = layoutSize - $figureHeight
-        tExtentY = [-exceed/2, $figureHeight+exceed/2]
-      }
-
-      // Adjust zoom
-      zoomBehaviour.translateExtent(tExtentX.map((_, i) => [ tExtentX[i], tExtentY[i] ]))
-      resetZoom(0)
-
-      return (node) => {
-        // Get category of sector
-        const category = node[$sortBy]
-
-        // Get occurrence of this node in the group of nodes with the same category
-        const catNodes = groupedNodes.get(category)
-        const nodeIndex = catNodes.findIndex(d => d.id === node.id)
-        const barIndex = Math.floor(nodeIndex / radMaxStacks)
-        const stackIndex = nodeIndex % radMaxStacks
-
-        const radians = xScale(category) + barPosScale(barIndex)
-        const radius = innerRadius + stackIndex * ($nodeSize + $gap)
-        
-        const x = Math.cos(radians) * radius + padding.left
-        const y = Math.sin(radians) * radius + padding.top
-
-        return { x, y, rotation: radians }
-      }
+    if ($layout === 'radial') {
+      return radialLayout($nodes, $nodeSize, $gap, $sortBy, $figureWidth, $figureHeight)
     }
   })
 
@@ -221,6 +217,13 @@
     canvasContexts,
     addCanvasContext: (key, ctx) => canvasContexts[key] = ctx,
     getPos: getPos_d,
+    layout: _layout,
+    state: _state,
+    config: _config,
+    ticker: _ticker,
+    padding: _padding,
+    duration,
+    blockParams,
   }
 
   $: setContext('layout', context)
