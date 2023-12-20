@@ -11,18 +11,15 @@
     figureHeight, 
   } from "$lib/store/canvas";
   import { zoomBehaviour } from "$lib/store/zoom";
-  import { nodes, nNodes, nodeSize, gap, sortIds } from "$lib/store/nodes";
+  import { nodes, nNodes, nodeSize, gap } from "$lib/store/nodes";
   import getBlockConfig from "$lib/helpers/getBlockConfig"
   import getRadialConfig from "$lib/helpers/getRadialConfig"
 
   export let layout
-  export let sortBy
 
   let wrapper
 
   const canvasContexts = {}
-
-
 
   // Radial layout
   const radMaxStacks = 10
@@ -35,9 +32,7 @@
   blockParams.colEntranceUpTo = duration/1000 * .2
   blockParams.fullColEntranceDuration = duration/1000 - blockParams.colEntranceUpTo
 
-  // Stores
-  const _sortBy = writable(sortBy)
-  
+  // Stores  
   const _layout = writable(layout)
   const _state = writable('idle')
   const _ticker = tweened(0, { duration })
@@ -45,10 +40,8 @@
   const _padding = writable()
 
 
-  $: sortIds(sortBy)
   $: $_layout, resetZoom()
   $: updateExtents($_layout, $width, $height, $figureWidth, $figureHeight)
-
 
   onMount(() => {
     d3.select(wrapper)
@@ -137,14 +130,14 @@
   }
 
 
-  function radialLayout(nodes, nodeSize, gap, sortBy, fw, fh) {
+  function radialLayout(nodes, nodeSize, gap, groupBy, fw, fh) {
     const {
       padding,
       extent,
       grouped,
       sectorRadiansScale,
       pileRadiansScale
-    } = getRadialConfig(nodes, nodeSize, gap, sortBy, innerRadius, radMaxStacks, fw, fh)
+    } = getRadialConfig(nodes, nodeSize, gap, groupBy, innerRadius, radMaxStacks, fw, fh)
 
     _padding.set(padding)
     _config.set({
@@ -161,7 +154,7 @@
 
     return (node) => {
       // Get category of sector
-      const catValue = node[sortBy]
+      const catValue = node[groupBy]
 
       // Get occurrence of this node in the group of nodes with the same catValue
       const catNodes = grouped.get(catValue)
@@ -202,13 +195,13 @@
   }
 
   
-  const getPos_d = derived([_layout, _sortBy, nNodes, nodeSize, gap, figureWidth, figureHeight], 
-  ([$layout, $sortBy, $nNodes, $nodeSize, $gap, $figureWidth, $figureHeight]) => {
+  const getPos_d = derived([_layout, nNodes, nodeSize, gap, figureWidth, figureHeight], 
+  ([$layout, $nNodes, $nodeSize, $gap, $figureWidth, $figureHeight]) => {
     if ($layout === 'block') {
       return blockLayout($nNodes, $nodeSize, $gap, $figureWidth, $figureHeight)
     }
     if ($layout === 'radial') {
-      return radialLayout($nodes, $nodeSize, $gap, $sortBy, $figureWidth, $figureHeight)
+      return radialLayout($nodes, $nodeSize, $gap, "year", $figureWidth, $figureHeight)
     }
   })
 
