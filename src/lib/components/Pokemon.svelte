@@ -152,9 +152,9 @@
   <Path canvas="main" makePath={productSiteEditorial($products.siteEditorial, { transform, getRotation })} />
 {/if}
 
-<!-- {#if !$isDragging}
-  {#each node.goals as id}
+<!-- {#if !$isDragging} -->
+  <!-- {#each node.goals as id}
     <Path canvas="goals" makePath={goal($goals[id], { transform, getFillStyle: () => $categories.goals.find(d => d.id === id).color })} />
-  {/each}
-{/if} -->
+  {/each} -->
+<!-- {/if} -->
 {/if}

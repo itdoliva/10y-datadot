@@ -22,7 +22,7 @@
   const canvasContexts = {}
 
   // Radial layout
-  const radMaxStacks = 10
+  const maxStacksK = .25
   const innerRadius = 180
 
   // Transition duration
@@ -130,14 +130,15 @@
   }
 
 
-  function radialLayout(nodes, nodeSize, gap, groupBy, fw, fh) {
+  function radialLayout(nodes, nNodes, nodeSize, gap, groupBy, fw, fh) {
     const {
       padding,
       extent,
       grouped,
       sectorRadiansScale,
-      pileRadiansScale
-    } = getRadialConfig(nodes, nodeSize, gap, groupBy, innerRadius, radMaxStacks, fw, fh)
+      pileRadiansScale,
+      maxStacks
+    } = getRadialConfig(nodes, nNodes, nodeSize, gap, groupBy, innerRadius, maxStacksK, fw, fh)
 
     _padding.set(padding)
     _config.set({
@@ -145,7 +146,7 @@
       sectorRadiansScale,
       pileRadiansScale,
       innerRadius,
-      maxStacks: radMaxStacks
+      maxStacks
     })
 
     // Adjust zoom
@@ -159,8 +160,8 @@
       // Get occurrence of this node in the group of nodes with the same catValue
       const catNodes = grouped.get(catValue)
       const nodeIndex = catNodes.findIndex(d => d.id === node.id)
-      const pileIndex = Math.floor(nodeIndex / radMaxStacks)
-      const stackIndex = nodeIndex % radMaxStacks
+      const pileIndex = Math.floor(nodeIndex / maxStacks)
+      const stackIndex = nodeIndex % maxStacks
 
       const radiansOffset = catNodes.diffPiles * pileRadiansScale.bandwidth()/2
       const radians = sectorRadiansScale(catValue) + pileRadiansScale(pileIndex) + radiansOffset
@@ -201,7 +202,7 @@
       return blockLayout($nNodes, $nodeSize, $gap, $figureWidth, $figureHeight)
     }
     if ($layout === 'radial') {
-      return radialLayout($nodes, $nodeSize, $gap, "year", $figureWidth, $figureHeight)
+      return radialLayout($nodes, $nNodes, $nodeSize, $gap, "year", $figureWidth, $figureHeight)
     }
   })
 

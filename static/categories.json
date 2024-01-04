@@ -30,5 +30,15 @@
     {"id": 2, "name": "impacto", "alias": "Impacto Positivo", "color": "#BAB0FF"},
     {"id": 3, "name": "institucional", "alias": "Institucional", "color": "#FFF3B8"},
     {"id": 4, "name": "editorial", "alias": "Editorial", "color": "#FFE2C0"}
+  ],
+
+  "industries": [
+    {"id": 0, "name": "jornalismo", "alias": "Jornalismo"},
+    {"id": 1, "name": "jornalismo", "alias": "Jornalismo"},
+    {"id": 2, "name": "jornalismo", "alias": "Jornalismo"},
+    {"id": 3, "name": "jornalismo", "alias": "Jornalismo"},
+    {"id": 4, "name": "jornalismo", "alias": "Jornalismo"},
+    {"id": 6, "name": "jornalismo", "alias": "Jornalismo"},
+    {"id": 7, "name": "jornalismo", "alias": "Jornalismo"}
   ]
 }

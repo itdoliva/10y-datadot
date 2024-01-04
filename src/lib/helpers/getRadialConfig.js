@@ -6,8 +6,14 @@ function getDomain(groupBy) {
     : [ 0, 1 ]
 }
 
-export default function getRadialConfig(nodes, nodeSize, gap, groupBy, innerRadius, maxStacks, fw, fh) {
+export default function getRadialConfig(nodes, nNodes, nodeSize, gap, groupBy, innerRadius, maxStacksK, fw, fh) {
   const padding = { left: fw/2, top: fh/2 }
+
+  const groupAcc = d => d[groupBy]
+  const grouped = d3.group(nodes, groupAcc)
+  grouped.groupAcc = groupAcc
+
+  const maxStacks = grouped.size // Math.round(nNodes * maxStacksK / grouped.size)
 
   const size = 2*(innerRadius + maxStacks * (nodeSize + gap))
   const exceedX = size - fw
@@ -16,16 +22,13 @@ export default function getRadialConfig(nodes, nodeSize, gap, groupBy, innerRadi
   const extentY = exceedY > 0 ? [-exceedY/2, fh+exceedY/2] : [0, fh]
   const extent = extentX.map((_, i) => [ extentX[i], extentY[i] ])
 
-  const groupAcc = d => d[groupBy]
-  const grouped = d3.group(nodes, groupAcc)
-  grouped.groupAcc = groupAcc
 
   // Count Number of Piles each category will have
   grouped.forEach((v) => v.nPiles = Math.ceil(v.length/maxStacks))
 
-  const innerPad = .15
+  const innerPad = grouped.size > 1 ? .15 : 0
   const sectorRadiansScale = d3.scaleBand()
-    .domain(getDomain(groupBy))
+    .domain([...grouped.keys()])
     .range([ 0, 2*Math.PI ])
     .paddingInner(innerPad)
     .paddingOuter(innerPad/2)
@@ -42,7 +45,8 @@ export default function getRadialConfig(nodes, nodeSize, gap, groupBy, innerRadi
     extent,
     grouped,
     sectorRadiansScale,
-    pileRadiansScale
+    pileRadiansScale,
+    maxStacks
   }
 
   // const radiansScale = (node) => {

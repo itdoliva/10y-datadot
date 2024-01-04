@@ -34,7 +34,7 @@ export async function load({ fetch }) {
   const categories = await fetch("/categories.json")
     .then(d => d.json())
 
-  const { products, designs, channels, goals} = categories
+  const { products, designs, channels, goals, industries } = categories
 
   const nNodes = 387
 
@@ -56,6 +56,7 @@ export async function load({ fetch }) {
       channel: getCategories(channels, false),
       designs: getCategories(designs),
       goals: getCategories(goals),
+      industry: getCategories(industries, false),
       products: prodList
     })
   }

@@ -5,13 +5,33 @@ export const dataset = writable([])
 
 export const sortBy = writable('year')
 export const fyears = writable()
+export const fdesigns = writable()
+export const fgoals = writable()
+export const findustries = writable()
+export const fproducts = writable()
 
-export const filtered = derived([dataset, fyears], ([$dataset, $years]) => {
+export const filtered = derived([dataset, fyears, findustries, fdesigns, fgoals, fproducts], ([$dataset, $years, $industries, $designs, $goals, $products]) => {
   let f = [...$dataset]
 
   if ($years) {
     const [ minYear, maxYear ] = $years
     f = f.filter(d => d.year >= minYear && d.year <= maxYear)
+  }
+
+  if ($designs && $designs.length > 0) {
+    f = f.filter(d => d.designs.some(design => $designs.includes(design)))
+  }
+
+  if ($goals && $goals.length > 0) {
+    f = f.filter(d => d.goals.some(design => $goals.includes(design)))
+  }
+
+  if ($industries && $industries.length > 0) {
+    f = f.filter(d => $industries.some(d.industry))
+  }
+
+  if ($products && $products.length > 0) {
+    f = f.filter(d => d.products.some(design => $products.includes(design)))
   }
 
   return f

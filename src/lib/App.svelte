@@ -1,7 +1,7 @@
 <script>
   import { width, height, pixelRatio } from "$lib/store/canvas";
-  import { nodes, fyears } from "$lib/store/nodes";
-  import { writable, derived } from "svelte/store";
+  import { nodes, fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/store/nodes";
+  import { categories } from "$lib/store/categories";
 
   import Canvas from "$lib/components/Canvas.svelte";
   import Unit from "$lib/components/Unit.svelte";
@@ -9,10 +9,10 @@
   import PanelItem from "$lib/components/molecules/PanelItem.svelte";
   import InputGroup from "$lib/components/molecules/InputGroup.svelte";
   import YearSliderPicker from "./components/atoms/YearSliderPicker.svelte";
+  import Multiselect from "./components/atoms/Multiselect.svelte";
+  import Beeswarm from "./components/atoms/Beeswarm.svelte";
 
   let layout = 'block'
-
-  $: console.log({ nodes: $nodes })
 
   const vizLayouts = [
     { text: "Block", value: "block" },
@@ -39,19 +39,22 @@
       </PanelItem>
 
       <PanelItem title="categorias de design">
+        <Multiselect categories={$categories.designs} bind:selected={$fdesigns} direction='column' />
       </PanelItem>
 
       <PanelItem title="objetivos do projeto">
+        <Multiselect categories={$categories.goals} bind:selected={$fgoals} direction='column' />
       </PanelItem>
 
       <PanelItem title="setores do mercado">
+        <Beeswarm category="industry" categories={$categories.industries} bind:selected={$findustries} />
       </PanelItem>
     </ul>
   </div>
 
   <div class="pb-wrapper">
     <PanelItem title="tipos de entrega">
-        
+        <Multiselect categories={$categories.products} bind:selected={$fproducts} />
     </PanelItem>
   </div>
 
@@ -87,6 +90,7 @@
   .pa-wrapper {
     grid-area: pa;
     border-right: 1px solid black;
+    padding: 2em 1em 1em 2em;
 
     ul {
       list-style-type: none;
