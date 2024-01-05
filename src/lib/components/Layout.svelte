@@ -1,19 +1,16 @@
 <script>
-  import { onMount, beforeUpdate, setContext } from "svelte";
-  import { tweened } from "svelte/motion";
+  import { beforeUpdate, setContext } from "svelte";
   import { writable, derived } from "svelte/store";
+  import { tweened } from "svelte/motion";
   import * as d3 from "d3";
   import { gsap } from "gsap"
-  import { 
-    width,
-    height,
-    figureWidth, 
-    figureHeight, 
-  } from "$lib/store/canvas";
+
+  import { width, height, figureWidth, figureHeight } from "$lib/store/canvas";
   import { zoomBehaviour } from "$lib/store/zoom";
   import { nodes, nNodes, nodeSize, gap } from "$lib/store/nodes";
   import getBlockConfig from "$lib/helpers/getBlockConfig"
   import getRadialConfig from "$lib/helpers/getRadialConfig"
+
 
   export let layout
 
@@ -43,11 +40,6 @@
   $: $_layout, resetZoom()
   $: updateExtents($_layout, $width, $height, $figureWidth, $figureHeight)
 
-  onMount(() => {
-    d3.select(wrapper)
-      .call(zoomBehaviour)
-      .on("wheel", event => event.preventDefault())
-  })  
 
 
   beforeUpdate(() => {
@@ -87,7 +79,7 @@
 
 
   // Layouts
-  function blockLayout(nNodes, nodeSize, gap, fw, fh) {
+  function blockLayout(nodes, nNodes, nodeSize, gap, fw, fh) {
     const { 
       rows,
       columns,
@@ -116,6 +108,10 @@
     // Adjust zoom
     zoomBehaviour.translateExtent(extent)
     resetZoom(0)
+
+    // nodes.update(arr => arr.map(node => {
+    //   node.fx 
+    // }))
 
     return ({ i }) => {
       // Calculate the row and column indices for the given i
@@ -199,7 +195,7 @@
   const getPos_d = derived([_layout, nNodes, nodeSize, gap, figureWidth, figureHeight], 
   ([$layout, $nNodes, $nodeSize, $gap, $figureWidth, $figureHeight]) => {
     if ($layout === 'block') {
-      return blockLayout($nNodes, $nodeSize, $gap, $figureWidth, $figureHeight)
+      return blockLayout($nodes, $nNodes, $nodeSize, $gap, $figureWidth, $figureHeight)
     }
     if ($layout === 'radial') {
       return radialLayout($nodes, $nNodes, $nodeSize, $gap, "year", $figureWidth, $figureHeight)

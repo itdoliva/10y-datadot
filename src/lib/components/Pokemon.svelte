@@ -25,8 +25,6 @@
     products
   } from "$lib/store/categories"
 
-	import { isDragging } from '$lib/store/canvas';
-
 	import rotateAroundPoint from '$lib/helpers/rotateAroundPoint'
   import Path from "$lib/components/atoms/Path.svelte";
 

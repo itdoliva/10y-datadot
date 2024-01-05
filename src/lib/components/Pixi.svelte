@@ -2,19 +2,30 @@
 	import { figureWidth, figureHeight } from '$lib/store/canvas';
   import { onMount, getContext, setContext } from 'svelte'
   import * as PIXI from "pixi.js"
+  import * as d3 from "d3";
+  import { zoomBehaviour } from "$lib/store/zoom";
+  import { cameraOffsetX, cameraOffsetY, zoom } from "$lib/store/zoom";
 
   export let backgroundColor = 0xffffff
   
   const { wrapper, padding } = getContext('layout')
 
-  const container = new PIXI.Container()
+  const outer = new PIXI.Container() // Outer container applies zoom and paning
+  const inner = new PIXI.Container() // Inner container applies padding
+
+  outer.addChild(inner)
   
 
   let app
   let canvas
 
-  $: container.x = $padding.left
-  $: container.y = $padding.top
+  $: outer.x = $cameraOffsetX
+  $: outer.y = $cameraOffsetY
+  $: outer.scale.set($zoom)
+
+  $: inner.x = $padding.left
+  $: inner.y = $padding.top
+
 
   onMount(() => {
     app = new PIXI.Application({ 
@@ -24,20 +35,28 @@
       backgroundColor 
     })
 
-    const fpsText = new PIXI.Text('FPS: 0', { fill: 0xFF0000 })
+    const fpsText = new PIXI.Text('0fps', { fontSize: 12, fill: 0xFF0000 })
+    fpsText.x = 6
+    fpsText.y = 6
 
     app.ticker.add((delta) => {
       const fps = Math.round(PIXI.Ticker.shared.FPS)
-      fpsText.text = `FPS: ${fps}`
+      fpsText.text = `${fps}fps`
     })
 
-    globalThis.__PIXI_APP__ = app
-
     app.stage.addChild(fpsText)
-    app.stage.addChild(container)
+    app.stage.addChild(outer)
+
+    d3.select(canvas)
+      .call(zoomBehaviour)
+      .on("wheel", event => event.preventDefault())
+
+    globalThis.__PIXI_APP__ = app
   })
 
-  setContext('pixi', { container })
+  
+
+  setContext('pixi', { container: inner })
 
 </script>
 
