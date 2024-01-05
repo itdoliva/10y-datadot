@@ -37,7 +37,7 @@
   const _state = writable('idle')
   const _ticker = tweened(0, { duration })
   const _config = writable()
-  const _padding = writable()
+  const _padding = writable({ left: 0, top: 0 })
 
 
   $: $_layout, resetZoom()
@@ -208,6 +208,7 @@
 
 
   $: context = {
+    wrapper,
     canvasContexts,
     addCanvasContext: (key, ctx) => canvasContexts[key] = ctx,
     getPos: getPos_d,

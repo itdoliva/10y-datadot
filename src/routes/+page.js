@@ -57,7 +57,8 @@ export async function load({ fetch }) {
       designs: getCategories(designs),
       goals: getCategories(goals),
       industry: getCategories(industries, false),
-      products: prodList
+      products: prodList,
+      active: true
     })
   }
 

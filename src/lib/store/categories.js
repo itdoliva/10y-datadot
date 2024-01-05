@@ -4,11 +4,15 @@ import { nodeSize, colorHeight } from "$lib/store/nodes"
 import getRegPolyPoints from "$lib/helpers/getRegPolyPoints";
 import rotateAroundPoint from "$lib/helpers/rotateAroundPoint";
 
+
+
 export const categories = writable({})
 
 export const props = derived(nodeSize, $nodeSize => {
   return d3.range(0, 1.01, .01).map(d => $nodeSize*d)
 })
+
+
 
 
 // DESIGNS

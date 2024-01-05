@@ -1,10 +1,11 @@
 <script>
+  import "./pixi.js"
   import { width, height, pixelRatio } from "$lib/store/canvas";
-  import { nodes, fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/store/nodes";
+  import { nodes, filterDataset, fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/store/nodes";
   import { categories } from "$lib/store/categories";
 
-  import Canvas from "$lib/components/Canvas.svelte";
-  import Unit from "$lib/components/Unit.svelte";
+  import Pixi from "$lib/components/Pixi.svelte";
+  import Node from "$lib/components/Node.svelte";
   import Layout from "$lib/components/Layout.svelte";
   import PanelItem from "$lib/components/molecules/PanelItem.svelte";
   import InputGroup from "$lib/components/molecules/InputGroup.svelte";
@@ -18,6 +19,8 @@
     { text: "Block", value: "block" },
     { text: "Radial", value: "radial" },
   ]
+
+  $: filterDataset($fyears, $findustries, $fdesigns, $fgoals, $fproducts)
 
 </script>
 
@@ -35,7 +38,7 @@
       </PanelItem>
 
       <PanelItem title="período">
-        <YearSliderPicker min={2014} max={2024} bind:selected={$fyears} />
+        <!-- <YearSliderPicker min={2014} max={2024} bind:selected={$fyears} /> -->
       </PanelItem>
 
       <PanelItem title="categorias de design">
@@ -47,7 +50,7 @@
       </PanelItem>
 
       <PanelItem title="setores do mercado">
-        <Beeswarm category="industry" categories={$categories.industries} bind:selected={$findustries} />
+        <!-- <Beeswarm category="industry" categories={$categories.industries} bind:selected={$findustries} /> -->
       </PanelItem>
     </ul>
   </div>
@@ -60,11 +63,11 @@
 
   <div class="viz-wrapper">
     <Layout bind:layout>
-      <Canvas key="main" />
-      <Canvas key="goals" composition='multiply' mixBlendMode='multiply'/>
-      {#each $nodes as node (node.id)}
-        <Unit {node} />
-      {/each}
+      <Pixi>
+        {#each $nodes as node (node.id)}
+          <Node {node} />
+        {/each}
+      </Pixi>
     </Layout>
   </div>
 </div>

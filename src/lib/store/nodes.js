@@ -10,43 +10,38 @@ export const fgoals = writable()
 export const findustries = writable()
 export const fproducts = writable()
 
-export const filtered = derived([dataset, fyears, findustries, fdesigns, fgoals, fproducts], ([$dataset, $years, $industries, $designs, $goals, $products]) => {
-  let f = [...$dataset]
 
-  if ($years) {
-    const [ minYear, maxYear ] = $years
-    f = f.filter(d => d.year >= minYear && d.year <= maxYear)
-  }
+export function filterDataset(years, industries, designs, goals, products) {
+  dataset.update(data => {
+    return data.map(d => {
+      let active = true
 
-  if ($designs && $designs.length > 0) {
-    f = f.filter(d => d.designs.some(design => $designs.includes(design)))
-  }
+      const isDeactive = (
+        (years && d.year < years[0] && d.year > years[1]) ||
+        (designs && designs.length > 0 && !d.designs.some(design => designs.includes(design))) ||
+        (goals && goals.length > 0 && !d.goals.some(goal => goals.includes(goal))) || 
+        (products && products.length > 0 && !d.products.some(product => products.includes(product))) ||
+        (industries && industries.length > 0 && !industries.some(d.industry))
+      )
 
-  if ($goals && $goals.length > 0) {
-    f = f.filter(d => d.goals.some(design => $goals.includes(design)))
-  }
+      if (isDeactive) {
+        active = false
+      }
 
-  if ($industries && $industries.length > 0) {
-    f = f.filter(d => $industries.some(d.industry))
-  }
+      return { ...d, active }
+    })
+  })
+}
 
-  if ($products && $products.length > 0) {
-    f = f.filter(d => d.products.some(design => $products.includes(design)))
-  }
 
-  return f
-})
-
-export const nodes = derived([ filtered, sortBy ], ([ $filtered, $sortBy ]) => {
-  return $filtered
-    .sort((a, b) => a[$sortBy] - b[$sortBy])
+export const nodes = derived([ dataset, sortBy ], ([ $dataset, $sortBy ]) => {
+  return $dataset
+    .sort((a, b) => (b.active - a.active) || (a[$sortBy] - b[$sortBy]))
     .map((item, i) => ({ ...item, i }))
 })
 
 
-
-
-export const nNodes = derived(nodes, $nodes => $nodes.length);
+export const nNodes = derived(nodes, $nodes => $nodes.filter(d => d.active).length);
 
 
 export const nodeSize = derived(([ width ]), ([ $width ]) => {

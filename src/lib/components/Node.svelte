@@ -1,9 +1,12 @@
 <script>
-  import { getContext } from "svelte";
+	import { categories } from '$lib/store/categories';
+  import { getContext, onMount } from "svelte";
+  import geometries from "$lib/geometries"
   import * as d3 from "d3"
   import { figureWidth, figureHeight } from "$lib/store/canvas";
   import { nodeSize, gap } from "$lib/store/nodes";
   import Pokemon from "$lib/components/Pokemon.svelte";
+  import * as PIXI from "pixi.js"
 
   export let node
 
@@ -18,13 +21,32 @@
     blockParams
   } = getContext("layout")
 
+  const { container } = getContext("pixi")
+
+  const parent = new PIXI.Container()
+
+  container.addChild(parent)
+
+  const channelGeometry = geometries[$categories.channels.find(d => d.id === node.channel).name].geometry
+  const channelGraphic = new PIXI.Graphics(channelGeometry)
+
+
+  if (node.designs.includes(0)) {
+    parent.addChild(new PIXI.Graphics(geometries.illustration.geometry))
+  }
+
+  parent.addChild(channelGraphic)
+
+
+
+
   const exitAt = (duration/1000) * .5 * Math.random()
   const exitTickerScale = d3.scaleLinear()
     .domain([exitAt, 1])
     .clamp(true)
 
-  let x
-  let y
+  let x = 0
+  let y = 0
   let rotation
   let fx
   let fy
@@ -33,6 +55,15 @@
 
   $: setFinalPos($getPos)
   $: getCurrentPos($layout, $state, $config, $ticker)
+
+  $: parent.x = x
+  $: parent.y = y
+  $: parent.renderable = node.active
+
+  $: if (node.id === 0) {
+    console.log({parent})
+    // parent.children.forEach(graphic => graphic.geometry.graphicsData.lineStyle({ width: 4 }))
+  }
 
 
   function setFinalPos(getPos) {
@@ -81,11 +112,13 @@
 
   }
 
+
+
 </script>
 
-<Pokemon 
+<!-- <Pokemon 
   {node} 
   x={x+$padding.left} 
   y={y+$padding.top} 
   {rotation} 
-/>
+/> -->
