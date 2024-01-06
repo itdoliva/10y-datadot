@@ -11,7 +11,9 @@
   const { wrapper, padding } = getContext('layout')
 
   const outer = new PIXI.Container() // Outer container applies zoom and paning
+  outer.name = "Camera"
   const inner = new PIXI.Container() // Inner container applies padding
+  inner.name = "Padding"
 
   outer.addChild(inner)
   
@@ -32,10 +34,13 @@
       renderer: PIXI.renderer,
       view: canvas, 
       resizeTo: wrapper, 
-      backgroundColor 
+      backgroundColor
     })
 
+    app.stage.name = "Stage"
+
     const fpsText = new PIXI.Text('0fps', { fontSize: 12, fill: 0xFF0000 })
+    fpsText.name = "FPS"
     fpsText.x = 6
     fpsText.y = 6
 
@@ -56,7 +61,7 @@
 
   
 
-  setContext('pixi', { container: inner })
+  setContext('pixi', { stage: inner })
 
 </script>
 

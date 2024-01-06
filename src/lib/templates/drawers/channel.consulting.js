@@ -1,9 +1,7 @@
 import * as PIXI from "pixi.js"
 
 
-export default function consultingTemplate({ nodeSize, lineWidth }) {
-  const template = new PIXI.Graphics()
-
+export default function consultingTemplate({ nodeSize, lineWidth }, template) {
   template.beginFill(0xFFFFFF)
   template.lineStyle(lineWidth, 0x000000)
   template.drawCircle(0, 0, nodeSize/2)

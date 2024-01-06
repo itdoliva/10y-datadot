@@ -1,7 +1,7 @@
 <script>
   import "./pixi.js"
   import { width, height, pixelRatio } from "$lib/store/canvas";
-  import { nodes, filterDataset, fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/store/nodes";
+  import { nodes, nNodes, fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/store/nodes";
   import { categories } from "$lib/store/categories";
 
   import Pixi from "$lib/components/Pixi.svelte";
@@ -19,8 +19,6 @@
     { text: "Block", value: "block" },
     { text: "Radial", value: "radial" },
   ]
-
-  $: filterDataset($fyears, $findustries, $fdesigns, $fgoals, $fproducts)
 
 </script>
 

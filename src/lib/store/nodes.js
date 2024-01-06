@@ -11,17 +11,18 @@ export const findustries = writable()
 export const fproducts = writable()
 
 
-export function filterDataset(years, industries, designs, goals, products) {
-  dataset.update(data => {
-    return data.map(d => {
+export const filtered = derived(
+  [dataset, fyears, findustries, fdesigns, fgoals, fproducts],
+  ([$dataset, $years, $industries, $designs, $goals, $products]) => {
+    return $dataset.map(d => {
       let active = true
 
       const isDeactive = (
-        (years && d.year < years[0] && d.year > years[1]) ||
-        (designs && designs.length > 0 && !d.designs.some(design => designs.includes(design))) ||
-        (goals && goals.length > 0 && !d.goals.some(goal => goals.includes(goal))) || 
-        (products && products.length > 0 && !d.products.some(product => products.includes(product))) ||
-        (industries && industries.length > 0 && !industries.some(d.industry))
+        ($years && d.year < $years[0] && d.year > $years[1]) ||
+        ($designs && $designs.length > 0 && !d.designs.some(design => $designs.includes(design))) ||
+        ($goals && $goals.length > 0 && !d.goals.some(goal => $goals.includes(goal))) || 
+        ($products && $products.length > 0 && !d.products.some(product => $products.includes(product))) ||
+        ($industries && $industries.length > 0 && !$industries.some(d.industry))
       )
 
       if (isDeactive) {
@@ -31,11 +32,10 @@ export function filterDataset(years, industries, designs, goals, products) {
       return { ...d, active }
     })
   })
-}
 
 
-export const nodes = derived([ dataset, sortBy ], ([ $dataset, $sortBy ]) => {
-  return $dataset
+export const nodes = derived([ filtered, sortBy ], ([ $filtered, $sortBy ]) => {
+  return $filtered
     .sort((a, b) => (b.active - a.active) || (a[$sortBy] - b[$sortBy]))
     .map((item, i) => ({ ...item, i }))
 })

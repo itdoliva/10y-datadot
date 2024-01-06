@@ -1,124 +1,132 @@
 <script>
-	import { categories } from '$lib/store/categories';
-  import { getContext, onMount } from "svelte";
-  import geometries from "$lib/geometries"
+  import { getContext } from "svelte";
+  import { tweened } from "svelte/motion";
+  import { figureHeight } from "$lib/store/canvas";
   import * as d3 from "d3"
-  import { figureWidth, figureHeight } from "$lib/store/canvas";
-  import { nodeSize, gap } from "$lib/store/nodes";
-  import Pokemon from "$lib/components/Pokemon.svelte";
   import * as PIXI from "pixi.js"
+  import Pokemon from './Pokemon.svelte';
 
-  export let node
+  export let node 
 
   const { 
-    getPos, 
     layout, 
     state, 
+    getPos,
     config, 
-    ticker, 
-    padding, 
-    duration,
+    switchDuration,
     blockParams
   } = getContext("layout")
 
-  const { container } = getContext("pixi")
+  const { stage } = getContext("pixi")
 
-  const parent = new PIXI.Container()
+  const origin = new PIXI.Container()
+  origin.name = "Node " + node.id
+  stage.addChild(origin)
 
-  container.addChild(parent)
+  const container = new PIXI.Container()
+  origin.addChild(container)
 
-  const channelGeometry = geometries[$categories.channels.find(d => d.id === node.channel).name].geometry
-  const channelGraphic = new PIXI.Graphics(channelGeometry)
+  const interpolateConstant = (a, b) => () => b
+  const defaultOptions = { duration: 1, interpolate: interpolateConstant }
 
+  const originAlpha = tweened(1, defaultOptions)
+  const originX = tweened(0, defaultOptions)
+  const originY = tweened(0, defaultOptions)
+  const originRotation = tweened(0, defaultOptions)
 
-  if (node.designs.includes(0)) {
-    parent.addChild(new PIXI.Graphics(geometries.illustration.geometry))
-  }
-
-  parent.addChild(channelGraphic)
-
-
-
-
-  const exitAt = (duration/1000) * .5 * Math.random()
-  const exitTickerScale = d3.scaleLinear()
-    .domain([exitAt, 1])
-    .clamp(true)
-
-  let x = 0
-  let y = 0
-  let rotation
+  const containerX = tweened(0, defaultOptions)
+  const containerY = tweened(0, defaultOptions)
+  
   let fx
   let fy
   let frotation
   let data
 
+  $: origin.renderable = node.active
+  $: origin.x = $originX
+  $: origin.y = $originY
+  $: origin.rotation = $originRotation
+  $: origin.alpha = $originAlpha
+
+  $: container.x = $containerX
+  $: container.y = $containerY
+  
   $: setFinalPos($getPos)
-  $: getCurrentPos($layout, $state, $config, $ticker)
-
-  $: parent.x = x
-  $: parent.y = y
-  $: parent.renderable = node.active
-
-  $: if (node.id === 0) {
-    console.log({parent})
-    // parent.children.forEach(graphic => graphic.geometry.graphicsData.lineStyle({ width: 4 }))
-  }
+  $: getCurrentPos($layout, $state, $config)
 
 
   function setFinalPos(getPos) {
     const pos = getPos(node)
-    fx = pos.x
-    fy = pos.y
+    fx = pos.fx
+    fy = pos.fy
     frotation = pos.rotation
     data = pos.data
   }
 
 
-  function getCurrentPos(layout, state, config, ticker) {
-    if (state === 'idle') {
-      x = fx
-      y = fy
+  function getCurrentPos(layout, state, config) {
+    if ( state === 'exit') {
+      const exitAt = Math.random() * .5 * 1000
+
+      const duration = switchDuration - exitAt - (Math.random() * 300)
+
+      originY.set(fy + $figureHeight, { delay: exitAt, easing: d3.easeSinIn, duration, interpolate: d3.interpolateNumber })
+      originAlpha.set(0, { delay: exitAt-Math.random()*150, duration, interpolate: d3.interpolateNumber })
     }
-    else if ( state === 'exit') {
-      x = fx
-      y = fy + d3.easeSinIn(exitTickerScale(ticker)) * $figureHeight
-    }
+
     // Entrances \/
     else if (layout === 'block') {
-      const { row, column } = data
-      const colDensity = config.columnDensities[column]
-      const entryAt = colDensity * blockParams.colEntranceUpTo + config.timeStepByRow * row
+      const { entryAt } = data
+      const delay = entryAt*1000
 
-      if (ticker >= entryAt) {
-        x = fx
-        y = fy
-      } else {
-        x = undefined
-        y = undefined
+      originRotation.set(0)
+      originX.set(fx)
+      originY.set(fy)
+
+      originAlpha.set(1, { delay })
+
+      containerX.set(0)
+      containerY.set(0)
+    }
+
+    else if (layout === 'radial') {
+      const { radians } = data
+      const rotation = radians - Math.PI/2
+
+      const delayScale = d3.scaleLinear()
+        .domain([-Math.PI/2, 2*Math.PI-Math.PI/2])
+        .range([0, 700])
+
+      originX.set(0)
+      originY.set(0)
+
+      if (state === "entrance") {
+        originRotation.set(rotation - Math.PI/8)
+        originAlpha.set(0)
+
+        const options = {
+          delay: delayScale(rotation),
+          duration: 300,
+          interpolate: d3.interpolateNumber,
+          easing: d3.easeCubicInOut
+        }
+
+        originRotation.set(rotation, options)
+        originAlpha.set(1, options)
+      }
+      else if (state === "idle") {
+        originRotation.set(rotation)
       }
 
-      rotation = undefined
-    }
-    else if (layout === 'radial') {
-      const { radians, radius } = data
-      const easedTicker = d3.easeCubicInOut(ticker)
-      const easeRadians = radians*easedTicker
-      const easeRadius =  config.innerRadius + (radius-config.innerRadius)*d3.easeQuadOut(exitTickerScale(ticker))
-      x = Math.cos(easeRadians) * (easeRadius)
-      y = Math.sin(easeRadians) * (easeRadius)
-      rotation = easeRadians
+      containerX.set(fx)
+      containerY.set(fy)
     }
 
   }
 
 
 
+
 </script>
 
-<!-- <Pokemon 
-  {node} 
-  x={x+$padding.left} 
-  y={y+$padding.top} 
-  {rotation} 
-/> -->
+<Pokemon parent={container} {node}/>
