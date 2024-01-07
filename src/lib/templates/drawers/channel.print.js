@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js"
 import getRegPolyPoints from "$lib/helpers/getRegPolyPoints";
 
 
-export default function printTemplate({ nodeSize, lineWidth }, template) {
+export default function printTemplate({ nodeSize, lineWidth }, template=new PIXI.Graphics()) {
   const points = getRegPolyPoints(0, 0, nodeSize, 6).flat()
 
   template.beginFill(0xFFFFFF)

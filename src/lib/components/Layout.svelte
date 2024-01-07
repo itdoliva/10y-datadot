@@ -58,7 +58,6 @@
   const getPos = {}
 
   getPos.block = (nNodes, groupBy, nodeSize, gap, fw, fh) => {
-    console.log('getPos.block')
     const { rows, columns, padding, extent } = getBlockConfig(nNodes, nodeSize, gap, fw, fh)
 
     // The calculation below support block entrance animation
@@ -89,7 +88,6 @@
   }
 
   getPos.radial = (nNodes, groupBy, nodeSize, gap, fw, fh) => {
-    console.log('getPos.radial')
     const {
       padding,
       extent,

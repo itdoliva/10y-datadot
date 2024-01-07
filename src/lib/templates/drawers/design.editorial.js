@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js"
 
 
-export default function editorialTemplate({ nodeSize, lineWidth }, template) {
+export default function editorialTemplate({ nodeSize, lineWidth }, template=new PIXI.Graphics()) {
   // Calculate shapes
   const triangle = [
     0, 0, 

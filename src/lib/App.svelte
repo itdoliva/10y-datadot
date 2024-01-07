@@ -4,7 +4,7 @@
   import { nodes, nNodes, fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/store/nodes";
   import { categories } from "$lib/store/categories";
 
-  import Pixi from "$lib/components/Pixi.svelte";
+  import Application from "$lib/components/Application.svelte";
   import Node from "$lib/components/Node.svelte";
   import Layout from "$lib/components/Layout.svelte";
   import PanelItem from "$lib/components/molecules/PanelItem.svelte";
@@ -61,11 +61,11 @@
 
   <div class="viz-wrapper">
     <Layout bind:layout>
-      <Pixi>
+      <Application>
         {#each $nodes as node (node.id)}
           <Node {node} />
         {/each}
-      </Pixi>
+      </Application>
     </Layout>
   </div>
 </div>

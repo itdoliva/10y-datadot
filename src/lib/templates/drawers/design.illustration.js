@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js"
 
 
-export default function illustrationTemplate({ nodeSize, lineWidth }, template) {
+export default function illustrationTemplate({ nodeSize, lineWidth }, template=new PIXI.Graphics()) {
 
   // Calculate edges
   const edges = [

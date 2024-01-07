@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js"
 
 
-export default function serviceTemplate({ nodeSize, lineWidth }, template) {
+export default function serviceTemplate({ nodeSize, lineWidth }, template=new PIXI.Graphics()) {
   const hline = [ -nodeSize*.8, nodeSize*.33, nodeSize*.86, nodeSize*.33 ]
   const dline = [ -nodeSize*.48, nodeSize*.85, nodeSize*.87, -nodeSize*.5 ]
 

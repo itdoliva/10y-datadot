@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js"
 
 
-export default function motionTemplate({ nodeSize, lineWidth }, template) {
+export default function motionTemplate({ nodeSize, lineWidth }, template=new PIXI.Graphics()) {
   template.lineStyle(lineWidth, 0x000000)
   template.moveTo(-nodeSize*.17, nodeSize*.83)
   template.lineTo(nodeSize*.83, -nodeSize*.17)

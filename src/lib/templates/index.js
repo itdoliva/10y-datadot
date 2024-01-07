@@ -21,7 +21,7 @@ const options = {
   lineWidth: 1.5,
 }
 
-const geometries = {
+const templates = {
   illustration: illustrationTemplate,
   editorial: editorialTemplate,
   service: serviceTemplate,
@@ -38,9 +38,9 @@ const geometries = {
   consulting: consultingTemplate,
   digital: digitalTemplate,
   print: printTemplate,
-
+  options
 }
 
 
 
-export default geometries
+export default templates

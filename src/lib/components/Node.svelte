@@ -17,7 +17,7 @@
     blockParams
   } = getContext("layout")
 
-  const { stage } = getContext("pixi")
+  const { stage, addTickerCallback } = getContext("pixi")
 
   const origin = new PIXI.Container()
   origin.name = "Node " + node.id
@@ -42,14 +42,16 @@
   let frotation
   let data
 
-  $: origin.renderable = node.active
-  $: origin.x = $originX
-  $: origin.y = $originY
-  $: origin.rotation = $originRotation
-  $: origin.alpha = $originAlpha
 
-  $: container.x = $containerX
-  $: container.y = $containerY
+  addTickerCallback(() => {
+    origin.x = $originX
+    origin.y = $originY
+    origin.rotation = $originRotation
+    origin.alpha = $originAlpha
+
+    container.x = $containerX
+    container.y = $containerY
+  })
   
   $: setFinalPos($getPos)
   $: getCurrentPos($layout, $state, $config)
@@ -70,7 +72,7 @@
 
       const duration = switchDuration - exitAt - (Math.random() * 300)
 
-      originY.set(fy + $figureHeight, { delay: exitAt, easing: d3.easeSinIn, duration, interpolate: d3.interpolateNumber })
+      originY.set(fy + $figureHeight*(.3 + Math.random()*.5), { delay: exitAt, easing: d3.easeSinIn, duration, interpolate: d3.interpolateNumber })
       originAlpha.set(0, { delay: exitAt-Math.random()*150, duration, interpolate: d3.interpolateNumber })
     }
 

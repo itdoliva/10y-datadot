@@ -6,17 +6,17 @@
   import { zoomBehaviour } from "$lib/store/zoom";
   import { cameraOffsetX, cameraOffsetY, zoom } from "$lib/store/zoom";
 
-  export let backgroundColor = 0xffffff
   
   const { wrapper, padding } = getContext('layout')
 
   const outer = new PIXI.Container() // Outer container applies zoom and paning
-  outer.name = "Camera"
   const inner = new PIXI.Container() // Inner container applies padding
+  outer.name = "Camera"
   inner.name = "Padding"
 
+  const tickerCallbacks = []
+
   outer.addChild(inner)
-  
 
   let app
   let canvas
@@ -31,10 +31,10 @@
 
   onMount(() => {
     app = new PIXI.Application({ 
-      renderer: PIXI.renderer,
+      roundPixels: true,
       view: canvas, 
       resizeTo: wrapper, 
-      backgroundColor
+      backgroundColor: 0xffffff,
     })
 
     app.stage.name = "Stage"
@@ -57,11 +57,19 @@
       .on("wheel", event => event.preventDefault())
 
     globalThis.__PIXI_APP__ = app
+
+    PIXI.Assets.add({ alias: 'petal', src: '/petal.png' })
+
+    tickerCallbacks.forEach(cb => app.ticker.add(cb))
   })
 
-  
 
-  setContext('pixi', { stage: inner })
+  setContext('pixi', { 
+    stage: inner,
+    addTickerCallback: (cb) => {
+      tickerCallbacks.push(cb)
+    }
+   })
 
 </script>
 

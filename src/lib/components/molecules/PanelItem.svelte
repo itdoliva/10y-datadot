@@ -1,6 +1,6 @@
 <script>
   export let title
-  export let icon
+  export let icon = undefined
 </script>
 
 <li class="panel-item-wrapper">

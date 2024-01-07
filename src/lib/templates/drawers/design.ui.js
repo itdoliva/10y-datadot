@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js"
 
 
-export default function uiTemplate({ nodeSize, lineWidth }, template) {
+export default function uiTemplate({ nodeSize, lineWidth }, template=new PIXI.Graphics()) {
   const uline = [
     -nodeSize*.83, -nodeSize*.5,
     nodeSize*.5, nodeSize*.83

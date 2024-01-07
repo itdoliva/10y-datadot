@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js"
 
 
-export default function infographicTemplate({ nodeSize, lineWidth }, template) {
+export default function infographicTemplate({ nodeSize, lineWidth }, template=new PIXI.Graphics()) {
   const otriangle = [0, 0, nodeSize*.5, nodeSize*.5, -nodeSize*.5, nodeSize*.5]
   template.lineStyle(lineWidth, 0x000000)
   template.drawPolygon(otriangle)

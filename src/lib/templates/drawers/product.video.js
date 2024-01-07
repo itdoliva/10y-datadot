@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js"
 
 
-export default function videoTemplate({ nodeSize, lineWidth }, template) {
+export default function videoTemplate({ nodeSize, lineWidth }, template=new PIXI.Graphics()) {
   const triangle = [
     0, 0,
     nodeSize*.12, nodeSize*.2252,

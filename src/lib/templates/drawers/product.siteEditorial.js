@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js"
 
 
-export default function siteEditorialTemplate({ nodeSize, lineWidth }, template) {
+export default function siteEditorialTemplate({ nodeSize, lineWidth }, template=new PIXI.Graphics()) {
 
   template.beginFill(0x000000)
   template.lineStyle(0)
