@@ -19,7 +19,7 @@
     flex-direction: column;
     align-items: stretch;
 
-    gap: .4em;
+    gap: .8rem;
   }
 
   .header {

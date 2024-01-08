@@ -2,7 +2,7 @@
   import "./pixi.js"
   import { width, height, pixelRatio } from "$lib/store/canvas";
   import { nodes, nNodes, fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/store/nodes";
-  import { categories } from "$lib/store/categories";
+  import { categories, categoriesEnriched } from "$lib/store/categories";
 
   import Application from "$lib/components/Application.svelte";
   import Node from "$lib/components/Node.svelte";
@@ -11,6 +11,10 @@
   import YearSliderPicker from "./components/organisms/YearSliderPicker.svelte";
   import InputGroup from "./components/molecules/InputGroup.svelte";
   import Beeswarm from "./components/organisms/Beeswarm.svelte";
+
+  console.log($nodes)
+  console.log($categories)
+  console.log($categoriesEnriched)
 
   let layout = 'block'
 
@@ -39,11 +43,21 @@
       </PanelItem>
 
       <PanelItem title="categorias de design">
-        <InputGroup categories={$categories.designs} bind:selected={$fdesigns} direction='column' />
+        <InputGroup 
+          categories={$categoriesEnriched.designs} 
+          direction='column' 
+          visualElement='pctBar'
+          bind:selected={$fdesigns} 
+        />
       </PanelItem>
 
       <PanelItem title="objetivos do projeto">
-        <InputGroup categories={$categories.goals} bind:selected={$fgoals} direction='column' />
+        <InputGroup 
+          categories={$categoriesEnriched.goals} 
+          direction='column' 
+          visualElement='colorBullet'
+          bind:selected={$fgoals} 
+        />
       </PanelItem>
 
       <PanelItem title="setores do mercado">
@@ -54,7 +68,7 @@
 
   <div class="p-wrapper pb-wrapper">
     <PanelItem title="tipos de entrega">
-        <InputGroup categories={$categories.products} bind:selected={$fproducts} />
+        <InputGroup categories={$categoriesEnriched.products} bind:selected={$fproducts} />
     </PanelItem>
   </div>
 

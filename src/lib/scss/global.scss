@@ -2,6 +2,8 @@
   --title-font-size: 12px;
   --item-font-size: 12px;
   --panel-text-transform: lowercase;
+
+  --color-accent: #818afa;
 }
 
 *, *::after, *::before {
@@ -32,17 +34,9 @@ ul {
   padding: 0;
 }
 
-label {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: .25em;
-}
-
 input:is([type="radio"], [type="checkbox"]) {
   -webkit-appearance: none;
   appearance: none; /* For iOS < 15 to remove gradient background */
-  background-color: #fff; 
   margin: 0;
   padding: 0;
 
