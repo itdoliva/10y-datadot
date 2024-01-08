@@ -8,16 +8,15 @@
   import Node from "$lib/components/Node.svelte";
   import Layout from "$lib/components/Layout.svelte";
   import PanelItem from "$lib/components/molecules/PanelItem.svelte";
-  import InputGroup from "$lib/components/molecules/InputGroup.svelte";
-  import YearSliderPicker from "./components/atoms/YearSliderPicker.svelte";
-  import Multiselect from "./components/atoms/Multiselect.svelte";
-  import Beeswarm from "./components/atoms/Beeswarm.svelte";
+  import YearSliderPicker from "./components/organisms/YearSliderPicker.svelte";
+  import InputGroup from "./components/molecules/InputGroup.svelte";
+  import Beeswarm from "./components/organisms/Beeswarm.svelte";
 
   let layout = 'block'
 
-  const vizLayouts = [
-    { text: "Block", value: "block" },
-    { text: "Radial", value: "radial" },
+  const layoutCategories = [
+    { alias: "Block", id: "block" },
+    { alias: "Radial", id: "radial" },
   ]
 
 </script>
@@ -29,10 +28,10 @@
 />
 
 <div class="grid">
-  <div class="pa-wrapper">
+  <div class="p-wrapper pa-wrapper">
     <ul>
       <PanelItem title="visualizar como">
-        <InputGroup data={vizLayouts} bind:selected={layout}/>
+        <InputGroup categories={layoutCategories} multiselect={false} bind:selected={layout}/>
       </PanelItem>
 
       <PanelItem title="período">
@@ -40,11 +39,11 @@
       </PanelItem>
 
       <PanelItem title="categorias de design">
-        <Multiselect categories={$categories.designs} bind:selected={$fdesigns} direction='column' />
+        <InputGroup categories={$categories.designs} bind:selected={$fdesigns} direction='column' />
       </PanelItem>
 
       <PanelItem title="objetivos do projeto">
-        <Multiselect categories={$categories.goals} bind:selected={$fgoals} direction='column' />
+        <InputGroup categories={$categories.goals} bind:selected={$fgoals} direction='column' />
       </PanelItem>
 
       <PanelItem title="setores do mercado">
@@ -53,9 +52,9 @@
     </ul>
   </div>
 
-  <div class="pb-wrapper">
+  <div class="p-wrapper pb-wrapper">
     <PanelItem title="tipos de entrega">
-        <Multiselect categories={$categories.products} bind:selected={$fproducts} />
+        <InputGroup categories={$categories.products} bind:selected={$fproducts} />
     </PanelItem>
   </div>
 
@@ -88,13 +87,23 @@
       "pa vi vi vi vi";
   }
 
+  .p-wrapper {
+    padding: 2rem 1rem 1rem 2rem;
+  }
+
   .pa-wrapper {
     grid-area: pa;
     border-right: 1px solid black;
-    padding: 2em 1em 1em 2em;
 
     ul {
       list-style-type: none;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+
+      gap: 2rem;
     }
   }
 

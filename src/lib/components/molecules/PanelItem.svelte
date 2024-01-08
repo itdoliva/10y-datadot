@@ -7,6 +7,7 @@
   <div class="header">
     <h6>{title}</h6>
   </div>
+
   <div class="body">
     <slot />
   </div>
@@ -17,6 +18,8 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+
+    gap: .4em;
   }
 
   .header {
@@ -26,6 +29,11 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+
+    h6 {
+      margin: 0;
+      font-size: var(--title-font-size);
+    }
   }
 
   .body {

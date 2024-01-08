@@ -1,6 +1,6 @@
 {
   "products": [
-    {"id": 0, "name": "anima/video", "alias": "Animação | Vídeo"},
+    {"id": 0, "name": "anima/video", "alias": "Animação & Vídeo"},
     {"id": 1, "name": "publicacao", "alias": "Publicação"},
     {"id": 2, "name": "relatorio", "alias": "Relatório"},
     {"id": 3, "name": "apresentacao", "alias": "Apresentação"},
