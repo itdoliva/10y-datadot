@@ -42,6 +42,8 @@
   let frotation
   let data
 
+  $: origin.renderable = node.active
+
 
   addTickerCallback(() => {
     origin.x = $originX
@@ -72,11 +74,16 @@
 
       const duration = switchDuration - exitAt - (Math.random() * 300)
 
-      originY.set(fy + $figureHeight*(.3 + Math.random()*.5), { delay: exitAt, easing: d3.easeSinIn, duration, interpolate: d3.interpolateNumber })
-      originAlpha.set(0, { delay: exitAt-Math.random()*150, duration, interpolate: d3.interpolateNumber })
+      const options = {
+        delay: exitAt,
+        duration,
+        interpolate: d3.interpolateNumber
+      }
+
+      originY.set(fy + $figureHeight*(.3 + Math.random()*.5), { ...options, easing: d3.easeSinIn })
+      originAlpha.set(0, { ...options, delay: exitAt-Math.random()*150 })
     }
 
-    // Entrances \/
     else if (layout === 'block') {
       const { entryAt } = data
       const delay = entryAt*1000
@@ -101,6 +108,7 @@
 
       originX.set(0)
       originY.set(0)
+      containerX.set(fx)
 
       if (state === "entrance") {
         originRotation.set(rotation - Math.PI/8)
@@ -115,19 +123,18 @@
 
         originRotation.set(rotation, options)
         originAlpha.set(1, options)
+
+        containerY.set(config.innerRadius)
+        containerY.set(fy, { ...options, delay: Math.max(0, options.delay-100), duration: 500})
       }
+
       else if (state === "idle") {
         originRotation.set(rotation)
       }
 
-      containerX.set(fx)
-      containerY.set(fy)
     }
 
   }
-
-
-
 
 </script>
 

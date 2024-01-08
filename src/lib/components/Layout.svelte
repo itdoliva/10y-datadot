@@ -1,10 +1,10 @@
 <script>
-  import { beforeUpdate, setContext } from "svelte";
+  import { beforeUpdate, onMount, setContext } from "svelte";
   import { writable, derived } from "svelte/store";
   import { gsap } from "gsap"
 
   import { width, height, figureWidth, figureHeight } from "$lib/store/canvas";
-  import { zoomBehaviour, updateExtents, resetZoomFactory } from "$lib/store/zoom";
+  import { zoomBehaviour, updateExtents, resetZoomFactory, cameraOffset } from "$lib/store/zoom";
   import { nodes, nNodes, nodeSize, gap } from "$lib/store/nodes";
   import getBlockConfig from "$lib/helpers/getBlockConfig"
   import getRadialConfig from "$lib/helpers/getRadialConfig"
@@ -14,6 +14,8 @@
   export let layout
 
   let wrapper
+  let resetZoom = () => undefined
+
 
   // Radial layout
   const maxStacksK = .25
@@ -26,7 +28,6 @@
   blockParams.colEntranceUpTo = switchDuration/1000 * .2
   blockParams.fullColEntranceDuration = switchDuration/1000 - blockParams.colEntranceUpTo
 
-  const resetZoom = resetZoomFactory(wrapper, switchDuration)
 
   // Stores  
   const _layout = writable(layout)
@@ -34,6 +35,10 @@
   const _config = writable()
   const _padding = writable({ left: 0, top: 0 })
 
+
+  onMount(() => {
+    resetZoom = resetZoomFactory(wrapper, switchDuration)
+  })
 
   beforeUpdate(() => {
     if ($_state != 'idle') return
@@ -43,7 +48,7 @@
     }
   })
 
-
+  $: console.log($cameraOffset)
   $: $_layout, resetZoom()
   $: updateExtents($_layout, $width, $height, $figureWidth, $figureHeight)
   
