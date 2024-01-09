@@ -1,8 +1,7 @@
 <script>
   import "./pixi.js"
-  import { width, height, pixelRatio } from "$lib/store/canvas";
   import { nodes, nNodes, fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/store/nodes";
-  import { categories, categoriesEnriched } from "$lib/store/categories";
+  import { categoriesEnriched } from "$lib/store/categories";
 
   import Application from "$lib/components/Application.svelte";
   import Node from "$lib/components/Node.svelte";
@@ -12,9 +11,6 @@
   import InputGroup from "./components/molecules/InputGroup.svelte";
   import Beeswarm from "./components/organisms/Beeswarm.svelte";
 
-  console.log($nodes)
-  console.log($categories)
-  console.log($categoriesEnriched)
 
   let layout = 'block'
 
@@ -25,11 +21,7 @@
 
 </script>
 
-<svelte:window
-  bind:innerWidth={$width} 
-  bind:innerHeight={$height} 
-  bind:devicePixelRatio={$pixelRatio} 
-/>
+
 
 <div class="grid">
   <div class="p-wrapper pa-wrapper">

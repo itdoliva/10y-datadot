@@ -1,16 +1,16 @@
 import { derived, writable } from "svelte/store";
-import { nodes } from "$lib/store/nodes";
+import { filtered } from "$lib/store/nodes";
 
 export const categories = writable({})
 
-export const categoriesEnriched = derived([ nodes, categories ], ([ $nodes, $categories ]) => {
+export const categoriesEnriched = derived([ filtered, categories ], ([ $filtered, $categories ]) => {
   if (Object.keys($categories).length === 0) return {}
 
   const enriched = {...$categories}
 
   const categoriesOfInterest = ['products', 'designs', 'industries']
 
-  const activeNodes = $nodes.filter(d => d.active)
+  const activeNodes = $filtered.filter(d => d.active)
 
   categoriesOfInterest.forEach(category => {
     enriched[category].forEach(d => {

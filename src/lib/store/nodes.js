@@ -41,7 +41,7 @@ export const nodes = derived([ filtered, sortBy ], ([ $filtered, $sortBy ]) => {
 })
 
 
-export const nNodes = derived(nodes, $nodes => $nodes.filter(d => d.active).length);
+export const nNodes = derived(filtered, $filtered => $filtered.filter(d => d.active).length);
 
 
 export const nodeSize = derived(([ width ]), ([ $width ]) => {

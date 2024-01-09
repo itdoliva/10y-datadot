@@ -48,7 +48,6 @@
     }
   })
 
-  $: console.log($cameraOffset)
   $: $_layout, resetZoom()
   $: updateExtents($_layout, $width, $height, $figureWidth, $figureHeight)
   

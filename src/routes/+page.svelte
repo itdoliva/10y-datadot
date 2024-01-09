@@ -1,13 +1,22 @@
 <script>
   import App from "$lib/App.svelte";
   import "$lib/scss/global.scss";
-  import { dataset } from "$lib/store/nodes"
+  import { dataset, nodes } from "$lib/store/nodes"
   import { categories } from "$lib/store/categories"
+  import { width, height, pixelRatio } from "$lib/store/canvas"
 
   export let data
 
-  dataset.set(data.nodes)
   categories.set(data.categories)
+  dataset.set(data.nodes)
 </script>
 
-<App />
+<svelte:window
+  bind:innerWidth={$width} 
+  bind:innerHeight={$height} 
+  bind:devicePixelRatio={$pixelRatio} 
+/>
+
+{#if $nodes.length > 0}
+  <App />
+{/if}
