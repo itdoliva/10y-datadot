@@ -13,7 +13,7 @@
     state, 
     getPos,
     config, 
-    switchDuration,
+    shiftms,
     blockParams
   } = getContext("layout")
 
@@ -33,6 +33,7 @@
   const originX = tweened(0, defaultOptions)
   const originY = tweened(0, defaultOptions)
   const originRotation = tweened(0, defaultOptions)
+  const originRenderable = tweened(true, { interpolate: interpolateConstant })
 
   const containerX = tweened(0, defaultOptions)
   const containerY = tweened(0, defaultOptions)
@@ -42,7 +43,6 @@
   let frotation
   let data
 
-  $: origin.renderable = node.active
 
 
   addTickerCallback(() => {
@@ -50,6 +50,7 @@
     origin.y = $originY
     origin.rotation = $originRotation
     origin.alpha = $originAlpha
+    origin.renderable = $originRenderable
 
     container.x = $containerX
     container.y = $containerY
@@ -69,10 +70,11 @@
 
 
   function getCurrentPos(layout, state, config) {
+    
     if ( state === 'exit') {
       const exitAt = Math.random() * .5 * 1000
 
-      const duration = switchDuration - exitAt - (Math.random() * 300)
+      const duration = shiftms - exitAt - (Math.random() * 300)
 
       const options = {
         delay: exitAt,
@@ -85,17 +87,30 @@
     }
 
     else if (layout === 'block') {
-      const { entryAt } = data
-      const delay = entryAt*1000
+      const delay = data.entryAt*1000
 
       originRotation.set(0)
-      originX.set(fx)
-      originY.set(fy)
-
-      originAlpha.set(1, { delay })
 
       containerX.set(0)
       containerY.set(0)
+
+      
+      if (state === 'filterA') {
+        originRenderable.set(node.active, { delay })
+      }
+      else if (state === 'filterB') {
+        originX.set(fx, { duration: 1000, interpolate: d3.interpolateNumber, easing: d3.easeSinIn })
+        originY.set(fy, { duration: 1000, interpolate: d3.interpolateNumber, easing: d3.easeSinIn })
+      }
+      else {
+        originX.set(fx)
+        originY.set(fy)
+        originAlpha.set(1, { delay })
+
+      }
+
+
+     
     }
 
     else if (layout === 'radial') {

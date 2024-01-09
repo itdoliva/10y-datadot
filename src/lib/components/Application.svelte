@@ -39,22 +39,11 @@
 
     app.stage.name = "Stage"
 
-    // const fpsText = new PIXI.Text('0fps', { fontSize: 12, fill: 0xFF0000 })
-    // fpsText.name = "FPS"
-    // fpsText.x = 6
-    // fpsText.y = 6
-
-    // app.ticker.add((delta) => {
-    //   const fps = Math.round(PIXI.Ticker.shared.FPS)
-    //   fpsText.text = `${fps}fps`
-    // })
-
-    // app.stage.addChild(fpsText)
     app.stage.addChild(outer)
 
     d3.select(canvas)
       .call(zoomBehaviour)
-      .on("wheel", event => event.preventDefault())
+      .on("wheel", e => e.preventDefault())
 
     globalThis.__PIXI_APP__ = app
 

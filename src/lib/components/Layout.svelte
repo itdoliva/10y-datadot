@@ -10,43 +10,78 @@
   import getRadialConfig from "$lib/helpers/getRadialConfig"
   import randomDensity from "$lib/utility/randomDensity"
 
+  // Overall Config
+  const maxStacksK = .25
+  const innerRadius = 180
+
+  const shiftms = 1000
+  const shifts = shiftms/1000
+
+  const blockParams = {}
+  blockParams.colEntranceUpTo = shiftms/1000 * .2
+  blockParams.fullColEntranceDuration = shiftms/1000 - blockParams.colEntranceUpTo
+
 
   export let layout
 
   let wrapper
   let resetZoom = () => undefined
 
+  let nextLayout = layout
+  let prevCount = $nNodes
+  let prevState
 
-  // Radial layout
-  const maxStacksK = .25
-  const innerRadius = 180
-
-  // Transition switchDuration ms
-  const switchDuration = 1000
-
-  const blockParams = {}
-  blockParams.colEntranceUpTo = switchDuration/1000 * .2
-  blockParams.fullColEntranceDuration = switchDuration/1000 - blockParams.colEntranceUpTo
-
+  const tl = gsap.timeline()
+  
 
   // Stores  
   const _layout = writable(layout)
-  const _state = writable('idle')
+  const _state = writable('entrance')
+  const _filter = writable()
   const _config = writable()
   const _padding = writable({ left: 0, top: 0 })
 
 
   onMount(() => {
-    resetZoom = resetZoomFactory(wrapper, switchDuration)
+    resetZoom = resetZoomFactory(wrapper, shiftms)
   })
 
+
   beforeUpdate(() => {
-    if ($_state != 'idle') return
-    
-    if ($_layout != layout) {
-      switchLayout(layout)
+    // If layout is changed
+    if (layout != $_layout) {
+      nextLayout = layout
+      _state.set('exit')
+    }
+
+
+    // Data filtered
+    if (prevCount != $nNodes) {
+      _filter.set(prevCount > $nNodes ? 'exclusion' : 'inclusion')
+      _state.set('filterA')
+      prevCount = $nNodes
+    }
+
+
+    if (prevState != $_state) {
+      prevState = $_state
+      tl.clear()
+      tl.add(() => {
+        if ($_state === 'exit') {
+          _state.set('entrance')
+          _layout.set(nextLayout)
+          nextLayout = undefined
+        }
+        else if ($_state === 'entrance' || $_state === 'filterB') {
+          _state.set('idle')
+        }
+        else if ($_state == 'filterA') {
+          _state.set('filterB')
+        }
+      }, `+=${shifts}`)
     }
   })
+
 
   $: $_layout, resetZoom()
   $: updateExtents($_layout, $width, $height, $figureWidth, $figureHeight)
@@ -128,18 +163,6 @@
   }
   
 
-  function switchLayout(newLayout) {
-    const tl = gsap.timeline()
-
-    const seconds = switchDuration/1000
-
-    tl.add(() => _state.set('exit'))
-    tl.add(() => _layout.set(newLayout), `+=${seconds}`)
-    tl.add(() => _state.set('entrance'))
-    tl.add(() => _state.set('idle'), `+=${seconds}`)
-  }
-
-
 
 
 
@@ -150,7 +173,7 @@
     state: _state,
     config: _config,
     padding: _padding,
-    switchDuration,
+    shiftms,
     blockParams,
   })
 
@@ -165,14 +188,23 @@
   bind:clientWidth={$figureWidth}
   bind:clientHeight={$figureHeight}
 >
+  <p>{$_state}</p>
   {#if $figureWidth > 100}
     <slot />
   {/if}
 </div>
 
-<style>
+<style lang="scss">
   .wrapper {
     width: 100%;
     height: 100%;
+
+    position: relative;
+
+    p {
+      position: absolute;
+      top: -12px;
+      left: 12px;
+    }
   }
 </style>
