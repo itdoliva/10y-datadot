@@ -34,15 +34,22 @@ export const filtered = derived(
   })
 
 
+let counter = 0 
 export const nodes = derived([ filtered, sortBy ], ([ $filtered, $sortBy ]) => {
-  console.log('nodes')
-  return [...$filtered]
+  counter++
+
+  const arr = [...$filtered]
     .sort((a, b) => 
       (+(b.active) - +(a.active)) || // Descending because we want active (1) before unactive (0)
       (a.id - b.id)
       // (a[$sortBy] - b[$sortBy])
     )
-    .map((item, i) => ({ ...item, i }))
+    .map((item, i) => ({ ...item, i, counter }))
+
+  arr.counter = counter
+
+  return arr
+
 })
 
 
