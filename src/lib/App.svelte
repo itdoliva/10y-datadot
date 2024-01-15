@@ -1,4 +1,5 @@
 <script>
+	import { hovered } from '$lib/store/canvas.js';
   import "./pixi.js"
   import { nodes, nNodes, fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/store/nodes";
   import { categoriesEnriched } from "$lib/store/categories";
@@ -18,6 +19,8 @@
     { alias: "Block", id: "block" },
     { alias: "Radial", id: "radial" },
   ]
+
+  // $: console.log($nodes)
 
 </script>
 
@@ -120,5 +123,10 @@
 
   .viz-wrapper {
     grid-area: vi;
+
+    // margin: auto auto;
+    // width: 160px;
+    // height: 200px;
+    // border: 1px solid black;
   }
 </style>

@@ -17,10 +17,6 @@
   const shiftms = 1000
   const shifts = shiftms/1000
 
-  const blockParams = {}
-  blockParams.colEntranceUpTo = shiftms/1000 * .2
-  blockParams.fullColEntranceDuration = shiftms/1000 - blockParams.colEntranceUpTo
-
 
   export let layout
 
@@ -33,13 +29,13 @@
 
   const tl = gsap.timeline()
   
-
   // Stores  
   const _layout = writable(layout)
   const _state = writable('entrance')
   const _filter = writable()
   const _config = writable()
-  const _padding = writable({ left: 0, top: 0 })
+  const _prevConfig = writable()
+
 
 
   onMount(() => {
@@ -57,8 +53,16 @@
 
     // Data filtered
     if (prevCount != $nNodes) {
-      _filter.set(prevCount > $nNodes ? 'exclusion' : 'inclusion')
-      _state.set('filterA')
+      const filter = prevCount > $nNodes ? 'exclusion' : 'inclusion'
+
+      // Defines the first state of the filter type
+      const filterState = filter === 'exclusion' 
+        ? 'filter' // First step on exclusion is to _filter_ out, then move
+        : 'move' // First step on inclusion is to _move_, then filter in
+
+      _filter.set(filter)
+      _state.set(filterState)
+
       prevCount = $nNodes
     }
 
@@ -72,12 +76,24 @@
           _layout.set(nextLayout)
           nextLayout = undefined
         }
-        else if ($_state === 'entrance' || $_state === 'filterB') {
+        else if ($_state === 'entrance') {
           _state.set('idle')
         }
-        else if ($_state == 'filterA') {
-          _state.set('filterB')
-        }
+        else if ($_filter === 'exclusion' && $_state === 'filter') {
+          _state.set('move')
+        } 
+        else if ($_filter === 'exclusion' && $_state === 'move') {
+          _state.set('idle')
+          _filter.set()
+        } 
+        else if ($_filter === 'inclusion' && $_state === 'move') {
+          _state.set('filter')
+        } 
+        else if ($_filter === 'inclusion' && $_state === 'filter') {
+          _state.set('idle')
+          _filter.set()
+        } 
+
       }, `+=${shifts}`)
     }
   })
@@ -87,48 +103,68 @@
   $: updateExtents($_layout, $width, $height, $figureWidth, $figureHeight)
   
 
-  const getPos_d = derived([_layout, nNodes, nodeSize, gap, figureWidth, figureHeight],
-    ([$layout, $nNodes, $size, $gap, $fw, $fh]) => {
-      return getPos[$layout]($nNodes, "year", $size, $gap, $fw, $fh)
+  const getPos_d = derived([_layout, nodes, nodeSize, gap, figureWidth, figureHeight],
+    ([$layout, $nodes, $size, $gap, $fw, $fh]) => {
+      const nNodes = $nodes.filter(d => d.active).length
+      return getPos[$layout](nNodes, "year", $size, $gap, $fw, $fh)
     }
   )
 
   // Layouts
   const getPos = {}
 
-  getPos.block = (nNodes, groupBy, nodeSize, gap, fw, fh) => {
-    const { rows, columns, padding, extent } = getBlockConfig(nNodes, nodeSize, gap, fw, fh)
+  getPos.colEntranceUpTo = shiftms/1000 * .2
+  getPos.fullColEntranceDuration = shiftms/1000 - getPos.colEntranceUpTo
 
+
+  getPos.block = (nNodes, groupBy, nodeSize, gap, fw, fh) => {
+    const { rows, columns, padding, extent, maxRowsOnView, blockHeight } = getBlockConfig(nNodes, nodeSize, gap, fw, fh)
+    
     // The calculation below support block entrance animation
     const columnDensities = randomDensity(columns)
+    const timeStepByRow = +(getPos.fullColEntranceDuration / maxRowsOnView).toFixed(4)
 
-    const timeStepByRow = +(blockParams.fullColEntranceDuration / rows).toFixed(4)
+    console.log({columns, nNodes, rows, maxRowsOnView })
 
-    _padding.set(padding)
+    _prevConfig.set($_config)
     _config.set({ rows, columns, columnDensities, timeStepByRow })
 
     // Adjust zoom
     zoomBehaviour.translateExtent(extent)
     resetZoom(0)
 
+    const getDelay = (data, prev=false) => {
+      if (!data) return 0
+
+      const { row, column } = data
+
+      const config = prev ? $_prevConfig : $_config
+      const { columnDensities, timeStepByRow } = config
+
+      const columnDelay = columnDensities[column] * getPos.colEntranceUpTo
+      const rowDelay = timeStepByRow * row
+
+      return +(columnDelay + rowDelay).toFixed(3)
+    }
+
     return ({ i }) => {
       // Calculate the node row and column indices for the given i
       const column = Math.floor(i % columns)
       const row = Math.floor(i / columns)
 
-      const fx = column * (nodeSize + gap) + nodeSize/2
-      const fy = row * (nodeSize + gap) + nodeSize/2
+      const fx = column * (nodeSize + gap) + nodeSize/2 - fw/2 + padding.left
+      const fy = row * (nodeSize + gap) + nodeSize/2 - fh/2 + padding.top
 
-      const colDensity = columnDensities[column]
-      const entryAt = colDensity * blockParams.colEntranceUpTo + timeStepByRow * row
+      const delay = getDelay({ row, column})
+      
 
-      return { fx, fy, data: { row, column, entryAt } }
+
+      return { fx, fy, data: { row, column, delay, getDelay, columns, rows, i } }
     }
   }
 
   getPos.radial = (nNodes, groupBy, nodeSize, gap, fw, fh) => {
     const {
-      padding,
       extent,
       grouped,
       sectorRadiansScale,
@@ -136,7 +172,6 @@
       maxStacks
     } = getRadialConfig($nodes, nNodes, nodeSize, gap, groupBy, innerRadius, maxStacksK, fw, fh)
 
-    _padding.set(padding)
     _config.set({ grouped, sectorRadiansScale, pileRadiansScale, innerRadius, maxStacks })
 
     // Adjust zoom
@@ -161,8 +196,6 @@
       return { fx: 0, fy: radius, rotation: radians, data: { radius, radians } }
     }
   }
-  
-
 
 
 
@@ -172,9 +205,8 @@
     layout: _layout,
     state: _state,
     config: _config,
-    padding: _padding,
+    filter: _filter,
     shiftms,
-    blockParams,
   })
 
 
@@ -188,7 +220,11 @@
   bind:clientWidth={$figureWidth}
   bind:clientHeight={$figureHeight}
 >
-  <p>{$_state}</p>
+  <div>
+    <p style:opacity={$_filter ? 1 : 0}>filter: {$_filter}</p>
+    <p>state: {$_state}</p>
+  </div>
+
   {#if $figureWidth > 100}
     <slot />
   {/if}
@@ -201,10 +237,17 @@
 
     position: relative;
 
-    p {
+
+    div {
       position: absolute;
-      top: -12px;
-      left: 12px;
+      bottom: 0;
+      right: 110%;
+      font-weight: 900;
+
+      p {
+        background: yellow;
+        padding: 0 12px;
+      }
     }
   }
 </style>

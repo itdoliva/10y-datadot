@@ -7,26 +7,19 @@
   import { cameraOffsetX, cameraOffsetY, zoom } from "$lib/store/zoom";
 
   
-  const { wrapper, padding } = getContext('layout')
+  const { wrapper } = getContext('layout')
 
-  const outer = new PIXI.Container() // Outer container applies zoom and paning
-  const inner = new PIXI.Container() // Inner container applies padding
-  outer.name = "Camera"
-  inner.name = "Padding"
+  const root = new PIXI.Container()
+  root.name = "Root"
 
   const tickerCallbacks = []
-
-  outer.addChild(inner)
 
   let app
   let canvas
 
-  $: outer.x = $cameraOffsetX
-  $: outer.y = $cameraOffsetY
-  $: outer.scale.set($zoom)
-
-  $: inner.x = $padding.left
-  $: inner.y = $padding.top
+  $: root.x = $cameraOffsetX + $figureWidth/2
+  $: root.y = $cameraOffsetY + $figureHeight/2
+  $: root.scale.set($zoom)
 
 
   onMount(() => {
@@ -39,7 +32,7 @@
 
     app.stage.name = "Stage"
 
-    app.stage.addChild(outer)
+    app.stage.addChild(root)
 
     d3.select(canvas)
       .call(zoomBehaviour)
@@ -54,7 +47,7 @@
 
 
   setContext('pixi', { 
-    stage: inner,
+    stage: root,
     addTickerCallback: (cb) => {
       tickerCallbacks.push(cb)
     }

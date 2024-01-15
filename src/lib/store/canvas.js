@@ -6,3 +6,5 @@ export const pixelRatio = writable(1);
 
 export const figureWidth = writable(0);
 export const figureHeight = writable(0);
+
+export const hovered = writable()

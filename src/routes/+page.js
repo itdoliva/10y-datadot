@@ -50,7 +50,7 @@ export async function load({ fetch }) {
     prodList.push(products.slice(products.length-2)[Math.random() < .5 ? 0 : 1].id)
     prodList.push(products.slice(0, products.length-2)[Math.floor(Math.random()*(products.length-2))].id)
 
-    nodes.push({ 
+    const node = { 
       id: i, 
       year,
       channel: getCategories(channels, false),
@@ -59,7 +59,17 @@ export async function load({ fetch }) {
       industry: getCategories(industries, false),
       products: prodList,
       active: true
-    })
+    }
+
+    node.ids = [
+      node.channel, 
+      node.designs, 
+      node.goals, 
+      node.industry, 
+      node.products
+    ].flat()
+
+    nodes.push(node)
   }
 
   return {

@@ -1,7 +1,7 @@
 <script>
   import { getContext } from "svelte";
   import { tweened } from "svelte/motion";
-  import { figureHeight } from "$lib/store/canvas";
+  import { figureHeight, hovered } from "$lib/store/canvas";
   import * as d3 from "d3"
   import * as PIXI from "pixi.js"
   import Pokemon from './Pokemon.svelte';
@@ -11,16 +11,16 @@
   const { 
     layout, 
     state, 
+    filter,
     getPos,
     config, 
-    shiftms,
-    blockParams
+    shiftms
   } = getContext("layout")
 
   const { stage, addTickerCallback } = getContext("pixi")
 
   const origin = new PIXI.Container()
-  origin.name = "Node " + node.id
+  origin.name = node.id
   stage.addChild(origin)
 
   const container = new PIXI.Container()
@@ -30,6 +30,7 @@
   const defaultOptions = { duration: 1, interpolate: interpolateConstant }
 
   const originAlpha = tweened(1, defaultOptions)
+  const originScale = tweened(1, defaultOptions)
   const originX = tweened(0, defaultOptions)
   const originY = tweened(0, defaultOptions)
   const originRotation = tweened(0, defaultOptions)
@@ -38,83 +39,104 @@
   const containerX = tweened(0, defaultOptions)
   const containerY = tweened(0, defaultOptions)
   
-  let fx
-  let fy
-  let frotation
-  let data
-
-
+  let prevPos
+  let pos
 
   addTickerCallback(() => {
     origin.x = $originX
     origin.y = $originY
     origin.rotation = $originRotation
+    // origin.renderable = $originRenderable
     origin.alpha = $originAlpha
-    origin.renderable = $originRenderable
+    origin.scale.set($originScale)
 
     container.x = $containerX
     container.y = $containerY
   })
-  
-  $: setFinalPos($getPos)
-  $: getCurrentPos($layout, $state, $config)
 
-
-  function setFinalPos(getPos) {
-    const pos = getPos(node)
-    fx = pos.fx
-    fy = pos.fy
-    frotation = pos.rotation
-    data = pos.data
+  $: {
+    prevPos = pos
+    pos = $getPos(node)
   }
 
+  $: {
+    if ( $state === 'exit') {
+      const fallDelay = Math.random() * .5 * 1000
+      const fadeoutDelay = Math.max(0, fallDelay - Math.random()*150)
 
-  function getCurrentPos(layout, state, config) {
-    
-    if ( state === 'exit') {
-      const exitAt = Math.random() * .5 * 1000
+      const y = pos.fy + $figureHeight*(Math.random()*.5 + .3)
 
-      const duration = shiftms - exitAt - (Math.random() * 300)
+      const duration = shiftms - fallDelay - (Math.random() * 300)
 
-      const options = {
-        delay: exitAt,
-        duration,
-        interpolate: d3.interpolateNumber
-      }
+      const options = { duration, interpolate: d3.interpolateNumber }
 
-      originY.set(fy + $figureHeight*(.3 + Math.random()*.5), { ...options, easing: d3.easeSinIn })
-      originAlpha.set(0, { ...options, delay: exitAt-Math.random()*150 })
+      // Fall
+      originY.set(y, { ...options, delay: fallDelay, easing: d3.easeSinIn }) 
+
+      // Fade Out
+      originAlpha.set(0, { ...options, delay: fadeoutDelay }) 
     }
 
-    else if (layout === 'block') {
-      const delay = data.entryAt*1000
 
+    else if ($layout === 'block') {
+      // At any state of the block layout, there is not origin rotation
+      // and the container does not 
       originRotation.set(0)
-
       containerX.set(0)
       containerY.set(0)
+      // const entranceDelay = pos.data.getDelay(pos.data) * 1000 
+      // const exitDelay = pos.data.getDelay(prevPos?.data, true) * 1000
+      const entranceDelay = pos.data.delay * 1000 
+      const exitDelay = prevPos ? prevPos.data.delay * 1000 : 0
+      if (node.id === 0) console.log(`
+        ${$state};\n
+        cur: ${pos.data.row}, ${pos.data.column}\n
+        prv: ${prevPos?.data.row}, ${prevPos?.data.column}\n
+        -> ${entranceDelay}, ${pos.data.getDelay(pos.data) * 1000}\n
+        <- ${exitDelay}, ${pos.data.getDelay(prevPos?.data, true) * 1000}
+      `)
 
-      
-      if (state === 'filterA') {
+      if (node.active !== $originRenderable) {
+        const delay = node.active 
+          ? entranceDelay // If prev <> cur & cur = true, it's entering
+          : exitDelay // If prev <> cur & cur = false, it's exiting
+
+        // if (delay > 1000) {
+        //   console.log({ 
+        //     id: node.id, 
+        //     y: node.active ? pos.fy : prevPos.fy,
+        //     delay, 
+        //     type: node.active ? 'entrance' : 'exit'
+        //   })
+        // }
+
         originRenderable.set(node.active, { delay })
-      }
-      else if (state === 'filterB') {
-        originX.set(fx, { duration: 1000, interpolate: d3.interpolateNumber, easing: d3.easeSinIn })
-        originY.set(fy, { duration: 1000, interpolate: d3.interpolateNumber, easing: d3.easeSinIn })
-      }
-      else {
-        originX.set(fx)
-        originY.set(fy)
-        originAlpha.set(1, { delay })
-
+        originScale.set(node.active ? 1 : .2, { delay })
       }
 
+      if ($state === 'idle' || $state === 'entrance') {
+        originAlpha.set(1, { delay: entranceDelay })
+        originX.set(pos.fx)
+        originY.set(pos.fy)
+      }
+      else if ($state === 'filter') {
+        originAlpha.set(1, { delay: exitDelay })
+      }
+      else if ($state === 'move' && $filter === 'exclusion') {
+        const moveOptions = {
+          duration: shiftms,
+          interpolate: d3.interpolateNumber,
+          easing: d3.easeSinIn
+        }
 
-     
+        originX.set(pos.fx, moveOptions)
+        originY.set(pos.fy, moveOptions)
+      }
+
     }
 
-    else if (layout === 'radial') {
-      const { radians } = data
+    else if ($layout === 'radial') {
+      const { radians } = pos.data
       const rotation = radians - Math.PI/2
 
       const delayScale = d3.scaleLinear()
@@ -123,9 +145,9 @@
 
       originX.set(0)
       originY.set(0)
-      containerX.set(fx)
+      containerX.set(pos.fx)
 
-      if (state === "entrance") {
+      if ($state === "entrance") {
         originRotation.set(rotation - Math.PI/8)
         originAlpha.set(0)
 
@@ -139,17 +161,17 @@
         originRotation.set(rotation, options)
         originAlpha.set(1, options)
 
-        containerY.set(config.innerRadius)
-        containerY.set(fy, { ...options, delay: Math.max(0, options.delay-100), duration: 500})
+        containerY.set($config.innerRadius)
+        containerY.set(pos.fy, { ...options, delay: Math.max(0, options.delay-100), duration: 500})
       }
 
-      else if (state === "idle") {
+      else if ($state === "idle") {
         originRotation.set(rotation)
       }
 
     }
-
   }
+
 
 </script>
 

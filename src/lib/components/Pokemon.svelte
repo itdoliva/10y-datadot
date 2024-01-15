@@ -12,28 +12,34 @@
   const template = new PIXI.Graphics()
   template.cacheAsBitmap = true
 
-  parent.addChild(template)
+  const text = new PIXI.Text('', { align: 'center', textBaseline: 'middle', fontSize: 8, textBaseline: 'middle', lineHeight: 8 })
+  text.anchor.set(.5)
+
+  $: text.text = node.id //\n(${node.i}
+
+  parent.addChild(template, text)
+  
   
 
   // Behind Basis
-  if (node.designs.includes(0)) templates.illustration(templates.options, template)
-  if (node.designs.includes(1)) templates.editorial(templates.options, template)
-  if (node.designs.includes(3)) templates.service(templates.options, template)
-  if (node.designs.includes(4)) templates.ui(templates.options, template)
+  // if (node.designs.includes(20)) templates.illustration(templates.options, template)
+  // if (node.designs.includes(21)) templates.editorial(templates.options, template)
+  // if (node.designs.includes(23)) templates.service(templates.options, template)
+  // if (node.designs.includes(24)) templates.ui(templates.options, template)
 
   // Basis
   const basisGraphic = templates[channelName](templates.options, template)
 
   // In front of Basis
-  if (node.products.includes(6)) template.addChild(mask(templates.dashboard(templates.options)))
-  if (node.products.includes(7)) template.addChild(mask(templates.infographic(templates.options)))
-  if (node.products.includes(0)) templates.video(templates.options, template)
-  if (node.products.includes(1)) templates.publication(templates.options, template)
-  if (node.products.includes(2)) templates.report(templates.options, template)
-  if (node.products.includes(3)) templates.presentation(templates.options, template)
-  if (node.products.includes(4)) templates.siteInstitutional(templates.options, template)
-  if (node.products.includes(5)) templates.siteEditorial(templates.options, template)
-  if (node.designs.includes(2)) templates.motion(templates.options, template)
+  // if (node.products.includes(16)) template.addChild(mask(templates.dashboard(templates.options)))
+  // if (node.products.includes(17)) template.addChild(mask(templates.infographic(templates.options)))
+  // if (node.products.includes(10)) templates.video(templates.options, template)
+  // if (node.products.includes(11)) templates.publication(templates.options, template)
+  // if (node.products.includes(12)) templates.report(templates.options, template)
+  // if (node.products.includes(13)) templates.presentation(templates.options, template)
+  // if (node.products.includes(14)) templates.siteInstitutional(templates.options, template)
+  // if (node.products.includes(15)) templates.siteEditorial(templates.options, template)
+  // if (node.designs.includes(22)) templates.motion(templates.options, template)
 
 
   node.goals.forEach(d => {

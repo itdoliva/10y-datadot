@@ -3,26 +3,30 @@ export default function getBlockConfig(nNodes, nodeSize, gap, fw, fh) {
     const aspectRatio = fw / fh
     let rows = Math.ceil(Math.sqrt(nNodes / aspectRatio))
     let columns = Math.ceil(aspectRatio * rows)
+    rows = Math.ceil(nNodes / columns)
 
     // Make sure all nodes will fit the figure width
-    let blockWidth = columns * (nodeSize + gap) - gap
+    let blockWidth = columns * (nodeSize + gap) - gap + nodeSize
     while ((blockWidth + nodeSize) > fw) {
       // Remove one node column
-      columns--
+      columns -= 1
 
       // Calculate new block width and amount of rows
-      blockWidth = columns * (nodeSize + gap) - gap
+      blockWidth = columns * (nodeSize + gap) - gap + nodeSize 
       rows = Math.ceil(nNodes / columns)
     }
+
 
     const blockHeight = rows * (nodeSize + gap) - gap
 
     const padding = {
-      left: (fw - blockWidth)/2,
+      left: (fw - blockWidth)/2 + nodeSize/2,
       top: blockHeight < fh 
         ? (fh - blockHeight)/2 
         : nodeSize
     }
+
+    const maxRowsOnView = Math.min(rows, Math.ceil((fh - padding.top) / (nodeSize + gap)))
 
     // Layout Dimensions
     const extentX = [0, fw]
@@ -31,23 +35,14 @@ export default function getBlockConfig(nNodes, nodeSize, gap, fw, fh) {
       : [0, blockHeight + 2*nodeSize]
     const extent = extentX.map((_, i) => [ extentX[i], extentY[i] ])
 
-    // Getters
-    const xScale = ({ i }) => {
-      const index = Math.floor(i % columns)
-      return index * (nodeSize + gap) + nodeSize/2 + padding.left
-    }
-
-    const yScale = ({ i }) => {
-      const index = Math.floor(i / columns)
-      return index * (nodeSize + gap) + nodeSize/2 + padding.top
-    }
 
     return {
       rows,
       columns,
       padding,
       extent,
-      xScale,
-      yScale
+      blockWidth,
+      blockHeight,
+      maxRowsOnView,
     }
 }

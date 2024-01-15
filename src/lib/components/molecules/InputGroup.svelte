@@ -1,4 +1,5 @@
 <script>
+	import { hovered } from '$lib/store/canvas.js';
   import Button from "../atoms/Button.svelte";
   import PercentageBar from "../atoms/PercentageBar.svelte";
   export let categories
@@ -18,7 +19,10 @@
     {#each categories as { id, alias, nNodes, pctNodes, color }}
       <li>
 
-        <label>
+        <label 
+          on:mouseenter={() => $hovered = id}
+          on:mouseleave={() => $hovered = undefined}
+        >
 
           <div 
             class="input-wrapper"
