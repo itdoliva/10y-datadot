@@ -139,7 +139,11 @@
       grid-template-areas: 
         "check"
         "icon"
-        "label"
+        "label";
+
+      .label-wrapper {
+        text-align: center;
+      }
     }
 
 
@@ -150,6 +154,8 @@
       position: relative;
       display: flex;
       align-items: center;
+
+      justify-self: center;
 
       .circle-wrapper {
         position: absolute;
