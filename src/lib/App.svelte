@@ -30,7 +30,12 @@
   <div class="p-wrapper pa-wrapper">
     <ul>
       <PanelItem title="visualizar como">
-        <InputGroup categories={layoutCategories} multiselect={false} bind:selected={layout}/>
+        <InputGroup 
+          gridlayout="layout"
+          categories={layoutCategories} 
+          multiselect={false} 
+          bind:selected={layout}
+        />
       </PanelItem>
 
       <PanelItem title="período">
@@ -39,6 +44,7 @@
 
       <PanelItem title="categorias de design">
         <InputGroup 
+          gridlayout="design"
           categories={$categoriesEnriched.designs} 
           direction='column' 
           visualElement='pctBar'
@@ -48,6 +54,7 @@
 
       <PanelItem title="objetivos do projeto">
         <InputGroup 
+        gridlayout="goal"
           categories={$categoriesEnriched.goals} 
           direction='column' 
           visualElement='colorBullet'
@@ -63,7 +70,11 @@
 
   <div class="p-wrapper pb-wrapper">
     <PanelItem title="tipos de entrega">
-        <InputGroup categories={$categoriesEnriched.products} bind:selected={$fproducts} />
+        <InputGroup 
+          gridlayout="product"
+          categories={$categoriesEnriched.products} 
+          bind:selected={$fproducts} 
+        />
     </PanelItem>
   </div>
 
