@@ -4,93 +4,106 @@
   import { nodes, nNodes, fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/store/nodes";
   import { categoriesEnriched } from "$lib/store/categories";
 
-  import Application from "$lib/components/Application.svelte";
+  import Pixi from "$lib/components/Pixi.svelte";
   import Node from "$lib/components/Node.svelte";
   import Layout from "$lib/components/Layout.svelte";
   import PanelItem from "$lib/components/molecules/PanelItem.svelte";
   import YearSliderPicker from "./components/organisms/YearSliderPicker.svelte";
   import InputGroup from "./components/molecules/InputGroup.svelte";
   import Beeswarm from "./components/organisms/Beeswarm.svelte";
+  import Visualization from '$lib/components/Visualization.svelte';
 
 
   let layout = 'block'
+  let app
+
+  let contentBoxSize
+
+  $: console.log(contentBoxSize)
 
   const layoutCategories = [
     { alias: "Block", id: "block" },
     { alias: "Radial", id: "radial" },
   ]
-
-  // $: console.log($nodes)
-
+// https://webglfundamentals.org/webgl/lessons/webgl-multiple-views.html#toc
 </script>
 
+<div class="root">
 
+  <Pixi bind:app={app}/>
 
-<div class="grid">
-  <div class="p-wrapper pa-wrapper">
-    <ul>
-      <PanelItem title="visualizar como">
-        <InputGroup 
-          gridlayout="layout"
-          categories={layoutCategories} 
-          multiselect={false} 
-          bind:selected={layout}
-        />
+  <div class="grid">
+    <div class="p-wrapper pa-wrapper"  bind:borderBoxSize={contentBoxSize}>
+      <ul>
+        <PanelItem title="visualizar como">
+          <InputGroup 
+            gridlayout="layout"
+            categories={layoutCategories} 
+            multiselect={false} 
+            bind:selected={layout}
+          />
+        </PanelItem>
+
+        <PanelItem title="período">
+          <!-- <YearSliderPicker min={2014} max={2024} bind:selected={$fyears} /> -->
+        </PanelItem>
+
+        <PanelItem title="categorias de design">
+          <InputGroup 
+            gridlayout="design"
+            categories={$categoriesEnriched.designs} 
+            direction='column' 
+            visualElement='pctBar'
+            bind:selected={$fdesigns} 
+          />
+        </PanelItem>
+
+        <PanelItem title="objetivos do projeto">
+          <InputGroup 
+          gridlayout="goal"
+            categories={$categoriesEnriched.goals} 
+            direction='column' 
+            visualElement='colorBullet'
+            bind:selected={$fgoals} 
+          />
+        </PanelItem>
+
+        <PanelItem title="setores do mercado">
+          <!-- <Beeswarm category="industry" categories={$categories.industries} bind:selected={$findustries} /> -->
+        </PanelItem>
+      </ul>
+    </div>
+
+    <div class="p-wrapper pb-wrapper">
+      <PanelItem title="tipos de entrega">
+          <InputGroup 
+            gridlayout="product"
+            categories={$categoriesEnriched.products} 
+            bind:selected={$fproducts} 
+          />
       </PanelItem>
+    </div>
 
-      <PanelItem title="período">
-        <!-- <YearSliderPicker min={2014} max={2024} bind:selected={$fyears} /> -->
-      </PanelItem>
-
-      <PanelItem title="categorias de design">
-        <InputGroup 
-          gridlayout="design"
-          categories={$categoriesEnriched.designs} 
-          direction='column' 
-          visualElement='pctBar'
-          bind:selected={$fdesigns} 
-        />
-      </PanelItem>
-
-      <PanelItem title="objetivos do projeto">
-        <InputGroup 
-        gridlayout="goal"
-          categories={$categoriesEnriched.goals} 
-          direction='column' 
-          visualElement='colorBullet'
-          bind:selected={$fgoals} 
-        />
-      </PanelItem>
-
-      <PanelItem title="setores do mercado">
-        <!-- <Beeswarm category="industry" categories={$categories.industries} bind:selected={$findustries} /> -->
-      </PanelItem>
-    </ul>
-  </div>
-
-  <div class="p-wrapper pb-wrapper">
-    <PanelItem title="tipos de entrega">
-        <InputGroup 
-          gridlayout="product"
-          categories={$categoriesEnriched.products} 
-          bind:selected={$fproducts} 
-        />
-    </PanelItem>
-  </div>
-
-  <div class="viz-wrapper">
-    <Layout bind:layout>
-      <Application>
-        {#each $nodes as node (node.id)}
-          <Node {node} />
-        {/each}
-      </Application>
-    </Layout>
+    <div class="viz-wrapper">
+      {#if app}
+        <Visualization app={app}>
+          <Layout bind:layout>
+            {#each $nodes as node (node.id)}
+              <Node {node} />
+            {/each}
+          </Layout>
+        </Visualization>
+      {/if}
+    </div>
   </div>
 </div>
 
 
 <style lang="scss">
+  .root {
+    position: relative;
+  }
+
   .grid {
     width: 100vw;
     height: 100vh;
@@ -134,10 +147,5 @@
 
   .viz-wrapper {
     grid-area: vi;
-
-    // margin: auto auto;
-    // width: 160px;
-    // height: 200px;
-    // border: 1px solid black;
   }
 </style>

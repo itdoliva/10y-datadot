@@ -18,11 +18,11 @@
     shiftms
   } = getContext("layout")
 
-  const { stage, addTickerCallback } = getContext("pixi")
+  const { app, scene } = getContext("viz")
 
   const origin = new PIXI.Container()
   origin.name = node.id
-  stage.addChild(origin)
+  scene.addChild(origin)
 
   const container = new PIXI.Container()
   origin.addChild(container)
@@ -43,7 +43,7 @@
   let prevPos
   let pos
 
-  addTickerCallback(() => {
+  app.ticker.add(() => {
     origin.x = $originX
     origin.y = $originY
     origin.rotation = $originRotation

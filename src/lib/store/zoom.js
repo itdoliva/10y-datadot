@@ -59,13 +59,3 @@ export function updateExtents(layout, ww, wh, fw, fh) {
     zoomBehaviour.scaleExtent([1, 1])
   }
 }
-
-export function resetZoomFactory(target, duration=1000) {
-  return () => {
-    d3.select(target)
-      .transition()
-      .duration(duration)
-      .ease(d3.easeCubicInOut)
-      .call(zoomBehaviour.transform, d3.zoomIdentity)
-  }
-}

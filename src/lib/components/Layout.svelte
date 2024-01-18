@@ -1,35 +1,28 @@
 <script>
-  import { beforeUpdate, onMount, setContext } from "svelte";
+  import { beforeUpdate, setContext, getContext } from "svelte";
   import { writable, derived } from "svelte/store";
-  import { gsap } from "gsap"
+  import { gsap } from "gsap";
   import * as d3 from "d3";
 
   import { width, height, figureWidth, figureHeight } from "$lib/store/canvas";
-  import { zoomBehaviour, updateExtents, resetZoomFactory, cameraOffset } from "$lib/store/zoom";
+  import { zoomBehaviour, updateExtents } from "$lib/store/zoom";
   import { nodes, nNodes, nodeSize, gap } from "$lib/store/nodes";
   import getBlockConfig from "$lib/helpers/getBlockConfig"
   import getRadialConfig from "$lib/helpers/getRadialConfig"
   import randomDensity from "$lib/utility/randomDensity"
 
-  // Overall Config
-  const maxStacksK = .25
-  const innerRadius = 180
-
-  const shiftms = 1000
-  const shifts = shiftms/1000
-
+  import layoutConfig from "$lib/config/layout"
 
   export let layout
-
-  let wrapper
-  let resetZoom = () => undefined
 
   let nextLayout = layout
   let prevCount = $nNodes
   let prevState
 
   const tl = gsap.timeline()
-  
+  const { resetZoom } = getContext("viz")
+  const { maxStacksK, innerRadius, shiftms, shifts } = layoutConfig
+
   // Stores  
   const _layout = writable(layout)
   const _state = writable('entrance')
@@ -39,17 +32,12 @@
   const _prevConfig = writable()
 
 
-
-  onMount(() => {
-    resetZoom = resetZoomFactory(wrapper, shiftms)
-  })
-
-
   beforeUpdate(() => {
     // If layout is changed
     if (layout != $_layout) {
       nextLayout = layout
       _state.set('exit')
+      resetZoom()
     }
 
 
@@ -102,7 +90,6 @@
   })
 
 
-  $: $_layout, resetZoom()
   $: updateExtents($_layout, $width, $height, $figureWidth, $figureHeight)
   
 
@@ -210,10 +197,7 @@
     _config.set(config)
   }
 
-
-
   $: setContext('layout', {
-    wrapper,
     getPos: getPos_d,
     layout: _layout,
     state: _state,
@@ -223,44 +207,6 @@
   })
 
 
-
 </script>
 
-
-<div 
-  class="wrapper"
-  bind:this={wrapper}
-  bind:clientWidth={$figureWidth}
-  bind:clientHeight={$figureHeight}
->
-  <div>
-    <p style:opacity={$_filter ? 1 : 0}>filter: {$_filter}</p>
-    <p>state: {$_state}</p>
-  </div>
-
-  {#if $figureWidth > 100}
-    <slot />
-  {/if}
-</div>
-
-<style lang="scss">
-  .wrapper {
-    width: 100%;
-    height: 100%;
-
-    position: relative;
-
-
-    div {
-      position: absolute;
-      bottom: 0;
-      right: 110%;
-      font-weight: 900;
-
-      p {
-        background: yellow;
-        padding: 0 12px;
-      }
-    }
-  }
-</style>
+<slot/>
