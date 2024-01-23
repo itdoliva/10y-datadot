@@ -1,5 +1,5 @@
 <script>
-	import { hovered } from '$lib/store/canvas.js';
+	import { app, hovered } from '$lib/store/canvas.js';
   import "./pixi.js"
   import { nodes, nNodes, fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/store/nodes";
   import { categoriesEnriched } from "$lib/store/categories";
@@ -15,87 +15,95 @@
 
 
   let layout = 'block'
-  let app
-
-  let contentBoxSize
-
-  $: console.log(contentBoxSize)
 
   const layoutCategories = [
     { alias: "Block", id: "block" },
     { alias: "Radial", id: "radial" },
   ]
-// https://webglfundamentals.org/webgl/lessons/webgl-multiple-views.html#toc
+
+  $: console.log('findustries', $findustries)
+
 </script>
 
 <div class="root">
 
-  <Pixi bind:app={app}/>
+  <Pixi bind:app={$app}/>
 
-  <div class="grid">
-    <div class="p-wrapper pa-wrapper"  bind:borderBoxSize={contentBoxSize}>
-      <ul>
-        <PanelItem title="visualizar como">
-          <InputGroup 
-            gridlayout="layout"
-            categories={layoutCategories} 
-            multiselect={false} 
-            bind:selected={layout}
-          />
-        </PanelItem>
+  {#if $app}
+    <div class="grid">
 
-        <PanelItem title="período">
-          <!-- <YearSliderPicker min={2014} max={2024} bind:selected={$fyears} /> -->
-        </PanelItem>
+      <ul class="p-wrapper pa-wrapper">
 
-        <PanelItem title="categorias de design">
-          <InputGroup 
-            gridlayout="design"
-            categories={$categoriesEnriched.designs} 
-            direction='column' 
-            visualElement='pctBar'
-            bind:selected={$fdesigns} 
-          />
-        </PanelItem>
+        <li>
+          <PanelItem icon="layouts" title="visualizar como">
+            <InputGroup 
+              gridlayout="layout"
+              categories={layoutCategories} 
+              multiselect={false} 
+              bind:selected={layout}
+            />
+          </PanelItem>
+        </li>
 
-        <PanelItem title="objetivos do projeto">
-          <InputGroup 
-          gridlayout="goal"
-            categories={$categoriesEnriched.goals} 
-            direction='column' 
-            visualElement='colorBullet'
-            bind:selected={$fgoals} 
-          />
-        </PanelItem>
+        <li>
+          <PanelItem icon="period" title="período">
+            <YearSliderPicker min={2014} max={2023} bind:selected={$fyears} />
+          </PanelItem>
+        </li>
 
-        <PanelItem title="setores do mercado">
-          <!-- <Beeswarm category="industry" categories={$categories.industries} bind:selected={$findustries} /> -->
-        </PanelItem>
+        <li>
+          <PanelItem icon="designs" title="categorias de design">
+            <InputGroup 
+              gridlayout="design"
+              categories={$categoriesEnriched.designs} 
+              direction='column' 
+              bind:selected={$fdesigns} 
+            />
+          </PanelItem>
+        </li>
+
+        <li>
+          <PanelItem icon="goals" title="objetivos do projeto">
+            <InputGroup 
+              gridlayout="goal"
+              categories={$categoriesEnriched.goals} 
+              direction='column' 
+              bind:selected={$fgoals} 
+            />
+          </PanelItem>
+        </li>
+
+        <li>
+          <PanelItem icon="industries" title="setores do mercado">
+            <Beeswarm 
+              categories={$categoriesEnriched.industries} 
+              bind:selected={$findustries} 
+            />
+          </PanelItem>
+        </li>
       </ul>
-    </div>
 
-    <div class="p-wrapper pb-wrapper">
-      <PanelItem title="tipos de entrega">
-          <InputGroup 
-            gridlayout="product"
-            categories={$categoriesEnriched.products} 
-            bind:selected={$fproducts} 
-          />
-      </PanelItem>
-    </div>
+      <div class="p-wrapper pb-wrapper">
+        <PanelItem icon="products" title="tipos de entrega">
+            <InputGroup 
+              gridlayout="product"
+              categories={$categoriesEnriched.products} 
+              bind:selected={$fproducts} 
+            />
+        </PanelItem>
+      </div>
 
-    <div class="viz-wrapper">
-      {#if app}
-        <Visualization app={app}>
+      <div class="viz-wrapper">
+        <Visualization>
           <Layout bind:layout>
             {#each $nodes as node (node.id)}
               <Node {node} />
             {/each}
           </Layout>
         </Visualization>
-      {/if}
+      </div>
     </div>
-  </div>
+  {/if}
 </div>
 
 
@@ -121,23 +129,34 @@
   }
 
   .p-wrapper {
-    padding: 2rem 1rem 1rem 2rem;
+    padding: 3.2rem 1.4rem 1.4rem 3.2rem;
   }
 
-  .pa-wrapper {
+  ul.pa-wrapper  {
+    height: 100%;
     grid-area: pa;
     border-right: 1px solid black;
 
-    ul {
-      list-style-type: none;
+    list-style-type: none;
 
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
 
-      gap: 2rem;
+    overflow-x: visible;
+    overflow-y: auto;
+
+    li {
+      padding-bottom: .8rem;
+      margin-bottom: .8rem;
+
+      &:not(:last-child) {
+        border-bottom: .5px solid black;
+      }
     }
+
+
   }
 
   .pb-wrapper {

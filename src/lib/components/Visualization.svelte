@@ -3,11 +3,9 @@
   import * as PIXI from "pixi.js"
   import * as d3 from "d3";
   
-  import { width, height, figureWidth, figureHeight }  from '$lib/store/canvas';
+  import { app, width, height, figureWidth, figureHeight }  from '$lib/store/canvas';
   import { cameraOffsetX, cameraOffsetY, zoomBehaviour, zoom } from "$lib/store/zoom";
 
-
-  export let app
 
   let container
 
@@ -20,12 +18,12 @@
   const scene = new PIXI.Container()
   scene.name = "scene"
   
-  app.stage.addChild(root, mask)
+  $app.stage.addChild(root, mask)
   
   root.addChild(scene)
   root.mask = mask
 
-  app.ticker.add(() => {
+  $app.ticker.add(() => {
     root.mask.clear()
 
     root.mask.beginFill(0x000000)
@@ -50,7 +48,6 @@
   })
 
   setContext('viz', { 
-    app, 
     root, 
     scene,
     resetZoom

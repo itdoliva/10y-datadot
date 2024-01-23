@@ -5,11 +5,16 @@
 	import CheckIcon from './../atoms/CheckIcon.svelte';
   import NumberTween from '../atoms/NumberTween.svelte';
   import Circle from '../atoms/Circle.svelte';
+  import Container from '../atoms/Container.svelte';
+  import Graphics from '../atoms/Graphics.svelte';
+  import Bubble from '../atoms/Bubble.svelte';
+  import Icon from '../atoms/Icon.svelte';
+
+  import templates from "$lib/templates"
 
   export let categories
   export let selected = []
   export let multiselect = true
-  export let visualElement = undefined
 
   export let gridlayout = 'layout'
 
@@ -17,17 +22,13 @@
 
 </script>
 
-<div class="input-group">
-  <ul
-    style:flex-direction={direction}
-    style:gap={direction === 'row' ?  '1.25em' : '.5em'}
-  >
-    {#each categories as { id, alias, nNodes, pctNodes, color }}
+<div class="input-group {direction} {gridlayout}">
+  <ul class={gridlayout}>
+    {#each categories as { id, name, alias, nNodes, pctNodes, color }}
     {@const active = multiselect ? selected.includes(id) : selected === id}
       <li>
 
         <label 
-          class={gridlayout}
           class:active={active}
           on:mouseenter={() => $hovered = id}
           on:mouseleave={() => $hovered = undefined}
@@ -39,8 +40,26 @@
               </div>
             {/if}
 
-            <CheckIcon {active} />
+            <CheckIcon active={active} hovered={$hovered === id} />
           </div>
+
+          {#if gridlayout === 'product'}
+            <div class="icon-wrapper">
+              <Container>
+                <Graphics blendmode="MULTIPLY" alpha=.9>
+                  <Bubble {id} r={nNodes/3} />
+                </Graphics>
+
+                <Graphics drawFunc={templates[id]} />
+              </Container>
+            </div>
+          {/if}
+
+          {#if gridlayout === 'layout'}
+          <div class="icon-wrapper">
+            <Icon icon={id} />
+          </div>
+        {/if}
 
           <div class="label-wrapper">
             {#if multiselect}
@@ -69,31 +88,104 @@
   </ul>
 
   {#if multiselect}
-  <div>
-    <Button onClick={() => selected = []} disabled={selected.length === 0}>
-      Selecionar tudo
-    </Button>
-  </div>
+    <div class="btn-wrapper">
+      <Button onClick={() => selected = []} disabled={selected.length === 0}>
+        Selecionar tudo
+      </Button>
+    </div>
   {/if}
 </div>
 
 <style lang="scss">
   .input-group {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: .6rem;
-  }
+    display: grid;
+    gap: 0;
 
+    ul {
+      display: grid;
+    }
 
-  ul {
-      display: flex;
+    &.layout {
+      ul {
+        grid-auto-columns: min-content !important;
+        gap: 2rem !important;
+      }
 
-      li {
-        display: flex;
-        flex-direction: column;
+      label {
+        grid-template-columns: min-content min-content;
+        grid-template-rows: 1.4rem 1fr;
+        grid-template-areas: 
+          "icon icon"
+          "check label";
+        row-gap: .4rem;
       }
     }
+
+    &.design {
+      label {
+        grid-template-columns: min-content 1fr 2rem;
+        grid-template-rows: auto min-content;
+        grid-template-areas: 
+          "check label num"
+          "bar bar num";
+      }
+    }
+
+    &.goal {
+      label {
+        grid-template-columns: min-content 1fr;
+        grid-template-areas: "check label";
+      }
+    }
+
+    &.product {
+      grid-auto-columns: max-content !important;
+
+      ul {
+        grid-auto-columns: 96px !important;
+      }
+
+      label {
+        grid-template-rows: min-content 2.4rem auto;
+        grid-template-areas: 
+          "check"
+          "icon"
+          "label";
+
+        .label-wrapper {
+          text-align: center;
+        }
+      }
+    }
+
+
+    &.row {
+      grid-auto-flow: column;
+      margin-right: auto;
+
+      ul {
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        gap: .25rem;
+      }
+
+      .btn-wrapper {
+        // grid-column: 1;
+        align-self: end;
+      }
+
+    }
+
+    &.column {
+      grid-auto-flow: row;
+
+      ul {
+        grid-auto-flow: row;
+        grid-auto-rows: min-content;
+        gap: .4rem;
+      }
+    }
+  }
 
   input {
     display: none;
@@ -106,48 +198,14 @@
     display: grid;
     align-items: center;
     column-gap: .4rem;
+    
 
     &.active {
       .label-wrapper {
-        font-weight: 600;
+        font-weight: 500;
       }
     }
     
-    &.layout {
-      grid-template-columns: min-content 1fr;
-      grid-template-rows: min-content 1fr;
-      grid-template-areas: 
-        "icon icon"
-        "check label";
-    }
-
-    &.design {
-      grid-template-columns: min-content 1fr 2rem;
-      grid-template-rows: auto min-content;
-      grid-template-areas: 
-        "check label num"
-        "bar bar num";
-    }
-
-    &.goal {
-      grid-template-columns: min-content 1fr;
-      grid-template-areas: "check label";
-    }
-
-    &.product {
-      grid-template-rows: min-content min-content auto;
-      grid-template-areas: 
-        "check"
-        "icon"
-        "label";
-
-      .label-wrapper {
-        text-align: center;
-      }
-    }
-
-
-
     .check-wrapper {
       grid-area: check;
       
@@ -178,32 +236,20 @@
       grid-area: bar;
     }
 
+    .icon-wrapper {
+      position: relative;
+      grid-area: icon;
+
+      height: 100%;
+    }
+
     .number-wrapper {
       grid-area: num;
       text-align: right;
     }
-
-
-
-    // div.input-wrapper {
-    //   position: relative;
-    //   display: flex;
-    //   flex-direction: row;
-    //   align-items: center;
-    //   gap: .6em;
-
-    //   &.colorbullet::before {
-    //     position: absolute;
-    //     z-index: -1;
-    //     content: '';
-    //     width: 1.5em;
-    //     height: 1.5em;
-    //     background: var(--color-bullet);
-    //     border-radius: 50%;
-    //     transform: translate(calc(-50% + .4em), 0);
-    //   }
-    // }
   }
+
+
 
   
 

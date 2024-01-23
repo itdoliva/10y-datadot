@@ -1,44 +1,54 @@
 <script>
+  import Icon
+   from "../atoms/Icon.svelte";
   export let title
   export let icon = undefined
 </script>
 
-<li class="panel-item-wrapper">
-  <div class="header">
-    <h6>{title}</h6>
-  </div>
+<div class="panel-item-wrapper">
+  {#if icon}
+    <div class="icon">
+      <Icon {icon} />
+    </div>
+  {/if}
+
+  <h6 class="title">{title}</h6>
 
   <div class="body">
     <slot />
   </div>
-</li>
+</div>
 
 <style lang="scss">
-  li.panel-item-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+  div.panel-item-wrapper {
+    display: grid;
+    
+    grid-template-columns: 1.2rem 1fr;
+    grid-template-rows: max-content min-content;
+    grid-template-areas: 
+      "icon title"
+      "body body";
 
     gap: .8rem;
   }
 
-  .header {
-    flex-grow: 0;
-    flex-shrink: 0;
+  .icon {
+    grid-area: icon;
+  }
 
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+  .title {
+    grid-area: title;
 
-    h6 {
-      margin: 0;
-      font-size: var(--title-font-size);
-    }
+    align-self: center;
+  
+    margin: 0;
+    font-size: var(--title-font-size);
+    font-weight: 500;
   }
 
   .body {
-    flex-grow: 1;
-    flex-shrink: 0;
+    grid-area: body;
   }
+
 
 </style>

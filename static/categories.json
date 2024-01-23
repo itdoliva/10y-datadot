@@ -25,20 +25,20 @@
   ],
 
   "goals": [
-    {"id": 30, "name": "educacional", "alias": "Educacional", "color": "#B0DAFF"},
-    {"id": 31, "name": "informacional", "alias": "Informacional", "color": "#B6FFC7"},
-    {"id": 32, "name": "impacto", "alias": "Impacto Positivo", "color": "#BAB0FF"},
-    {"id": 33, "name": "institucional", "alias": "Institucional", "color": "#FFF3B8"},
-    {"id": 34, "name": "editorial", "alias": "Editorial", "color": "#FFE2C0"}
+    {"id": 30, "name": "educacional", "alias": "Educacional", "color": "#aed8ff"},
+    {"id": 31, "name": "informacional", "alias": "Informacional", "color": "#b4ffc5"},
+    {"id": 32, "name": "impacto", "alias": "Impacto Positivo", "color": "#fff1b6"},
+    {"id": 33, "name": "institucional", "alias": "Institucional", "color": "#b1f5ff"},
+    {"id": 34, "name": "editorial", "alias": "Editorial", "color": "#ffe0be"}
   ],
 
   "industries": [
     {"id": 40, "name": "jornalismo", "alias": "Jornalismo"},
-    {"id": 41, "name": "jornalismo", "alias": "Jornalismo"},
-    {"id": 42, "name": "jornalismo", "alias": "Jornalismo"},
-    {"id": 43, "name": "jornalismo", "alias": "Jornalismo"},
-    {"id": 44, "name": "jornalismo", "alias": "Jornalismo"},
-    {"id": 46, "name": "jornalismo", "alias": "Jornalismo"},
-    {"id": 47, "name": "jornalismo", "alias": "Jornalismo"}
+    {"id": 41, "name": "educacao", "alias": "Educação"},
+    {"id": 42, "name": "turismo", "alias": "Turismo"},
+    {"id": 43, "name": "varejo", "alias": "Varejo"},
+    {"id": 44, "name": "ong", "alias": "ONGs"},
+    {"id": 46, "name": "financeiro", "alias": "Financeiro"},
+    {"id": 47, "name": "imobiliario", "alias": "Imobiliário"}
   ]
 }

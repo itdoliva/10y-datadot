@@ -1,18 +1,20 @@
 import * as PIXI from "pixi.js"
+import { get } from 'svelte/store';
+import { nodeSize, lineWidth } from "$lib/store/nodes"
 
 
-export default function illustrationTemplate({ nodeSize, lineWidth }, template=new PIXI.Graphics()) {
+export default function illustrationTemplate(template=new PIXI.Graphics()) {
 
   // Calculate edges
   const edges = [
-    [0, -nodeSize*.98], //top
-    [nodeSize*.84, nodeSize*.84], //right
-    [0, nodeSize], // bottom
-    [-nodeSize*.84, nodeSize*.84], // left
+    [0, -get(nodeSize)*.98], //top
+    [get(nodeSize)*.84, get(nodeSize)*.84], //right
+    [0, get(nodeSize)], // bottom
+    [-get(nodeSize)*.84, get(nodeSize)*.84], // left
   ]
 
   edges.forEach(edge => {
-    template.lineStyle(lineWidth, 0x000000)
+    template.lineStyle(get(lineWidth), 0x000000)
     template.moveTo(0, 0)
     template.lineTo(...edge)
     template.endFill()

@@ -1,9 +1,10 @@
 <script>
-  export let active = false
   export let size = 10
   export let strokewidth = 1
+  export let active = false
+  export let hovered = false
 
-  const lineprop = .275
+  const lineprop = .35
 </script>
 
 <svg 
@@ -13,23 +14,23 @@
   viewBox="0 0 {size} {size}"
 >
   <g transform="translate({size/2}, {size/2})">
+
     <circle
-      style:--fill={active ? "black" : "transparent"}
+      class="main"
+      fill={active ? "black" : hovered ? "#8D95FB" : "transparent"}
       stroke="black"
       stroke-width={strokewidth}
       r={(size-2*strokewidth)/2}
     />
 
-    <g 
-      class="lines" 
-      style:--stroke={active ? "white" : "black"}
-    >
-      <line x1={-size*lineprop} x2={size*lineprop} y1=0 y2=0/>
+  <g class="center">
+    {#if active}
+      <line x1={-size*lineprop} x2={size*lineprop} y1=0 y2=0 stroke="#8D95FB" stroke-width=1.5/>
+    {:else if !hovered}
+      <circle r=1 />
+    {/if}
+  </g>
 
-      {#if !active}
-        <line y1={-size*lineprop} y2={size*lineprop} x1=0 x2=0/>
-      {/if}
-    </g>
   </g>
 </svg>
 
@@ -40,14 +41,5 @@
 
     margin: 0;
     padding: 0;
-
-    circle {
-      fill: var(--fill);
-    }
-
-    .lines {
-      stroke: var(--stroke);
-    }
-
   }
 </style>

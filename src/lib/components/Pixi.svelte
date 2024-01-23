@@ -12,7 +12,7 @@
       roundPixels: true,
       view: canvas, 
       resizeTo: window, 
-      backgroundColor: 0xffffff,
+      backgroundColor: 0xE9FAFE,
     })
 
     app.stage.name = "stage"

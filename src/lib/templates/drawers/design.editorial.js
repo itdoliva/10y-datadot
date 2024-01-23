@@ -1,25 +1,27 @@
 import * as PIXI from "pixi.js"
+import { get } from 'svelte/store';
+import { nodeSize, lineWidth } from "$lib/store/nodes"
 
 
-export default function editorialTemplate({ nodeSize, lineWidth }, template=new PIXI.Graphics()) {
+export default function editorialTemplate(template=new PIXI.Graphics()) {
   // Calculate shapes
   const triangle = [
     0, 0, 
-    -nodeSize*.33, -nodeSize*.83, 
-    nodeSize*.33, -nodeSize*.83
+    -get(nodeSize)*.33, -get(nodeSize)*.83, 
+    get(nodeSize)*.33, -get(nodeSize)*.83
   ]
 
   const square = [
-    -nodeSize*.33, nodeSize*.5,
-    nodeSize*.33, nodeSize*.5,
-    nodeSize*.33, nodeSize*.66,
-    -nodeSize*.33, nodeSize*.66
+    -get(nodeSize)*.33, get(nodeSize)*.5,
+    get(nodeSize)*.33, get(nodeSize)*.5,
+    get(nodeSize)*.33, get(nodeSize)*.66,
+    -get(nodeSize)*.33, get(nodeSize)*.66
   ]
 
   const shapes = [ triangle, square ]
 
   shapes.forEach(shapePoints => {
-    template.lineStyle(lineWidth, 0x000000)
+    template.lineStyle(get(lineWidth), 0x000000)
     template.drawPolygon(shapePoints)
     template.endFill()
   })

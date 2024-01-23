@@ -1,4 +1,4 @@
-import { writable, derived } from "svelte/store";
+import { writable, derived, readable } from "svelte/store";
 import { width } from "$lib/store/canvas"
 
 export const dataset = writable([])
@@ -17,12 +17,13 @@ export const filtered = derived(
     return $dataset.map(d => {
       let active = true
 
+
       const isDeactive = (
-        ($years && d.year < $years[0] && d.year > $years[1]) ||
+        ($years && (d.year < $years[0] || d.year > $years[1])) ||
         ($designs && $designs.length > 0 && !d.designs.some(design => $designs.includes(design))) ||
         ($goals && $goals.length > 0 && !d.goals.some(goal => $goals.includes(goal))) || 
         ($products && $products.length > 0 && !d.products.some(product => $products.includes(product))) ||
-        ($industries && $industries.length > 0 && !$industries.some(d.industry))
+        ($industries && $industries.length > 0 && !$industries.includes(d.industry))
       )
 
       if (isDeactive) {
@@ -55,7 +56,7 @@ export const nodes = derived([ filtered, sortBy ], ([ $filtered, $sortBy ]) => {
 
 export const nNodes = derived(filtered, $filtered => $filtered.filter(d => d.active).length);
 
-
+export const lineWidth = readable(1.5)
 export const nodeSize = derived(([ width ]), ([ $width ]) => {
   // Mobile
   if ($width <= 768) {

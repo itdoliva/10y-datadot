@@ -12,23 +12,33 @@
 
 <style>
   button {
-    font-size: 8px;
-    text-transform: uppercase;
+    font-family: var(--font-family);
+    font-size: var(--btn-font-size);
+    font-weight: 300;
+
+    text-transform: lowercase;
+    text-decoration: underline;
     outline: none;
     background: none;
-    border-radius: .2em;
-    padding: .5em 1em;
-    color: rgb(125, 125, 125);
-    border: 1px solid rgb(125, 125, 125);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--color-accent);
   }
 
   button:not(:disabled):hover {
-    border: 1px solid black;
-    color: black;
+    font-family: inherit;
+    font-weight: 600;
+  }
+
+  button:not(:disabled):active {
+    font-family: inherit;
+    font-weight: 600;
+    color: #DCDEFE;
   }
 
   button:disabled {
-    color: rgb(220, 220, 220);
-    border: 1px solid transparent;
+    color: #DCDEFE;
+    cursor: default;
   }
 </style>

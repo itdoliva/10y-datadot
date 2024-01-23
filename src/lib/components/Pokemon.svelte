@@ -9,37 +9,30 @@
 
   const channelName = $categories.channels.find(d => d.id === node.channel).name
   
-  const template = new PIXI.Graphics()
-  template.cacheAsBitmap = true
+  const graphics = new PIXI.Graphics()
+  graphics.cacheAsBitmap = true
 
-  // const text = new PIXI.Text('', { align: 'center', textBaseline: 'middle', fontSize: 8, textBaseline: 'middle', lineHeight: 8 })
-  // text.anchor.set(.5)
-
-  // $: text.text = node.id //\n(${node.i}
-
-  parent.addChild(template)
+  parent.addChild(graphics)
   
-  
-
   // Behind Basis
-  if (node.designs.includes(20)) templates.illustration(templates.options, template)
-  if (node.designs.includes(21)) templates.editorial(templates.options, template)
-  if (node.designs.includes(23)) templates.service(templates.options, template)
-  if (node.designs.includes(24)) templates.ui(templates.options, template)
+  if (node.designs.includes(20)) templates.illustration(graphics)
+  if (node.designs.includes(21)) templates.editorial(graphics)
+  if (node.designs.includes(23)) templates.service(graphics)
+  if (node.designs.includes(24)) templates.ui(graphics)
 
   // Basis
-  const basisGraphic = templates[channelName](templates.options, template)
+  const basisGraphic = templates[channelName](graphics)
 
   // In front of Basis
-  if (node.products.includes(16)) template.addChild(mask(templates.dashboard(templates.options)))
-  if (node.products.includes(17)) template.addChild(mask(templates.infographic(templates.options)))
-  if (node.products.includes(10)) templates.video(templates.options, template)
-  if (node.products.includes(11)) templates.publication(templates.options, template)
-  if (node.products.includes(12)) templates.report(templates.options, template)
-  if (node.products.includes(13)) templates.presentation(templates.options, template)
-  if (node.products.includes(14)) templates.siteInstitutional(templates.options, template)
-  if (node.products.includes(15)) templates.siteEditorial(templates.options, template)
-  if (node.designs.includes(22)) templates.motion(templates.options, template)
+  if (node.products.includes(16)) graphics.addChild(mask(templates.dashboard()))
+  if (node.products.includes(17)) graphics.addChild(mask(templates.infographic()))
+  if (node.products.includes(10)) templates.video(graphics)
+  if (node.products.includes(11)) templates.publication(graphics)
+  if (node.products.includes(12)) templates.report(graphics)
+  if (node.products.includes(13)) templates.presentation(graphics)
+  if (node.products.includes(14)) templates.siteInstitutional(graphics)
+  if (node.products.includes(15)) templates.siteEditorial(graphics)
+  if (node.designs.includes(22)) templates.motion(graphics)
 
 
   node.goals.forEach(d => {

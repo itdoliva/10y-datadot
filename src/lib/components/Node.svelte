@@ -1,7 +1,7 @@
 <script>
   import { getContext } from "svelte";
   import { tweened } from "svelte/motion";
-  import { figureHeight } from "$lib/store/canvas";
+  import { app, figureHeight } from "$lib/store/canvas";
   import { nodes } from "$lib/store/nodes";
   import * as d3 from "d3"
   import * as PIXI from "pixi.js"
@@ -18,7 +18,7 @@
     shiftms
   } = getContext("layout")
 
-  const { app, scene } = getContext("viz")
+  const { scene } = getContext("viz")
 
   const origin = new PIXI.Container()
   origin.name = node.id
@@ -43,7 +43,7 @@
   let prevPos
   let pos
 
-  app.ticker.add(() => {
+  $app.ticker.add(() => {
     origin.x = $originX
     origin.y = $originY
     origin.rotation = $originRotation

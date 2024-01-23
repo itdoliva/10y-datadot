@@ -1,53 +1,88 @@
 <script>
-  import * as d3 from "d3"
-  import { nodes, nNodes } from '$lib/store/nodes.js';
+  import { onMount } from "svelte";
+  import * as d3 from "d3";
+  import { gsap } from "gsap";
+  import textures from "textures";
 
-  export let category
+  import BSBubble from "$lib/components/atoms/BSBubble.svelte";
+
   export let categories
   export let selected = []
 
-  console.log({categories})
-
   let w
   let h
+
   let svg
-
-  let simulationNodes
-
-  const radiusScale = d3.scaleLinear()
-    .domain([0, 1])
-    .range([0, 140])
   
+  let initialized = false
+  let tick = 0
+  let simulationNodes
+  
+  const tl = gsap.timeline()
 
-    const simulation = d3.forceSimulation()
-    .force("y", d3.forceY().y(() => h/2))
-    .force("x", d3.forceX().x(() => w/2))
-    .force("collide", d3.forceCollide().radius(d => radiusScale(d.value) + 4))
+  const r = d3.scaleLinear()
+    .domain([0, 1])
+    .range([0, 160])
+  
+  const simulation = d3.forceSimulation()
+    .force("center", d3.forceCenter(0, 0))
+    .force("charge", d3.forceManyBody().strength(30))
+    .force("collide", d3.forceCollide(d => r(d.pctNodes) + 5).strength(1))
+    .force('forceX', d3.forceX(d => d.x).strength(1))
+    .force('forceY', d3.forceY(() => h/2).strength(0.01))
     .on("tick", ticked)
 
-  $: updateNodes($nodes)
+  const texture = textures
+    .circles()
+    .size(10)
+    .radius(1)
+    .complement()
+    .fill("#818afa")
 
-  
-  $: console.log(selected)
+  onMount(() => {
+    d3.select(svg)
+      .call(texture)
+  })
+
+  $: x = d3.scalePoint()
+    .domain(categories.map(d => d.id))
+    .range([-w/2, w/2])
+    .padding(.5)  
 
 
-  function ticked() {
-    simulationNodes = [...simulationNodes]
+  $: if (categories) {
+    tick += .01
+
+    simulationNodes = makeSimulationNodes()
+    simulationNodes.tick = tick
+    simulation.nodes(simulationNodes)
+
+    if (initialized) {
+      tl.clear()
+      tl.add(() => simulation.alphaTarget(0).alphaTarget(.3).restart())
+      tl.add(() => simulation.alphaTarget(0), 2000)
+    } else {
+      initialized = true
+    }
   }
   
+  function makeSimulationNodes() {
+    const currentNodes = simulation.nodes()
 
-  function updateNodes(nodes) {
-    if (!nodes) return
-
-    categories.forEach(({ id, name, alias }) => {
-      const value = nodes.filter(d => d.industry === id).length / nodes.length
+    const simulationNodes = categories.map(d => {
+      const current = currentNodes.find(n => n.id === d.id)
+      return {
+        ...d,
+        x: current ? current.x : x(d.id), 
+        y: current ? current.y : -(h/2) + Math.random() * h
+      }
     })
 
-    simulationNodes = d3.groups(nodes, d => d[category])
-      .map(([index, arr]) => ({ index, value: arr.length / $nNodes, x: w ? w/2 : 40, y: h ? h/2 : 40 }))
+    return simulationNodes
+  }
 
-    simulation.nodes(simulationNodes)
-    simulation.alphaTarget(.3).restart()
+  function ticked() {
+    tick += .01
   }
 
   function toggle(id) {
@@ -57,6 +92,7 @@
     } else {
       selected.push(id)
     }
+    selected = [...selected]
   }
 
 
@@ -65,55 +101,44 @@
 
 <div class="beeswarm-wrapper" bind:clientWidth={w} bind:clientHeight={h}>
   <svg bind:this={svg}>
-    {#if w && h}
-      <g class="chart">
-        {#each simulationNodes as { x, y, value, index } (index)}
-          <g 
-            class="node"
-            transform="translate({x}, {y})"
-            on:click={() => toggle(index)}
-          >
-            <circle 
-              r={radiusScale(value)}
-            />
 
-            <text
-              text-anchor="middle"
-              dominant-baseline="middle"
-              font-weight=700
-            >
-              <tspan>{Math.round(value*100)}%</tspan>
-            </text>
-          </g>
-        {/each}
+    <defs>
+      <filter x="0" y="0" width="1" height="1" id="text-bg">
+        <feFlood flood-color="#CEFC6E" result="bg" />
+        <feMerge>
+          <feMergeNode in="bg"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+
+    {#if w && h}
+      <g class="chart" transform="translate({w/2}, {h/2})">
+          {#each simulationNodes as { x, y, pctNodes, id, alias } (id)}
+            <BSBubble 
+              x={x} 
+              y={y} 
+              r={r(pctNodes)} 
+              pct={pctNodes}
+              label={alias}
+              fill={texture.url()}
+              active={selected.includes(id)}
+              onClick={() => toggle(id)}
+            />
+          {/each}
       </g>
     {/if}
   </svg>
 </div>
 
 <style lang="scss">
+  .beeswarm-wrapper {
+    aspect-ratio: 1.71;
+  }
+
   svg {
     width: 100%;
     height: 100%;
-  }
-
-  .node {
-
-    circle {
-      stroke: #818afa;
-      fill: none;
-    }
-
-    text {
-      -webkit-user-select: none; /* Safari */
-      -ms-user-select: none; /* IE 10 and IE 11 */
-      user-select: none; /* Standard syntax */
-    }
-
-    &:hover {
-      circle {
-        fill: #818afa;
-      }
-    }
+    overflow: visible;
   }
 </style>

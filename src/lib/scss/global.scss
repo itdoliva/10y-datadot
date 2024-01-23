@@ -1,9 +1,21 @@
+@import url(./_fonts.scss);
+
 :root {
-  --title-font-size: 12px;
-  --item-font-size: 12px;
+  --title-font-size: 10.5px;
+  --item-font-size: 10px;
+  --btn-font-size: 10px;
   --panel-text-transform: lowercase;
+  --font-family: 'Rational', 'sans-serif';
 
   --color-accent: #818afa;
+  --color-accent-low: #DCDEFE;
+  --color-secondary: #CEFC6E;
+
+}
+
+* {
+  font-family: var(--font-family);
+  font-weight: 300;
 }
 
 *, *::after, *::before {
@@ -20,9 +32,6 @@ body {
   -ms-overflow-style: none; /* for Internet Explorer, Edge */
   scrollbar-width: none; /* for Firefox */
   overflow-y: scroll; 
-
-  font-family: 'Courier New', Courier, monospace;
-
 }
 
 body::-webkit-scrollbar {
@@ -36,4 +45,17 @@ ul {
 
 ul {
   margin: 0;
+}
+
+*::-webkit-scrollbar {
+  width: 1px;
+  height: 8px;
+  border-radius: 50%;
+
+  // background-color: var(--color-accent-low); /* ou que isso seja adicionado ao "caminho" da barra */
+}
+
+/* Adiciona a barra arrastável */
+*::-webkit-scrollbar-thumb {
+    background: black;
 }
