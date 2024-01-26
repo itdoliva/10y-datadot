@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import * as d3 from "d3"
+  import CheckIcon from "$lib/components/atoms/CheckIcon.svelte";
 
   export let min
   export let max
@@ -13,6 +14,7 @@
   let w
   let h
   let isBehaviourSet = false
+  let hovered = false
 
   const handlerR = 4
   const pad = { left: 8, right: 8 }
@@ -25,7 +27,7 @@
   $: {
     if (svg && !isBehaviourSet) {
       d3.select(svg)
-        .selectAll('g.handlers .handler')
+        .selectAll('g.handlers .handler-wrapper')
         .call(dragBehaviour)
     }
   }
@@ -36,6 +38,8 @@
     .domain(years)
     .range([0, innerW])
 
+  $: console.log(year2pos.step())
+
   $: pos2year = d3.scaleQuantize()
     .domain([0, innerW])
     .range(years)
@@ -43,9 +47,11 @@
   function dragged(e) {
     const i = +this.getAttribute('data-index')
     const newYear = pos2year(e.x)
-    drag[i] = i === 0 
-      ? Math.min(newYear, drag[1])
-      : Math.max(newYear, drag[0])
+    if (i === 0) {
+      drag[i] = Math.min(newYear, drag[1])
+    } else {
+      drag[i] = Math.max(newYear, drag[0])
+    }
   }
 
   function dragEnd() {
@@ -77,50 +83,60 @@
         </g>
 
         <g class="handlers">
-          
+
           {#each drag as year, i}
-            <g
+
+          <!-- svelte-ignore a11y-no-static-element-interactions -->
+          <g 
+            class="handler-wrapper"
+            class:unclickable={i === 1 && drag[0] === max}
+            transform="translate({year2pos(year)}, 0)"
+            data-index={i}
+            on:mouseenter={() => hovered = i}
+            on:mouseleave={() => hovered = false}
+          >
+            <g 
               class="handler"
-              class:unclickable={i === 1 && drag[0] === max}
-              transform="translate({year2pos(year)}, 0)"
-              data-index={i}
             >
-              <circle 
-                r={handlerR*3} 
+              <circle
+                class="main"
+                fill={hovered === i ? '#8D95FB' : i === 0 ? "transparent" : "black"}
+                stroke="black"
+                stroke-width=1
+                r={(10-2*1)/2}
+              />
+
+              {#if hovered !== i}
+                <circle
+                  class="inner"
+                  r=1 
+                  fill={i === 0 ? "black" : "white"}
+                />
+              {/if}
+
+              <rect 
+                x={-year2pos.step()/2}
+                width={year2pos.step()}
+                y={-h/2}
+                height={h}
                 fill="transparent"
               />
-
-              <circle 
-                r={handlerR} 
-                fill={i === 0 ? "white" : 'black'}
-                stroke="black"
-              />
-
-              <circle 
-                r={handlerR*.2} 
-                fill={i === 0 ? "black" : 'white'}
-              />
             </g>
-          {/each}
-        </g>
 
-        <g 
-          class="labels unclickable"
-          transform="translate(0, {-handlerR*2.5})"
-        >
-          {#each drag as year, i}
-            <text
-              font-size=9
-              font-weight=600
-              transform="translate({year2pos(year)}, 0)"
+            <g 
+              class="label"
+              transform="translate(0, {-handlerR*2.5})"
               text-anchor="middle"
             >
-              {year}
-            </text>
-    
+              <text
+              >
+                {year}
+              </text>
+            </g>
+          </g>
+
           {/each}
         </g>
-
 
       </g>
     </svg>
@@ -139,12 +155,19 @@
     overflow: visible;
   }
 
+  .label {
+    font-size: 9px;
+    font-weight: 600;
 
-  .unclickable {
-    pointer-events: none;
+
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */
     user-select: none; /* Standard syntax */
+  }
+
+
+  .unclickable {
+    pointer-events: none;
   }
   
 </style>

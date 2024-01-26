@@ -21,8 +21,6 @@
     { alias: "Radial", id: "radial" },
   ]
 
-  $: console.log('findustries', $findustries)
-
 </script>
 
 <div class="root">

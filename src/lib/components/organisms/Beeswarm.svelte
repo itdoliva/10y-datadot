@@ -4,6 +4,7 @@
   import { gsap } from "gsap";
   import textures from "textures";
 
+  import Button from "$lib/components/atoms/Button.svelte";
   import BSBubble from "$lib/components/atoms/BSBubble.svelte";
 
   export let categories
@@ -20,9 +21,9 @@
   
   const tl = gsap.timeline()
 
-  const r = d3.scaleLinear()
+  const area = d3.scaleLinear()
     .domain([0, 1])
-    .range([0, 160])
+    .range([0, 20000])
   
   const simulation = d3.forceSimulation()
     .force("center", d3.forceCenter(0, 0))
@@ -64,6 +65,10 @@
     } else {
       initialized = true
     }
+  }
+
+  function r(v) {
+    return Math.sqrt(area(v)/(2*Math.PI))
   }
   
   function makeSimulationNodes() {
@@ -129,6 +134,10 @@
       </g>
     {/if}
   </svg>
+
+  <Button onClick={() => selected = []} disabled={selected.length === 0}>
+    Selecionar tudo
+  </Button>
 </div>
 
 <style lang="scss">

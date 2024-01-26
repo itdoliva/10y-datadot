@@ -23,13 +23,11 @@
       r={(size-2*strokewidth)/2}
     />
 
-  <g class="center">
     {#if active}
       <line x1={-size*lineprop} x2={size*lineprop} y1=0 y2=0 stroke="#8D95FB" stroke-width=1.5/>
     {:else if !hovered}
       <circle r=1 />
     {/if}
-  </g>
 
   </g>
 </svg>
