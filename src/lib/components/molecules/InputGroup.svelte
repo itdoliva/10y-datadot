@@ -156,6 +156,11 @@
           text-align: center;
         }
       }
+
+      .btn-wrapper {
+        align-self: start !important;
+        padding-top: calc(2.4rem + 10px);
+      }
     }
 
 
@@ -172,6 +177,8 @@
       .btn-wrapper {
         // grid-column: 1;
         align-self: end;
+
+        display: flex;
       }
 
     }
