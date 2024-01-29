@@ -6,17 +6,19 @@
 
   import { width, height, figureWidth, figureHeight } from "$lib/store/canvas";
   import { zoomBehaviour, updateExtents } from "$lib/store/zoom";
-  import { nodes, nNodes, nodeSize, gap } from "$lib/store/nodes";
+  import { nodes, nodeSize, gap } from "$lib/store/nodes";
   import getBlockConfig from "$lib/helpers/getBlockConfig"
   import getRadialConfig from "$lib/helpers/getRadialConfig"
   import randomDensity from "$lib/utility/randomDensity"
+
+  import Node from "$lib/components/Node.svelte";
 
   import layoutConfig from "$lib/config/layout"
 
   export let layout
 
   let nextLayout = layout
-  let prevCount = $nNodes
+  let prevCount = $nodes.activeCount
   let prevState
 
   const tl = gsap.timeline()
@@ -42,8 +44,8 @@
 
 
     // Data filtered
-    if (prevCount != $nNodes) {
-      const filter = prevCount > $nNodes ? 'exclusion' : 'inclusion'
+    if (prevCount != $nodes.activeCount) {
+      const filter = prevCount > $nodes.activeCount ? 'exclusion' : 'inclusion'
 
       // Defines the first state of the filter type
       const filterState = filter === 'exclusion' 
@@ -53,7 +55,7 @@
       _filter.set(filter)
       _state.set(filterState)
 
-      prevCount = $nNodes
+      prevCount = $nodes.activeCount
     }
 
 
@@ -91,14 +93,8 @@
 
 
   $: updateExtents($_layout, $width, $height, $figureWidth, $figureHeight)
+  $: pos = getPos[$_layout]($nodes.activeCount, "year", $nodeSize, $gap, $figureWidth, $figureHeight)
   
-
-  const getPos_d = derived([_layout, nodes, nodeSize, gap, figureWidth, figureHeight],
-    ([$layout, $nodes, $size, $gap, $fw, $fh]) => {
-      const nNodes = $nodes.filter(d => d.active).length
-      return getPos[$layout](nNodes, "year", $size, $gap, $fw, $fh)
-    }
-  )
 
   // Layouts
   const getPos = {}
@@ -107,8 +103,8 @@
   getPos.fullColEntranceDuration = shiftms/1000 - getPos.colEntranceUpTo
   getPos.rotationOffset = -Math.PI/2
 
-  getPos.block = (nNodes, groupBy, nodeSize, gap, fw, fh) => {
-    const { rows, columns, padding, extent, maxRowsOnView, blockHeight } = getBlockConfig(nNodes, nodeSize, gap, fw, fh)
+  getPos.block = (activeCount, groupBy, nodeSize, gap, fw, fh) => {
+    const { rows, columns, padding, extent, maxRowsOnView, blockHeight } = getBlockConfig(activeCount, nodeSize, gap, fw, fh)
     
     // The calculation below support block entrance animation
     const columnDensities = randomDensity(columns)
@@ -145,14 +141,14 @@
     }
   }
 
-  getPos.radial = (nNodes, groupBy, nodeSize, gap, fw, fh) => {
+  getPos.radial = (activeCount, groupBy, nodeSize, gap, fw, fh) => {
     const {
       extent,
       grouped,
       sectorRadiansScale,
       pileRadiansScale,
       maxStacks
-    } = getRadialConfig($nodes, nNodes, nodeSize, gap, groupBy, innerRadius, maxStacksK, fw, fh)
+    } = getRadialConfig($nodes, activeCount, nodeSize, gap, groupBy, innerRadius, maxStacksK, fw, fh)
 
     updateConfig({ grouped, sectorRadiansScale, pileRadiansScale, innerRadius, maxStacks })
     updateZoomExtent(extent)
@@ -198,15 +194,23 @@
   }
 
   $: setContext('layout', {
-    getPos: getPos_d,
-    layout: _layout,
-    state: _state,
-    config: _config,
-    filter: _filter,
     shiftms,
   })
 
 
 </script>
 
-<slot/>
+{#each $nodes as node (node.id)}
+  {@const nodePos = pos(node)}
+
+  <Node 
+    id={node.id}
+    active={node.active}
+    pos={nodePos}
+    node={node}
+
+    layout={$_layout}
+    state={$_state}
+    config={$_config}
+  />
+{/each}

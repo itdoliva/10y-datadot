@@ -1,7 +1,7 @@
 <script>
 	import { pixelRatio } from '$lib/store/canvas';
   import * as PIXI from "pixi.js"
-  import { categories } from '$lib/store/categories';
+  import { categories } from '$lib/store/nodes';
   import templates from "$lib/templates"
 
   export let parent

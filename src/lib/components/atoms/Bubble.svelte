@@ -1,22 +1,28 @@
 <script>
   import * as d3 from "d3";
-	import { tweened } from 'svelte/motion';
   import { getContext } from "svelte";
   import { app } from "$lib/store/canvas";
+  import { gsap } from "gsap";
 
-  export let id
+  export let i
   export let r
 
-  const rTween = tweened(0, { ease: d3.easeCubicInOut })
-
   const graphics = getContext("graphics")
+  
+  const bubble = { r }
 
-  $: $rTween = r
+  const tweenOptions = {
+    duration: 1,
+    delay: i * .05,
+    ease: d3.easeCubicInOut
+  }
+
+  $: gsap.to(bubble, { r: r, ...tweenOptions })
 
   $app.ticker.add(() => {
     graphics.clear()
     graphics.beginFill(0xDCDEFE)
-    graphics.drawCircle(0, 0, $rTween)
+    graphics.drawCircle(0, 0, bubble.r)
     graphics.endFill()
   })
 </script>

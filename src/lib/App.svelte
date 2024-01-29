@@ -1,18 +1,15 @@
 <script>
 	import { app, hovered } from '$lib/store/canvas.js';
   import "./pixi.js"
-  import { nodes, nNodes, fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/store/nodes";
-  import { categoriesEnriched } from "$lib/store/categories";
+  import { fyears, fdesigns, fgoals, findustries, fproducts, categoriesEnriched } from "$lib/store/nodes";
 
   import Pixi from "$lib/components/Pixi.svelte";
-  import Node from "$lib/components/Node.svelte";
   import Layout from "$lib/components/Layout.svelte";
   import PanelItem from "$lib/components/molecules/PanelItem.svelte";
   import YearSliderPicker from "./components/organisms/YearSliderPicker.svelte";
   import InputGroup from "./components/molecules/InputGroup.svelte";
   import Beeswarm from "./components/organisms/Beeswarm.svelte";
   import Visualization from '$lib/components/Visualization.svelte';
-
 
   let layout = 'block'
 
@@ -93,11 +90,7 @@
 
       <div class="viz-wrapper">
         <Visualization>
-          <Layout bind:layout>
-            {#each $nodes as node (node.id)}
-              <Node {node} />
-            {/each}
-          </Layout>
+          <Layout bind:layout />
         </Visualization>
       </div>
     </div>

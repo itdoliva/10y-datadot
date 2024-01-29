@@ -38,8 +38,6 @@
     .domain(years)
     .range([0, innerW])
 
-  $: console.log(year2pos.step())
-
   $: pos2year = d3.scaleQuantize()
     .domain([0, innerW])
     .range(years)

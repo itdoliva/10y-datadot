@@ -6,14 +6,14 @@ function getDomain(groupBy) {
     : [ 0, 1 ]
 }
 
-export default function getRadialConfig(nodes, nNodes, nodeSize, gap, groupBy, innerRadius, maxStacksK, fw, fh) {
+export default function getRadialConfig(nodes, activeCount, nodeSize, gap, groupBy, innerRadius, maxStacksK, fw, fh) {
   const padding = { left: fw/2, top: fh/2 }
 
   const groupAcc = d => d[groupBy]
   const grouped = d3.group(nodes, groupAcc)
   grouped.groupAcc = groupAcc
 
-  const maxStacks = grouped.size // Math.round(nNodes * maxStacksK / grouped.size)
+  const maxStacks = grouped.size // Math.round(activeCount * maxStacksK / grouped.size)
 
   const size = 2*(innerRadius + maxStacks * (nodeSize + gap))
   const exceedX = size - fw

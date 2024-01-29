@@ -2,6 +2,7 @@
   import * as d3 from "d3"
   import { tweened } from "svelte/motion";
 
+  export let i
   export let number
   export let domain = [0, 1]
   export let options = {}
@@ -10,8 +11,9 @@
   let h = 0
 
   const defaultOptions = {
-    duration: 500,
-    easing: d3.easeCubicInOut
+    duration: 1000,
+    delay: i * .05 * 1000,
+    easing: d3.easeCubicInOut,
   }
 
   const tweenOptions = {
@@ -26,7 +28,6 @@
     .range([0, w])
 
   $: $bw = xScale(number)
-
 
 </script>
 

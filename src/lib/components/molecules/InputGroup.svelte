@@ -24,7 +24,8 @@
 
 <div class="input-group {direction} {gridlayout}">
   <ul class={gridlayout}>
-    {#each categories as { id, name, alias, nNodes, pctNodes, color }}
+    {#each categories as { id, name, alias, nNodes, pctNodes, color }, i}
+    <!-- {@debug id, nNodes} -->
     {@const active = multiselect ? selected.includes(id) : selected === id}
       <li>
 
@@ -47,7 +48,7 @@
             <div class="icon-wrapper">
               <Container>
                 <Graphics blendmode="MULTIPLY" alpha=.9>
-                  <Bubble {id} r={nNodes/3} />
+                  <Bubble {id} {i} r={nNodes/3} />
                 </Graphics>
 
                 <Graphics drawFunc={templates[id]} />
@@ -73,11 +74,11 @@
 
           {#if gridlayout === 'design'}
             <div class="bar-wrapper">
-              <BarTween number={pctNodes}/>
+              <BarTween {i} number={pctNodes}/>
             </div>
 
             <div class="number-wrapper">
-              <NumberTween number={pctNodes} isPct={true} />
+              <NumberTween {i} number={pctNodes} isPct={true} />
             </div>
           {/if}
 
