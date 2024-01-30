@@ -1,3 +1,8 @@
+<!-- 
+  This component controls the layout, its variables, changes, and 
+  the final positions of the nodes based on the current layout
+ -->
+
 <script>
   import { beforeUpdate, setContext, getContext } from "svelte";
   import { writable, derived } from "svelte/store";
@@ -23,7 +28,7 @@
 
   const tl = gsap.timeline()
   const { resetZoom } = getContext("viz")
-  const { maxStacksK, innerRadius, shiftms, shifts } = layoutConfig
+  const { maxStacksK, innerRadius, shiftms, shifts, maxDelayRadial } = layoutConfig
 
   // Stores  
   const _layout = writable(layout)
@@ -99,8 +104,8 @@
   // Layouts
   const getPos = {}
 
-  getPos.colEntranceUpTo = shiftms/1000 * .2
-  getPos.fullColEntranceDuration = shiftms/1000 - getPos.colEntranceUpTo
+  getPos.colEntranceUpTo = shifts * .2
+  getPos.fullColEntranceDuration = shifts - getPos.colEntranceUpTo
   getPos.rotationOffset = -Math.PI/2
 
   getPos.block = (activeCount, groupBy, nodeSize, gap, fw, fh) => {
@@ -124,7 +129,7 @@
       const columnDelay = columnDensities[column] * getPos.colEntranceUpTo
       const rowDelay = timeStepByRow * row
 
-      return +(columnDelay + rowDelay).toFixed(3) * 1000
+      return +(columnDelay + rowDelay).toFixed(3)
     }
 
     return ({ i }) => {
@@ -155,7 +160,7 @@
 
     const delayScale = d3.scaleLinear()
       .domain([0, 2*Math.PI])
-      .range([0, shiftms*.7])
+      .range([0, maxDelayRadial])
 
     const getDelay = ({ radians }) => delayScale(radians)
 
@@ -195,6 +200,7 @@
 
   $: setContext('layout', {
     shiftms,
+    shifts,
   })
 
 

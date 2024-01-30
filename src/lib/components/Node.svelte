@@ -1,12 +1,18 @@
+<!-- 
+  This component controls the movement and effects of each Node
+ -->
+
 <script>
   import { getContext, afterUpdate } from "svelte";
   import { tweened } from "svelte/motion";
   import { app, figureHeight } from "$lib/store/canvas";
-  import { nodes } from "$lib/store/nodes";
+  import { gsap } from "gsap";
   import * as d3 from "d3"
   import * as PIXI from "pixi.js"
   import Pokemon from './Pokemon.svelte';
   import { isEqual } from "lodash"
+  import c from "$lib/config/layout"
+  import clockwiseAngle from "$lib/utility/clockwiseAngle";
 
   export let id
   export let active
@@ -17,152 +23,181 @@
   export let state
   export let config
 
-  const { shiftms } = getContext("layout")
+  const { shiftms, shifts } = getContext("layout")
   const { scene } = getContext("viz")
 
   const posTracker = [ pos, undefined ]
   let prevPos = posTracker[1]
 
   // PIXI Hierarchy
-  const origin = new PIXI.Container()
-  origin.name = id
-  scene.addChild(origin)
+  const outer = new PIXI.Container()
+  outer.name = id
+  scene.addChild(outer)
 
-  const container = new PIXI.Container()
-  origin.addChild(container)
+  const inner = new PIXI.Container()
+  outer.addChild(inner)
 
-  // Tweening options
-  const interpolateConstant = (a, b) => () => b
-  const defaultOptions = { duration: 1, interpolate: interpolateConstant }
+  // Timeline
+  const tlPos = gsap.timeline()
+  const tlAlpha = gsap.timeline()
+  const tlRenderable = gsap.timeline()
 
-  // Tweens
-  const originAlpha = tweened(1, defaultOptions)
-  const originScale = tweened(1, defaultOptions)
-  const originX = tweened(0, defaultOptions)
-  const originY = tweened(0, defaultOptions)
-  const originRotation = tweened(0, defaultOptions)
-  const originRenderable = tweened(true, { interpolate: interpolateConstant })
-
-  const containerX = tweened(0, defaultOptions)
-  const containerY = tweened(0, defaultOptions)
-
-
+  // Variables
+  const t = { 
+    oX: 0, 
+    oY: 0, 
+    iX: 0,
+    iY: 0,
+    rotation: 0, 
+    alpha: 1, 
+    scale: 1,
+    renderable: true
+  }
+  
   $app.ticker.add(() => {
-    origin.x = $originX
-    origin.y = $originY
-    origin.rotation = $originRotation
-    origin.renderable = $originRenderable
-    origin.alpha = $originAlpha
+    outer.x = t.oX
+    outer.y = t.oY
+    outer.rotation = t.rotation
+    outer.renderable = t.renderable
+    outer.alpha = t.alpha
 
-    container.x = $containerX
-    container.y = $containerY
+    inner.x = t.iX
+    inner.y = t.iY
   })
 
   $: {
     // Both layouts have the same exit
     if ( state === 'exit') {
-      const fallDelay = Math.random() * .5 * 1000
-      const fadeoutDelay = Math.max(0, fallDelay - Math.random()*150)
-
-      const y = pos.fy + $figureHeight*(Math.random()*.5 + .3)
-
-      const duration = shiftms - fallDelay - (Math.random() * 300)
-
-      const options = { duration, interpolate: d3.interpolateNumber }
+      const delayFall = Math.random() * .5
+      const delayFadeOut = Math.max(0, delayFall - Math.random()*.15)
+      const duration = shifts - delayFall - (Math.random() * .3)
 
       // Fall
-      originY.set(y, { ...options, delay: fallDelay, easing: d3.easeSinIn }) 
+      const y = pos.fy + $figureHeight*(Math.random()*.5 + .3)
+      tlPos.clear()
+      tlPos.to(t, { oY: y, duration, delay: delayFall, ease: c.easeExit })
 
       // Fade Out
-      originAlpha.set(0, { ...options, delay: fadeoutDelay }) 
+      tlAlpha.clear()
+      tlAlpha.to(t, { alpha: 0, duration, delay: delayFadeOut, ease: c.easeFade })
     }
 
     else if (layout === 'block') {
       // At any state of the block layout, there is not origin rotation
-      // and the container does not 
-      originRotation.set(0)
-      containerX.set(0)
-      containerY.set(0)
+      // and there's no inner container offset
+      t.rotation = 0
+      t.iX = 0
+      t.iY = 0
 
-      const entranceDelay = pos.data.delay
+      const delayEntrance = pos.data.delay
 
-      if (state === 'idle' || state === 'entrance') {
-        originAlpha.set(1, { delay: entranceDelay })
-        originX.set(pos.fx)
-        originY.set(pos.fy)
+      if (state === 'idle') {
+        // tlPos.clear()
+        // tlAlpha.clear()
+        // tlRenderable.clear()
+
+        // t.oX = pos.fx
+        // t.oY = pos.fy
+        // t.renderable = active
+        // t.alpha = 1
       }
 
-      else if (state === 'filter' && active !== $originRenderable) {
+      else if (state === 'entrance') {
+        tlPos.clear()
+        t.oX = pos.fx
+        t.oY = pos.fy
+
+        tlAlpha.clear()
+        tlAlpha.add(() => t.alpha = 1, delayEntrance)
+        tlAlpha.restart()
+      }
+
+      else if (state === 'filter' && active !== t.renderable) {
         const delay = active 
-          ? entranceDelay // If prev <> cur & cur = true, it's entering
+          ? delayEntrance // If prev <> cur & cur = true, it's entering
           : pos.data.getDelay(prevPos?.data, true) // If prev <> cur & cur = false, it's exiting
 
-        originRenderable.set(active, { delay }) // originScale.set(active ? 1 : .2, { delay })
+        tlRenderable.clear()
+        tlRenderable.add(() => t.renderable = active, delay)
+        tlRenderable.restart()
       }
 
       else if (state === 'move') {
-        const delay = entranceDelay * .2
-        const moveOptions = {
-          delay,
-          duration: shiftms - delay,
-          interpolate: d3.interpolateNumber,
-          easing: d3.easeSinIn
-        }
+        const delay = delayEntrance * .2
 
-        originX.set(pos.fx, moveOptions)
-        originY.set(pos.fy, moveOptions)
+        tlPos.clear()
+        tlPos.to(t, { oX: pos.fx, oY: pos.fy, delay, duration: shifts-delay, ease: c.easeExit })
       }
 
     }
 
     else if (layout === 'radial') {
       const { delay } = pos.data
-      const duration = 300
+      const duration = c.maxDurationRadial
 
-      originX.set(0)
-      originY.set(0)
-      containerX.set(pos.fx)
-
-      const options = {
-          delay,
-          duration,
-          interpolate: d3.interpolateNumber,
-          easing: d3.easeCubicInOut
-        }
+      t.oX = 0
+      t.oY = 0
+      t.iX = pos.fx // fx = 0 on radial layout
 
       if (state === "idle") {
-        originRotation.set(pos.rotation)
-        originAlpha.set(1)
-        containerY.set(pos.fy)
+        // tlPos.clear()
+        // tlAlpha.clear()
+        // tlRenderable.clear()
+
+        // t.rotation = pos.rotation
+        // t.alpha = 1
+        // t.iY = pos.fy
+
+        // t.renderable = active
       }
 
       else if (state === "entrance") {
-        originRotation.set(pos.rotation - Math.PI/8)
-        containerY.set(config.innerRadius)
-        originAlpha.set(0)
-        
-        originRotation.set(pos.rotation, options)
-        containerY.set(pos.fy, { ...options, delay: Math.max(0, delay-100), duration: 500})
-        originAlpha.set(1, options)
+        tlPos.clear()
+        tlPos.fromTo(t, 
+          { rotation: pos.rotation - Math.PI/8, iY: config.innerRadius },
+          { rotation: pos.rotation, iY: pos.fy, delay, duration, ease: c.easeExit }
+        )
+
+        tlAlpha.clear()
+        tlAlpha.fromTo(t, 
+          { alpha: 0 },
+          { alpha: 1, delay, duration, ease: c.easeExit }
+        )
       }
 
-      else if (state === 'filter' && active !== $originRenderable) {
+      else if (state === 'filter' && active !== t.renderable) {
         const filterDelay = active 
           ? delay // If prev <> cur & cur = true, it's entering
           : pos.data.getDelay(prevPos?.data) // If prev <> cur & cur = false, it's exiting
 
-          originRenderable.set(active, { delay: filterDelay + duration })
-          originAlpha.set(+active, { ...options, delay: filterDelay })
+        tlRenderable.clear()
+        tlRenderable.add(() => t.renderable = active, active ? filterDelay : c.shifts)
+        tlRenderable.restart()
 
-          if (!active) {
-            originRotation.set(prevPos.data.rotation + Math.PI/8, { ...options, delay: filterDelay})
-            containerY.set(config.innerRadius, { ...options, delay: Math.max(0, filterDelay-100), duration: 500})
-          }
+        tlAlpha.clear()
+        tlAlpha.fromTo(t, 
+          { alpha: +!active },
+          { alpha: +active, delay: filterDelay, duration, ease: c.easeExit }
+        )
+
+        tlPos.clear()
+        if (active) { // good
+          tlPos.fromTo(t, 
+            { rotation: pos.rotation - Math.PI/8, iY: config.innerRadius },
+            { rotation: pos.rotation, iY: pos.fy, delay: filterDelay, duration, ease: c.easeExit }
+          )
+        } 
+        else { // not good
+          const rotation = prevPos.data.rotation + Math.PI/8
+          const iY = config.innerRadius
+
+          tlPos.to(t, { rotation, iY, duration, delay: filterDelay, ease: c.easeExit })
+        }
       }
 
       else if (state === 'move') {
-        originRotation.set(pos.rotation, { ...options, duration: shiftms-delay })
-        containerY.set(pos.fy, { ...options, delay: Math.max(0, delay-100), duration: 500 })
+        tlPos.clear()
+        tlPos.to(t, { rotation: clockwiseAngle(prevPos.rotation, pos.rotation), iY: pos.fy, duration, delay, ease: c.easeExit })
       }
 
     }
@@ -179,4 +214,4 @@
 
 </script>
 
-<Pokemon parent={container} {node}/>
+<Pokemon parent={inner} {node}/>
