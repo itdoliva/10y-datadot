@@ -1,24 +1,30 @@
 <script>
-  import { hovered } from '$lib/store/canvas.js';
-  import Button from "../atoms/Button.svelte";
-  import BarTween from "../atoms/BarTween.svelte";
-	import CheckIcon from './../atoms/CheckIcon.svelte';
-  import NumberTween from '../atoms/NumberTween.svelte';
-  import Circle from '../atoms/Circle.svelte';
-  import Container from '../atoms/Container.svelte';
-  import Graphics from '../atoms/Graphics.svelte';
-  import Bubble from '../atoms/Bubble.svelte';
-  import Icon from '../atoms/Icon.svelte';
+  import { app, hovered } from '$lib/stores/canvas.js';
+  import Button from "$lib/components/atoms/Button.svelte";
+  import BarTween from "$lib/components/atoms/BarTween.svelte";
+	import CheckIcon from '$lib/components/atoms/CheckIcon.svelte';
+  import NumberTween from '$lib/components/atoms/NumberTween.svelte';
+  import Circle from '$lib/components/atoms/Circle.svelte';
+  import Container from '$lib/components/atoms/Container.svelte';
+  import Graphics from '$lib/components/atoms/Graphics.svelte';
+  import Bubble from '$lib/components/atoms/Bubble.svelte';
+  import Icon from '$lib/components/atoms/Icon.svelte';
+  import * as PIXI from "pixi.js";
 
   import templates from "$lib/templates"
 
   export let categories
   export let selected = []
   export let multiselect = true
+  export let unselectBtn = multiselect
 
-  export let gridlayout = 'layout'
+  export let gridlayout = 'simple'
 
   export let direction = 'row'
+
+  export let parent = undefined
+
+
 
 </script>
 
@@ -35,18 +41,18 @@
           on:mouseleave={() => $hovered = undefined}
         >
           <div class="check-wrapper">
+            <CheckIcon active={active} hovered={$hovered === id} />
+
             {#if gridlayout === "goal"}
               <div class="circle-wrapper">
                 <Circle fill={color} number=1 range={[0, 8]} />
               </div>
             {/if}
-
-            <CheckIcon active={active} hovered={$hovered === id} />
           </div>
 
           {#if gridlayout === 'product'}
             <div class="icon-wrapper">
-              <Container>
+              <Container parent={parent}>
                 <Graphics blendmode="MULTIPLY" alpha=.9>
                   <Bubble {id} {i} r={nNodes/3} />
                 </Graphics>
@@ -88,10 +94,10 @@
     {/each}
   </ul>
 
-  {#if multiselect}
+  {#if unselectBtn}
     <div class="btn-wrapper">
       <Button onClick={() => selected = []} disabled={selected.length === 0}>
-        Selecionar tudo
+        selecionar tudo
       </Button>
     </div>
   {/if}
@@ -164,6 +170,12 @@
       }
     }
 
+    &.simple {
+      label {
+        grid-template-columns: min-content 1fr;
+        grid-template-areas: "check label";
+      }
+    }
 
     &.row {
       grid-auto-flow: column;
@@ -206,7 +218,7 @@
     display: grid;
     align-items: center;
     column-gap: .4rem;
-    
+  
 
     &.active {
       .label-wrapper {

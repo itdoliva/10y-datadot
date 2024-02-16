@@ -37,6 +37,7 @@ export async function load({ fetch }) {
   const { products, designs, channels, goals, industries } = categories
 
   const nNodes = 387
+  const nClients = Math.floor(nNodes *.9)
 
   const firstDt = new Date(2014, 0, 1)
   const lastDt = new Date(2023, 11, 1)
@@ -50,6 +51,8 @@ export async function load({ fetch }) {
     prodList.push(products.slice(products.length-2)[Math.random() < .5 ? 0 : 1].id)
     prodList.push(products.slice(0, products.length-2)[Math.floor(Math.random()*(products.length-2))].id)
 
+    const clientId = Math.floor(Math.random() * nClients)
+
     const node = { 
       id: i, 
       year,
@@ -58,7 +61,9 @@ export async function load({ fetch }) {
       goals: getCategories(goals),
       industry: getCategories(industries, false),
       products: prodList,
-      active: true
+      active: true,
+      clientId,
+      complexity: .4 + Math.random()*.7
     }
 
     node.ids = [

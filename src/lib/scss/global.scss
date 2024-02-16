@@ -10,7 +10,6 @@
   --color-accent: #818afa;
   --color-accent-low: #DCDEFE;
   --color-secondary: #CEFC6E;
-
 }
 
 * {
@@ -18,8 +17,18 @@
   font-weight: 300;
 }
 
-*, *::after, *::before {
+*, 
+*::after, 
+*::before {
   box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5 {
+  margin: 0;
+}
+
+p {
+  margin: 0;
 }
 
 body {
@@ -31,7 +40,7 @@ body {
 
   -ms-overflow-style: none; /* for Internet Explorer, Edge */
   scrollbar-width: none; /* for Firefox */
-  overflow-y: scroll; 
+  overflow: hidden; 
 }
 
 body::-webkit-scrollbar {

@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js"
 import getRegPolyPoints from "$lib/helpers/getRegPolyPoints"
 import { get } from 'svelte/store';
-import { nodeSize, lineWidth } from "$lib/store/nodes"
+import { nodeSize, lineWidth } from "$lib/stores/nodes"
 
 
 export default function reportTemplate(template=new PIXI.Graphics()) {

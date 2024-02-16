@@ -1,8 +1,8 @@
 <script>
   import App from "$lib/App.svelte";
   import "$lib/scss/global.scss";
-  import { dataset, nodes, categories } from "$lib/store/nodes"
-  import { width, height, pixelRatio } from "$lib/store/canvas"
+  import { dataset, nodes, categories } from "$lib/stores/nodes"
+  import { width, height, pixelRatio } from "$lib/stores/canvas"
 
   export let data
 

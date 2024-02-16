@@ -1,7 +1,7 @@
 <script>
-	import { pixelRatio } from '$lib/store/canvas';
+	import { pixelRatio, complexityOn } from '$lib/stores/canvas';
   import * as PIXI from "pixi.js"
-  import { categories } from '$lib/store/nodes';
+  import { categories } from '$lib/stores/nodes';
   import templates from "$lib/templates"
 
   export let parent
@@ -11,7 +11,7 @@
   
   const graphics = new PIXI.Graphics()
   graphics.cacheAsBitmap = true
-
+  
   parent.addChild(graphics)
   
   // Behind Basis

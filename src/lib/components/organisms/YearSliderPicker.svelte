@@ -1,7 +1,5 @@
 <script>
-  import { onMount } from "svelte";
   import * as d3 from "d3"
-  import CheckIcon from "$lib/components/atoms/CheckIcon.svelte";
 
   export let min
   export let max
@@ -33,6 +31,14 @@
   }
 
   $: innerW = w - (pad.left + pad.right)
+
+  $: if (selected) {
+    // When selected changes, updates drag
+    // This is particularly useful when changes to selected are made
+    // outside the component
+    drag[0] = selected[0]
+    drag[1] = selected[1]
+  }
 
   $: year2pos = d3.scalePoint()
     .domain(years)

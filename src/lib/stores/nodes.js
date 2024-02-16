@@ -1,5 +1,5 @@
 import { writable, derived, readable } from "svelte/store";
-import { width } from "$lib/store/canvas"
+import { width } from "$lib/stores/canvas"
 
 export const dataset = writable([])
 export const categories = writable({})
@@ -11,11 +11,11 @@ export const fgoals = writable()
 export const findustries = writable()
 export const fproducts = writable()
 
+export const selected = writable({ active: false })
 
 export const nodes = derived(
   [ dataset, fyears, findustries, fdesigns, fgoals, fproducts, categories, sortBy ], 
   ([ $dataset, $years, $industries, $designs, $goals, $products, $categories, $sortBy ]) => {
-    // console.log('nodes')
 
     const newNodes = $dataset.map(d => {
       const isDeactive = (
@@ -30,7 +30,7 @@ export const nodes = derived(
     })
     .sort((a, b) => 
       (+(b.active) - +(a.active)) || // Descending because we want active (1) before unactive (0)
-      (a.id - b.id)
+      a[$sortBy] - b[$sortBy]
     )
     .map((item, i) => ({ ...item, i }))
 

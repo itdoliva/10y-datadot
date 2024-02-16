@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js"
 import { get } from 'svelte/store';
-import { nodeSize, lineWidth } from "$lib/store/nodes"
+import { nodeSize, lineWidth } from "$lib/stores/nodes"
 
 
 export default function videoTemplate(template=new PIXI.Graphics()) {

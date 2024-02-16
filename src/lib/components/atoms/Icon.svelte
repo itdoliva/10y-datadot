@@ -7,6 +7,13 @@
 	import Products from '$lib/icons/Products.svelte';
 	import BlockLayout from '$lib/icons/BlockLayout.svelte';
 	import RadialLayout from '$lib/icons/RadialLayout.svelte';
+	import Caret from '$lib/icons/Caret.svelte';
+	import Play from '$lib/icons/Play.svelte';
+	import Pause from '$lib/icons/Pause.svelte';
+	import InfoDefault from '$lib/icons/InfoDefault.svelte';
+	import InfoActive from '$lib/icons/InfoActive.svelte';
+	import InfoHover from '$lib/icons/InfoHover.svelte';
+	import Wireless from '$lib/icons/Wireless.svelte';
 
   export let icon
 
@@ -19,6 +26,13 @@
     products: Products,
     block: BlockLayout,
     radial: RadialLayout,
+    caret: Caret,
+    play: Play,
+    pause: Pause,
+    wireless: Wireless,
+    infoDefault: InfoDefault,
+    infoActive: InfoActive,
+    infoHover: InfoHover,
   }
 
 </script>

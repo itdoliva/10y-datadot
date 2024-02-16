@@ -4,219 +4,283 @@
  -->
 
 <script>
-  import { beforeUpdate, setContext, getContext } from "svelte";
-  import { writable, derived } from "svelte/store";
+  import { getContext } from "svelte";
   import { gsap } from "gsap";
   import * as d3 from "d3";
 
-  import { width, height, figureWidth, figureHeight } from "$lib/store/canvas";
-  import { zoomBehaviour, updateExtents } from "$lib/store/zoom";
-  import { nodes, nodeSize, gap } from "$lib/store/nodes";
-  import getBlockConfig from "$lib/helpers/getBlockConfig"
-  import getRadialConfig from "$lib/helpers/getRadialConfig"
-  import randomDensity from "$lib/utility/randomDensity"
-
+  // Components
   import Node from "$lib/components/Node.svelte";
 
+  // Stores
+  import { width, height, figureWidth, figureHeight } from "$lib/stores/canvas";
+  import { zoomBehaviour, updateExtents } from "$lib/stores/zoom";
+  import { nodes, nodeSize, gap, sortBy, selected } from "$lib/stores/nodes"; 
+
+  // Helpers
+  import getPosRadial from "$lib/helpers/getPosRadial"
+  import getPosBlock from "$lib/helpers/getPosBlock"
+
+  // Config
   import layoutConfig from "$lib/config/layout"
+  const { shifts } = layoutConfig;
 
+
+  // Exports
   export let layout
+  
 
-  let nextLayout = layout
-  let prevCount = $nodes.activeCount
-  let prevState
-
-  const tl = gsap.timeline()
   const { resetZoom } = getContext("viz")
-  const { maxStacksK, innerRadius, shiftms, shifts, maxDelayRadial } = layoutConfig
+  
+  
+  let castableNodes = []
+  
+  const dummyNode = { id: -1, active: true, fx: 0, fy: 0 }
+  const simulation = d3.forceSimulation()
+    .alphaTarget(0.3) // stay hot
+    .velocityDecay(0.1) // low friction
+    .force("x", d3.forceX().x(d => 0).strength(0.01))
+    .force("y", d3.forceY().y(d => 0).strength(0.01))
+    .force("collide", d3.forceCollide())
+    .force("charge", d3.forceManyBody())
+  
 
-  // Stores  
-  const _layout = writable(layout)
-  const _state = writable('entrance')
-  const _filter = writable()
-  const _config = writable()
-  const _prevLayout = writable(layout)
-  const _prevConfig = writable()
+  // ------------ Timelines ------------
+  const tlState = gsap.timeline()
+  const tlLayout = gsap.timeline()
+
+  console.log($nodes)
+  // ------------ State Management ------------
+  let curLayout = layout
+  let state = 'entrance'
+
+  const config = { 
+    cur: undefined, 
+    prev: undefined, 
+    set: updateConfig 
+  }
+
+  let prevCount = $nodes.activeCount
+
+  tlState.add(() => {
+    state = 'idle'
+  }, `+=${shifts}`)
 
 
-  beforeUpdate(() => {
+  // ------------ Reactivity ------------
+  // reactive declarations are executed in batch.
+  // reactive declarations are executed in order of their dependency. 
+  // If no dependency, they are executed in the code order.
+  $: {
     // If layout is changed
-    if (layout != $_layout) {
-      nextLayout = layout
-      _state.set('exit')
-      resetZoom()
+    if (layout != curLayout) {
+      switchLayout(layout)
     }
-
 
     // Data filtered
     if (prevCount != $nodes.activeCount) {
-      const filter = prevCount > $nodes.activeCount ? 'exclusion' : 'inclusion'
-
-      // Defines the first state of the filter type
-      const filterState = filter === 'exclusion' 
-        ? 'filter' // First step on exclusion is to _filter_ out, then move
-        : 'move' // First step on inclusion is to _move_, then filter in
-
-      _filter.set(filter)
-      _state.set(filterState)
-
-      prevCount = $nodes.activeCount
-    }
-
-
-    if (prevState != $_state) {
-      prevState = $_state
-      tl.clear()
-      tl.add(() => {
-        if ($_state === 'exit') {
-          _state.set('entrance')
-          _prevLayout.set($_layout)
-          _layout.set(nextLayout)
-          nextLayout = undefined
-        }
-        else if ($_state === 'entrance') {
-          _state.set('idle')
-        }
-        else if ($_filter === 'exclusion' && $_state === 'filter') {
-          _state.set('move')
-        } 
-        else if ($_filter === 'exclusion' && $_state === 'move') {
-          _state.set('idle')
-          _filter.set()
-        } 
-        else if ($_filter === 'inclusion' && $_state === 'move') {
-          _state.set('filter')
-        } 
-        else if ($_filter === 'inclusion' && $_state === 'filter') {
-          _state.set('idle')
-          _filter.set()
-        } 
-
-      }, `+=${shifts}`)
-    }
-  })
-
-
-  $: updateExtents($_layout, $width, $height, $figureWidth, $figureHeight)
-  $: pos = getPos[$_layout]($nodes.activeCount, "year", $nodeSize, $gap, $figureWidth, $figureHeight)
-  
-
-  // Layouts
-  const getPos = {}
-
-  getPos.colEntranceUpTo = shifts * .2
-  getPos.fullColEntranceDuration = shifts - getPos.colEntranceUpTo
-  getPos.rotationOffset = -Math.PI/2
-
-  getPos.block = (activeCount, groupBy, nodeSize, gap, fw, fh) => {
-    const { rows, columns, padding, extent, maxRowsOnView, blockHeight } = getBlockConfig(activeCount, nodeSize, gap, fw, fh)
-    
-    // The calculation below support block entrance animation
-    const columnDensities = randomDensity(columns)
-    const timeStepByRow = +(getPos.fullColEntranceDuration / maxRowsOnView).toFixed(4)
-
-    updateConfig({ rows, columns, columnDensities, timeStepByRow })
-    updateZoomExtent(extent)
-
-    const getDelay = (data, prev=false) => {
-      if (!data) return 0
-
-      const { row, column } = data
-
-      const config = prev ? $_prevConfig : $_config
-      const { columnDensities, timeStepByRow } = config
-
-      const columnDelay = columnDensities[column] * getPos.colEntranceUpTo
-      const rowDelay = timeStepByRow * row
-
-      return +(columnDelay + rowDelay).toFixed(3)
-    }
-
-    return ({ i }) => {
-      // Calculate the node row and column indices for the given i
-      const column = Math.floor(i % columns)
-      const row = Math.floor(i / columns)
-
-      const fx = column * (nodeSize + gap) + nodeSize/2 - fw/2 + padding.left
-      const fy = row * (nodeSize + gap) + nodeSize/2 - fh/2 + padding.top
-
-      const delay = getDelay({ row, column })
-
-      return { fx, fy, data: { row, column, delay, getDelay } }
+      filtered()
     }
   }
 
-  getPos.radial = (activeCount, groupBy, nodeSize, gap, fw, fh) => {
-    const {
-      extent,
-      grouped,
-      sectorRadiansScale,
-      pileRadiansScale,
-      maxStacks
-    } = getRadialConfig($nodes, activeCount, nodeSize, gap, groupBy, innerRadius, maxStacksK, fw, fh)
 
-    updateConfig({ grouped, sectorRadiansScale, pileRadiansScale, innerRadius, maxStacks })
-    updateZoomExtent(extent)
+  $: updateExtents(curLayout, $width, $height, $figureWidth, $figureHeight)
+  $: switchSelected($selected.active)
 
-    const delayScale = d3.scaleLinear()
-      .domain([0, 2*Math.PI])
-      .range([0, maxDelayRadial])
+  $: settings = {
+    layout: curLayout,
+    state,
+    config,
+  }
 
-    const getDelay = ({ radians }) => delayScale(radians)
+  $: dimensions = {
+    fw: $figureWidth,
+    fh: $figureHeight,
+    nodeSize: $nodeSize,
+    gap: $gap
+  }
 
-    return (node) => {
-      // Get category of sector
-      const catValue = node[groupBy]
+  $: prepareNodes(
+    $nodes, 
+    $sortBy,
+    settings,
+    dimensions,
+    { zoomExtent: updateZoomExtent }
+  )
 
-      // Get occurrence of this node in the group of nodes with the same catValue
-      const catNodes = grouped.get(catValue)
-      const nodeIndex = catNodes.findIndex(d => d.id === node.id)
-      const pileIndex = Math.floor(nodeIndex / maxStacks)
-      const stackIndex = nodeIndex % maxStacks
 
-      const radiansOffset = catNodes.diffPiles * pileRadiansScale.bandwidth()/2
-      const radians = sectorRadiansScale(catValue) + pileRadiansScale(pileIndex) + radiansOffset
+  // Layouts
+  function prepareNodes(nodes, groupBy, settings, dimensions, update) {
+    console.log({ nodes: nodes.length, groupBy, settings, dimensions, update })
 
-      const radius = innerRadius + stackIndex * (nodeSize + gap)
+    const preCastableNodes = [
+      dummyNode,
+      ...nodes.map(node => ({ 
+        ...node, 
+        x: node.pos?.fx ? node.pos.fx : 0, 
+        y: node.pos?.fy ? node.pos.fy : 0
+      }))
+    ]
 
-      const rotation = radians + getPos.rotationOffset
+    preCastableNodes.activeCount = nodes.activeCount
 
-      const delay = getDelay({ radians })
+    const getPos = getPosFactory(preCastableNodes, groupBy, settings, dimensions, update)
 
-      return { fx: 0, fy: radius, rotation, data: { radius, radians, rotation, delay, getDelay } }
+    castableNodes = preCastableNodes.map(node => {
+      const pos = getPos(node)
+      return node.id === -1 
+        ? node 
+        : { ...node, pos }
+    })
+
+    if (state === 'selected') {
+      simulation
+        .nodes(castableNodes)
+        .on("tick", () => {
+          castableNodes.forEach(node => {
+            if (node.id !== -1) {
+              node.pos.fx = node.x
+              node.pos.fy = node.y
+            }
+          })
+
+          castableNodes = castableNodes
+        })
+    } else {
+      // simulation.stop()
+    }
+
+  }
+
+
+  function getPosFactory(preCastableNodes, groupBy, settings, dimensions, update) {
+    if (state === 'selected') {
+      const { nodeSize, fw, fh } = dimensions
+
+      const minSize = Math.max(fw, fh)
+      console.log(minSize)
+      const collideRadius = d => d.active ? d.id === -1 ? minSize * .45 : nodeSize/2 : 0
+      simulation.force("collide").radius(collideRadius)
+
+      const chargeStrength = d => !d.active || d.id === -1 ? -2 : -5
+      simulation.force("charge").strength(chargeStrength)
+
+      return (node) => ({ fx: node.x, fy: node.y, })
+    } 
+    else if (layout === 'block') {
+      return getPosBlock(preCastableNodes, settings, dimensions, update)
+    }
+    else if (layout === 'radial') {
+      return getPosRadial(preCastableNodes, groupBy, settings, dimensions, update)
+    }
+  }
+
+
+  function switchLayout(newLayout) {
+    // console.log(`switchLayout ${curLayout} -> ${newLayout}`)
+
+    if (state !== 'selected') {
+      tlLayout.clear()
+      tlState.clear()
+
+      tlState.add(() => {
+        state = 'exit'
+      }, `+=0`)
+      
+  
+      tlLayout.add(() => {
+        curLayout = newLayout
+        resetZoom()
+      }, `+=${shifts}`)
+  
+      tlState.add(() => {
+        state = 'entrance'
+      }, `+=${shifts}`)
+
+      tlState.add(() => {
+        state = 'idle'
+      }, `+=${shifts}`)
+    }
+    else {
+      curLayout = newLayout
+    }
+
+  }
+
+
+  function filtered() {
+    // console.log('filtered')
+
+    const isExclusion = prevCount > $nodes.activeCount
+
+    tlState.clear()
+    
+    // First step on exclusion is to _filter_ out, then move
+    // First step on inclusion is to _move_, then filter in
+    state = isExclusion ? 'filter' : 'move'
+      
+    tlState.add(() => {
+      state = isExclusion ? 'move' : 'filter'
+    }, `+=${shifts}`)
+
+    tlState.add(() => {
+      state = 'idle'
+    }, `+=${shifts}`)
+
+    prevCount = $nodes.activeCount
+  }
+
+
+  function switchSelected(isActive) {
+    console.log('\tswitchSelected')
+    if (isActive) {
+      tlState.clear()
+      state = 'selected'
+    } else if (state === 'selected') {
+      state = 'idle'
     }
   }
 
 
   function updateZoomExtent(extent, reset=true) {
     zoomBehaviour.translateExtent(extent)
-    if (reset) resetZoom(0)
+    if (reset) {
+      resetZoom(0)
+    }
   }
 
-  function updateConfig(config) {
-    _prevConfig.set($_config)
-    _config.set(config)
+
+  function updateConfig(newConfig) {
+    config.prev = config.cur
+    config.cur = newConfig
+    return config
   }
 
-  $: setContext('layout', {
-    shiftms,
-    shifts,
-  })
+
+
 
 
 </script>
 
-{#each $nodes as node (node.id)}
-  {@const nodePos = pos(node)}
-
-  <Node 
-    id={node.id}
-    active={node.active}
-    pos={nodePos}
-    node={node}
-
-    layout={$_layout}
-    state={$_state}
-    config={$_config}
-  />
+{#each castableNodes as node (node.id)}
+  {#if node.id !== -1}
+    <Node 
+      {...node} 
+      layout={settings.layout}
+      state={settings.state}
+      config={settings.config.cur}
+    />
+  {/if}
 {/each}
+
+<ul
+  style:position="absolute"
+  style:bottom=0
+  style:right=0
+  style:z-index=10
+  style:font-weight=700
+  style:color="yellow"
+  style:background="grey"
+>
+  <li>Layout: {curLayout.toUpperCase()}</li>
+  <li>State: {state.toUpperCase()}</li>
+</ul>

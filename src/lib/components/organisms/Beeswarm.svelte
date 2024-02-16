@@ -136,18 +136,20 @@
   </svg>
 
   <Button onClick={() => selected = []} disabled={selected.length === 0}>
-    Selecionar tudo
+    selecionar tudo
   </Button>
 </div>
 
 <style lang="scss">
   .beeswarm-wrapper {
     aspect-ratio: 1.71;
+
+    display: grid;
+    grid-template-rows: 1fr min-content;
   }
 
   svg {
     width: 100%;
-    height: 100%;
     overflow: visible;
   }
 </style>

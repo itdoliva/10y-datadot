@@ -1,5 +1,5 @@
 <script>
-	import { width, height } from '$lib/store/canvas';
+	import { width, height } from '$lib/stores/canvas';
   import { onMount } from 'svelte'
   import * as PIXI from "pixi.js"
 
@@ -33,6 +33,7 @@
     position: absolute;
     left: 0;
     top: 0;
-    z-index: -10;
+
+    z-index: 0;
   }
 </style>

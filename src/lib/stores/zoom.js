@@ -25,8 +25,6 @@ export const zoom = writable(1)
 export const isDragging = writable(false)
 
 
-
-
 export const zoomBehaviour = d3.zoom()
   .on("start", onZoomStart)
   .on("end", onZoomEnd)

@@ -3,11 +3,8 @@
   import * as PIXI from "pixi.js"
   import * as d3 from "d3";
   
-  import { app, width, height, figureWidth, figureHeight }  from '$lib/store/canvas';
-  import { cameraOffsetX, cameraOffsetY, zoomBehaviour, zoom } from "$lib/store/zoom";
-
-
-  let container
+  import { app, width, height, figureWidth, figureHeight }  from '$lib/stores/canvas';
+  import { cameraOffsetX, cameraOffsetY, zoomBehaviour, zoom } from "$lib/stores/zoom";
 
   const root = new PIXI.Container()
   root.name = "viz"
@@ -42,9 +39,11 @@
   $: scene.scale.set($zoom)
 
   onMount(() => {
-    d3.select(container)
+    d3.select($app.view)
       .call(zoomBehaviour)
-      .on("wheel", e => e.preventDefault())
+      .on("wheel", e => {
+        e.preventDefault()
+      })
   })
 
   setContext('viz', { 
@@ -54,7 +53,7 @@
   })
 
   function resetZoom(duration=1000) {
-    d3.select(container)
+    d3.select($app.view)
       .transition()
       .duration(duration)
       .ease(d3.easeCubicInOut)
@@ -65,7 +64,6 @@
 
 <div 
   class="container"
-  bind:this={container}
   bind:clientWidth={$figureWidth}
   bind:clientHeight={$figureHeight}
 />

@@ -1,7 +1,7 @@
 <script>
   import * as d3 from "d3";
   import { getContext } from "svelte";
-  import { app } from "$lib/store/canvas";
+  import { app } from "$lib/stores/canvas";
   import { gsap } from "gsap";
 
   export let i
