@@ -1,11 +1,13 @@
 <script>
 	import { pixelRatio, complexityOn } from '$lib/stores/canvas';
   import * as PIXI from "pixi.js"
-  import { categories } from '$lib/stores/nodes';
+  import { dataset, categories } from '$lib/stores/nodes';
   import templates from "$lib/templates"
 
   export let parent
-  export let node
+  export let id
+
+  const node = $dataset.find(d => d.id === id)
 
   const channelName = $categories.channels.find(d => d.id === node.channel).name
   

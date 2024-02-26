@@ -9,7 +9,7 @@ const {
 } = layoutConfig
 
 export default function getPosRadial(nodes, groupBy, settings, dimensions, update) {
-  console.log('\tgetPos radial')
+  console.log('\tgetPos radial', nodes.length, nodes.activeCount, dimensions.fw, dimensions.fh)
 
   const {
     extent,
@@ -19,7 +19,7 @@ export default function getPosRadial(nodes, groupBy, settings, dimensions, updat
     maxStacks
   } = getRadialConfig(nodes, groupBy, dimensions)
 
-  settings.config.set({ grouped, sectorRadiansScale, pileRadiansScale, innerRadius, maxStacks })
+  update.config({ grouped, sectorRadiansScale, pileRadiansScale, innerRadius, maxStacks })
   update.zoomExtent(extent)
 
   const delayScale = d3.scaleLinear()

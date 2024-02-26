@@ -4,15 +4,13 @@
   import "./pixi.js"
 
   import Pixi from "$lib/components/Pixi.svelte";
-  import Layout from "$lib/components/Layout.svelte";
+  import LayoutManager from "$lib/components/LayoutManager.svelte";
   import Visualization from '$lib/components/Visualization.svelte';
   import File from '$lib/components/organisms/File.svelte';
   import LeftPanel from '$lib/components/organisms/LeftPanel.svelte';
   import TopPanel from '$lib/components/organisms/TopPanel.svelte';
 
   let layout = 'block'
-
-  $: console.log($selected)
 
 </script>
 
@@ -29,7 +27,7 @@
 
     <div class="viz-container">
       <Visualization>
-        <Layout bind:layout />
+        <LayoutManager bind:layout />
       </Visualization>
 
       <File />

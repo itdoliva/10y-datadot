@@ -7,15 +7,15 @@ const {
 } = layoutConfig
 
 export default function getPosBlock(nodes, settings, dimensions, update) {
-  //activeCount, nodeSize, gap, fw, fh, config, prevConfig, updateConfig, updateZoomExtent) {
-  console.log('getPosBlock', {nodes, settings, dimensions, update})
+  console.log('getPosBlock', nodes.length, nodes.activeCount, dimensions.fw, dimensions.fh)
+
   const { rows, columns, padding, extent, maxRowsOnView, blockHeight } = getBlockConfig(nodes, dimensions)
   
   // The calculation below support block entrance animation
   const columnDensities = randomDensity(columns)
   const timeStepByRow = +(fullColEntranceDuration / maxRowsOnView).toFixed(4)
-  
-  settings.config.set({ rows, columns, columnDensities, timeStepByRow } )
+
+  update.config({ rows, columns, columnDensities, timeStepByRow } )
   update.zoomExtent(extent)
 
   const getDelay = (data, prev=false) => {
@@ -32,6 +32,7 @@ export default function getPosBlock(nodes, settings, dimensions, update) {
 
     return +(columnDelay + rowDelay).toFixed(3)
   }
+
 
   const { nodeSize, gap, fw, fh } = dimensions
   return ({ i }) => {

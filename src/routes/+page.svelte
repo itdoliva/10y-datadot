@@ -6,6 +6,8 @@
 
   export let data
 
+  console.log(data.nodes)
+
   categories.set(data.categories)
   dataset.set(data.nodes)
 </script>

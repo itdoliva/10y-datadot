@@ -38,6 +38,10 @@
   $: scene.y = $figureHeight/2 + $cameraOffsetY
   $: scene.scale.set($zoom)
 
+  $: if ($figureHeight && $figureWidth) {
+    scene.centerPoint = scene.toGlobal(new PIXI.Point(0, 0))
+  }
+
   onMount(() => {
     d3.select($app.view)
       .call(zoomBehaviour)
