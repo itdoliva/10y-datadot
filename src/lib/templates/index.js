@@ -33,6 +33,10 @@ const templates = {
   consulting,
   digital,
   print,
+
+  0: digital,
+  1: print,
+  2: consulting,
   
   10: video,
   11: publication,
@@ -42,6 +46,13 @@ const templates = {
   15: siteEditorial,
   16: dashboard,
   17: infographic,
+  
+  20: illustration,
+  21: editorial,
+  22: motion,
+  23: service,
+  24: ui,
 }
+
 
 export default templates

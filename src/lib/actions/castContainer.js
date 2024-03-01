@@ -25,7 +25,9 @@ export default function castContainer(node, {
     parent.addChild(mask)
   }
 
-  get(app).ticker.add(() => {
+  const ticker = get(app).ticker.add(ticked)
+
+  function ticked() {
     const bbox = node.getBoundingClientRect()
 
     const x = bbox.x + bbox.width/2
@@ -43,9 +45,17 @@ export default function castContainer(node, {
       mask.drawRect(-bbox.width/2, -bbox.height/2, bbox.width, bbox.height)
       mask.endFill()
     }
-  })
+  }
+
 
   return {
-    destroy: () => container.destroy()
+    destroy: () => {
+      ticker.remove(ticked)
+      container.destroy({ children: true })
+
+      if (hasMask) {
+        mask.destroy()
+      }
+    }
   }
 }

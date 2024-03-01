@@ -4,22 +4,30 @@ import { get } from 'svelte/store';
 import { nodeSize, lineWidth } from "$lib/stores/nodes"
 
 
-export default function publicationTemplate(template=new PIXI.Graphics()) {
+export default function publicationTemplate(template=new PIXI.Graphics(), size, strokeWidth) {
+  if (size === undefined) {
+    size = get(nodeSize)
+  }
 
-  const csquare = getRegPolyPoints(0, 0, get(nodeSize)*.33, 4).flat()
+  if (strokeWidth === undefined) {
+    strokeWidth = get(lineWidth)
+  }
+  
+
+  const csquare = getRegPolyPoints(0, 0, size*.33, 4).flat()
   const usquare = [
-    get(nodeSize)*.33/2, -get(nodeSize)*.15,
-    get(nodeSize)*.33/2, -get(nodeSize)*.32,
-    -get(nodeSize)*.33/2, -get(nodeSize)*.32,
-    -get(nodeSize)*.33/2, -get(nodeSize)*.15
+    size*.33/2, -size*.15,
+    size*.33/2, -size*.32,
+    -size*.33/2, -size*.32,
+    -size*.33/2, -size*.15
   ]
 
   template.beginFill(0x000000)
-  template.lineStyle(get(lineWidth), 0x000000)
+  template.lineStyle(strokeWidth, 0x000000)
   template.drawPolygon(csquare)
   template.endFill()
 
-  template.lineStyle(get(lineWidth), 0x000000)
+  template.lineStyle(strokeWidth, 0x000000)
   template.drawPolygon(usquare)
   template.endFill()
 

@@ -3,14 +3,22 @@ import { get } from 'svelte/store';
 import { nodeSize, lineWidth } from "$lib/stores/nodes"
 
 
-export default function serviceTemplate(template=new PIXI.Graphics()) {
-  const hline = [ -get(nodeSize)*.8, get(nodeSize)*.33, get(nodeSize)*.86, get(nodeSize)*.33 ]
-  const dline = [ -get(nodeSize)*.48, get(nodeSize)*.85, get(nodeSize)*.87, -get(nodeSize)*.5 ]
+export default function serviceTemplate(template=new PIXI.Graphics(), size, strokeWidth) {
+  if (size === undefined) {
+    size = get(nodeSize)
+  }
+
+  if (strokeWidth === undefined) {
+    strokeWidth = get(lineWidth)
+  }
+  
+  const hline = [ -size*.8, size*.33, size*.86, size*.33 ]
+  const dline = [ -size*.48, size*.85, size*.87, -size*.5 ]
 
   const lines = [ hline, dline ]
 
 
-  template.lineStyle(get(lineWidth), 0x000000)
+  template.lineStyle(strokeWidth, 0x000000)
 
   lines.forEach(linePoints => {
     for (let i=0; i<linePoints.length; i+=2) {
@@ -24,7 +32,7 @@ export default function serviceTemplate(template=new PIXI.Graphics()) {
     template.endFill()
   })
 
-  template.drawCircle(get(nodeSize)*.15, 0, get(nodeSize)*.5)
+  template.drawCircle(size*.15, 0, size*.5)
   template.endFill()
 
   return template

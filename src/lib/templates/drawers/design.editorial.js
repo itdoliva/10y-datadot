@@ -3,25 +3,33 @@ import { get } from 'svelte/store';
 import { nodeSize, lineWidth } from "$lib/stores/nodes"
 
 
-export default function editorialTemplate(template=new PIXI.Graphics()) {
+export default function editorialTemplate(template=new PIXI.Graphics(), size, strokeWidth) {
+  if (size === undefined) {
+    size = get(nodeSize)
+  }
+
+  if (strokeWidth === undefined) {
+    strokeWidth = get(lineWidth)
+  }
+  
   // Calculate shapes
   const triangle = [
     0, 0, 
-    -get(nodeSize)*.33, -get(nodeSize)*.83, 
-    get(nodeSize)*.33, -get(nodeSize)*.83
+    -size*.33, -size*.83, 
+    size*.33, -size*.83
   ]
 
   const square = [
-    -get(nodeSize)*.33, get(nodeSize)*.5,
-    get(nodeSize)*.33, get(nodeSize)*.5,
-    get(nodeSize)*.33, get(nodeSize)*.66,
-    -get(nodeSize)*.33, get(nodeSize)*.66
+    -size*.33, size*.5,
+    size*.33, size*.5,
+    size*.33, size*.66,
+    -size*.33, size*.66
   ]
 
   const shapes = [ triangle, square ]
 
   shapes.forEach(shapePoints => {
-    template.lineStyle(get(lineWidth), 0x000000)
+    template.lineStyle(strokeWidth, 0x000000)
     template.drawPolygon(shapePoints)
     template.endFill()
   })

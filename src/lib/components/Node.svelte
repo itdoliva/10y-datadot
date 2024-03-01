@@ -13,7 +13,6 @@
   import { isEqual } from "lodash"
   import c from "$lib/config/layout"
   import clockwiseAngle from "$lib/utility/clockwiseAngle";
-  import { Point, compressSpaces } from "canvg";
   
 
   const shouldLog = true
@@ -108,6 +107,7 @@
   // On turn complexity on or off
   $: playComplexity($complexityOn)
 
+
   // On state change
   $: if (state === 'selected') {
     playSelected()
@@ -161,8 +161,6 @@
         t.scale = getScale($complexityOn)
       })
     }
-
-
   }
 
 
@@ -177,18 +175,20 @@
     t.renderable = isActive()
 
     if (layout === 'block') {
-      t.x = pos.fx
-      t.y = pos.fy
+      tlPos.to(t, { x: pos.fx, y: pos.fy, delay: pos.data.delay, duration: .5 })
+      // t.x = pos.fx
+      // t.y = pos.fy
+      t.pivotY = 0
       t.alpha = 1
       t.rotation = 0
-      t.pivotY = 0
     } 
     else if (layout === 'radial') {
-      t.x = 0
-      t.y = 0
+      tlPos.to(t, { x: 0, y: 0, pivotY: pos.fy, delay: pos.data.delay, duration: .5 })
+      // t.x = 0
+      // t.y = 0
+      // t.pivotY = pos.fy
       t.alpha = 1
       t.rotation = pos.rotation
-      t.pivotY = pos.fy
     }
   }
 
@@ -334,6 +334,7 @@
     }
   }
 
+
   function playComplexity(complexityOn) {
     const { t } = simulationNode
 
@@ -347,6 +348,7 @@
     })
   }
 
+  
   function getScale(complexityOn) {
     return complexityOn
       ? simulationNode.getRef().complexity

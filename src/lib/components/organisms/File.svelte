@@ -1,40 +1,23 @@
 <script>
-  import { fly } from "svelte/transition"
-  import { selected } from "$lib/stores/nodes"
+  import { fly } from "svelte/transition";
+  import { selected } from "$lib/stores/nodes";
+  import FileTraces from "$lib/components/molecules/FileTraces.svelte";
+  import FileDescription from "$lib/components/molecules/FileDescription.svelte";
+
+
 </script>
 
 {#if $selected.active}
-  <div class="file" transition:fly={{ y: "1rem" }}>
+  <div class="file" in:fly={{ y: "1rem" }}>
 
-    <div class="primitives-container">
-
+    <div class="file__traces">
+      <FileTraces />
     </div>
 
-    <div class="text-container">
-
-      <div class="header">
-        <h3>IJEN</h3>
-        <h4>Baboom Filmes</h4>
-      </div>
-
-      <ul class="categories">
-        <li>Comunicação;</li>
-        <li>Agência publicidade;</li>
-      </ul>
-
-      <p class="description">
-        Infográficos animados para auxiliar na narrativa do documentário.
-      </p>
-      
-      <div class="footer">
-        <p class="date">01/2014</p>
-        <button on:click={() => selected.set({ active: false })}>
-          Back
-        </button>
-      </div>
-
+    <div class="file__description">
+      <FileDescription />
     </div>
-    
+
   </div>
 {/if}
 
@@ -48,33 +31,25 @@
     
     z-index: 1;
 
+    gap: 2rem;
+
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     align-items: center;
     
-    padding: 0 10%;
+    padding: 0 20%;
 
-    .text-container {
+    &__traces {
+      align-self: stretch;
+
+    }
+
+    &__description {
       display: grid;
       grid-auto-rows: min-content;
-      row-gap: 1rem;
+      row-gap: 1.25rem;
     }
 
-
-    h3 {
-      font-weight: 700;
-    }
-
-    ul {
-      li {
-        display: inline;
-      }
-    }
-
-
-    button {
-      pointer-events: all;
-    }
   }
 
 
