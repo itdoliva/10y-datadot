@@ -1,26 +1,79 @@
 <script>
+  import { onDestroy } from "svelte";
   import * as PIXI from "pixi.js"
+  import gsap from "gsap";
   import castContainer from '$lib/actions/castContainer';
-  import { categories, nodeSize } from '$lib/stores/nodes.js';
   import templates from "$lib/templates";
+	import { app } from '$lib/stores/canvas';
+  import { categories } from '$lib/stores/nodes.js';
   
   export let id
 
   let size
 
-  const category = Object.values($categories).flat()
-    .find(d => d.id === id)
+  const category = Object.values($categories).flat().find(d => d.id === id)
 
 
+  // RENDER FUNCTIONS
   const container = new PIXI.Container()
-  
   const graphics = new PIXI.Graphics()
-
   container.addChild(graphics)
 
-  templates[id](graphics)
+  templates[id](graphics, id >= 30 && id < 40 
+    ? { anchor: [ .5, .5],  rotateSprite: false }
+    : undefined)
 
-  $: graphics.scale.set((size/$nodeSize) * .7)
+
+  // ANIMATION
+  const tweens = {}
+
+  const t = {
+    rotation: 0,
+    translation: 0,
+    scale: 1
+  }
+
+  // Rotation
+  const thetaMin = -Math.PI/12;
+  const thetaMax = Math.PI/12; 
+
+  tweens.rotation = gsap.fromTo(t,
+    { rotation: thetaMin },
+    { rotation: thetaMax, repeat: -1, duration: 1.75 + Math.random() * .5, yoyo: true, ease: "none" }
+  )
+
+  // Translation
+  const radius = 5 + Math.random() * 2
+
+  tweens.translation = gsap.fromTo(t,
+    { translation: 0 },
+    { translation: 2*Math.PI, repeat: -1, duration: 10 + Math.random(), ease: "none" }
+  )
+
+  // Scale
+  tweens.scale = gsap.fromTo(t,
+    { scale:1.2 + Math.random()*.1 },
+    { scale: 1.35 + Math.random()*.05, repeat: -1, duration: 3 + Math.random(), yoyo: true, ease: "none" },
+  )
+
+
+  function animate() {
+    graphics.rotation = t.rotation
+    graphics.x = Math.sin(t.translation) * radius
+    graphics.y = Math.cos(t.translation) * radius
+    graphics.scale.set(t.scale)
+  }
+
+  const ticker = $app.ticker.add(animate)
+
+
+  // LIFECYCLE FUNCTIONS
+  onDestroy(() => {
+    ticker.remove(animate)
+
+    Object.values(tweens)
+      .forEach(tween => tween.kill())
+  })
 
 </script>
 

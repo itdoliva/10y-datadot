@@ -18,6 +18,8 @@
     app.stage.name = "stage"
 
     globalThis.__PIXI_APP__ = app
+
+    PIXI.Assets.add({ alias: 'petal', src: '/petal.png'})
   })
 
 </script>

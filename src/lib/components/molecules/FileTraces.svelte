@@ -7,7 +7,8 @@
   const traceIds = [
     node.channel,
     ...node.products,
-    ...node.designs
+    ...node.designs,
+    ...node.goals,
   ]
 
 </script>

@@ -9,45 +9,34 @@
 
   const node = $dataset.find(d => d.id === id)
 
-  const channelName = $categories.channels.find(d => d.id === node.channel).name
-  
   const graphics = new PIXI.Graphics()
   graphics.cacheAsBitmap = true
   
   parent.addChild(graphics)
   
   // Behind Basis
-  if (node.designs.includes(20)) templates.illustration(graphics)
-  if (node.designs.includes(21)) templates.editorial(graphics)
-  if (node.designs.includes(23)) templates.service(graphics)
-  if (node.designs.includes(24)) templates.ui(graphics)
+  if (node.designs.includes(20)) templates[20](graphics) // illustration
+  if (node.designs.includes(21)) templates[21](graphics) // editorial
+  if (node.designs.includes(23)) templates[23](graphics) // service
+  if (node.designs.includes(24)) templates[24](graphics) // ui
 
   // Basis
-  const basisGraphic = templates[channelName](graphics)
+  const basisGraphic = templates[node.channel](graphics)
 
   // In front of Basis
-  if (node.products.includes(16)) graphics.addChild(mask(templates.dashboard()))
-  if (node.products.includes(17)) graphics.addChild(mask(templates.infographic()))
-  if (node.products.includes(10)) templates.video(graphics)
-  if (node.products.includes(11)) templates.publication(graphics)
-  if (node.products.includes(12)) templates.report(graphics)
-  if (node.products.includes(13)) templates.presentation(graphics)
-  if (node.products.includes(14)) templates.siteInstitutional(graphics)
-  if (node.products.includes(15)) templates.siteEditorial(graphics)
-  if (node.designs.includes(22)) templates.motion(graphics)
+  if (node.products.includes(16)) graphics.addChild(mask(templates[16]())) // dashboard
+  if (node.products.includes(17)) graphics.addChild(mask(templates[17]())) // infographic
+  if (node.products.includes(10)) templates[10](graphics) // video
+  if (node.products.includes(11)) templates[11](graphics) // publication
+  if (node.products.includes(12)) templates[12](graphics) // report
+  if (node.products.includes(13)) templates[13](graphics) // presentation
+  if (node.products.includes(14)) templates[14](graphics) // siteInstitutional
+  if (node.products.includes(15)) templates[15](graphics) // siteEditorial
+  if (node.designs.includes(22)) templates[22](graphics) // motion
 
 
-  node.goals.forEach(d => {
-    PIXI.Assets.load('/petal.png')
-      .then(asset => new PIXI.Sprite(asset))
-      .then(sprite => {
-        sprite.anchor.set(.5, .9)
-        sprite.scale.set($pixelRatio/2)
-        sprite.rotation = d * 2*Math.PI/5
-        sprite.tint = new PIXI.Color($categories.goals.find(({ id }) => id === d).color).toNumber()
-        sprite.blendMode = PIXI.BLEND_MODES.MULTIPLY
-        parent.addChild(sprite)
-      })
+  node.goals.forEach(goalId => {
+    templates[goalId](parent)
   })
 
 

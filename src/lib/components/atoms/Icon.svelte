@@ -14,6 +14,7 @@
 	import InfoActive from '$lib/icons/InfoActive.svelte';
 	import InfoHover from '$lib/icons/InfoHover.svelte';
 	import Wireless from '$lib/icons/Wireless.svelte';
+	import Return from '$lib/icons/Return.svelte';
 
   export let icon
 
@@ -33,6 +34,7 @@
     infoDefault: InfoDefault,
     infoActive: InfoActive,
     infoHover: InfoHover,
+    return: Return,
   }
 
 </script>
