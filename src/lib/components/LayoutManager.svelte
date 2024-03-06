@@ -58,7 +58,6 @@
 
 
   function switchLayout(newLayout) {
-    // console.log(`switchLayout ${curLayout} -> ${newLayout}`)
 
     if (state !== 'selected') {
       tlLayout.clear()

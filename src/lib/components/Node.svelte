@@ -41,21 +41,23 @@
 
   scene.addChild(container)
 
-  container.eventMode = 'static'
-
   container.accessible = true
   container.cursor = 'pointer';
 
-  container.onpointerup = (e) => {
-    const { t } = simulationNode
-
-    selected.set({
-      active: true,
-      id,
-      x: t.x,
-      y: t.y
-    })
+  container.onpointerup = () => {
+    selected.set($selected.active
+      ? { active: false }
+      : {
+        active: true, 
+        id, 
+        x: simulationNode.t.x, 
+        y: simulationNode.t.y 
+      })
   }
+
+  $: container.eventMode = $selected.active && $selected.id === id 
+    ? 'none' 
+    : 'static'
 
   // Timeline
   const tlPos = gsap.timeline()
@@ -70,7 +72,6 @@
 
   // Variables
   $app.ticker.add(() => {
-
     const { t } = simulationNode
 
     container.x = t.x
@@ -83,24 +84,6 @@
     container.alpha = t.alpha
 
     container.scale.set(t.scale)
-
-    // if (id === 0) {
-    //   const globalPos = inner.toGlobal(scene.centerPoint)
-
-    //   point.x = -globalPos.x
-    //   point.y = -globalPos.y
-
-    //   point.clear()
-    //   point.beginFill(0xcc0000)
-    //   point.drawCircle(0, 0, 5)
-    //   point.endFill()
-
-
-    //   point.beginFill(0xccff00)
-    //   point.drawCircle(0, 0, 50)
-    //   point.endFill()
-    // }
-
   })
 
 
