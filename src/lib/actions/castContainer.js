@@ -3,18 +3,18 @@ import { app } from "$lib/stores/canvas";
 import * as PIXI from "pixi.js"
 
 export default function castContainer(node, { 
-  container, 
+  context, 
   parent=get(app).stage, 
   hasMask=false,
   destroy=true
 }) {
 
-  if (!container) {
+  if (!context) {
     return
   }
 
   // Add container to parent
-  parent.addChild(container)
+  parent.addChild(context)
 
   // Add mask if requested
   let mask
@@ -22,7 +22,7 @@ export default function castContainer(node, {
     mask = new PIXI.Graphics()
     mask.name = 'mask'
 
-    container.mask = mask
+    context.mask = mask
     parent.addChild(mask)
   }
 
@@ -34,8 +34,8 @@ export default function castContainer(node, {
     const x = bbox.x + bbox.width/2 - parent.x
     const y = bbox.y + bbox.height/2 - parent.y
 
-    container.x = x
-    container.y = y
+    context.x = x
+    context.y = y
 
     if (hasMask) {
       mask.x = x
@@ -53,7 +53,7 @@ export default function castContainer(node, {
     destroy: () => {
       if (destroy) {
         ticker.remove(ticked)
-        container.destroy({ children: true })
+        context.destroy({ children: true })
   
         if (hasMask) {
           mask.destroy()

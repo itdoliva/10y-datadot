@@ -81,7 +81,7 @@
 
   <div 
     class="primitive-holder"
-    use:castContainer={{ container }}
+    use:castContainer={{ context: container }}
     bind:clientWidth={size}
   />
 

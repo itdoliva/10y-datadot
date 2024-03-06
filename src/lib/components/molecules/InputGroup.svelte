@@ -50,10 +50,10 @@
 
 
           {#if gridlayout === 'product'}
-            {@const context = new PIXI.Container()}
+          {@const context = new PIXI.Container()}
             <div 
               class="icon-wrapper" 
-              use:castContainer={{ parent, container: context }}
+              use:castContainer={{ parent, context }}
             >
               <Graphics context={context} blendmode="MULTIPLY" alpha=.9>
                 <Bubble {id} {i} r={nNodes/3} />

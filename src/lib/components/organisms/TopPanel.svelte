@@ -20,7 +20,7 @@
     <li 
       class="pitems-wrapper"
       class:collapsed={isCollapsed}
-      use:castContainer={{ container: productContainer, hasMask: true }}
+      use:castContainer={{ context: productContainer, hasMask: true }}
     >
       <InputProduct parent={productContainer} />
     </li>
