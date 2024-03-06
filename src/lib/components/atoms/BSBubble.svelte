@@ -12,7 +12,7 @@
   export let active
   export let onClick
 
-  const r_t = tweened(r)
+  const r_t = tweened(r, { duration: 150 })
 
   $: $r_t = r
 
@@ -32,6 +32,7 @@
 
   <g class="text-content" font-size="1rem">
 
+    {#if pct > 0}
     <text 
       class="pct" 
       text-anchor="middle" 
@@ -40,6 +41,7 @@
     >
       {Math.round(pct*100)}%
     </text> 
+    {/if}
 
     <text 
       class="label" 
@@ -59,7 +61,12 @@
 <style lang="scss">
   .bs-bubble {
 
+    circle {
+      z-index: 0;
+    }
+
     .text-content {
+      z-index: 1;
       -webkit-user-select: none; /* Safari */
       -ms-user-select: none; /* IE 10 and IE 11 */
       user-select: none; /* Standard syntax */

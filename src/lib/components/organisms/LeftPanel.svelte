@@ -1,68 +1,33 @@
 <script>
-  import { fyears, fdesigns, fgoals, findustries, categoriesEnriched } from "$lib/stores/nodes";
-
-  import YearSliderPicker from "$lib/components/organisms/YearSliderPicker.svelte";
-  import Beeswarm from "$lib/components/organisms/Beeswarm.svelte";
-
-  import PanelItem from "$lib/components/molecules/PanelItem.svelte";
-  import InputGroup from "$lib/components/molecules/InputGroup.svelte";
+  import InputLayout from "$lib/components/organisms/InputLayout.svelte";
+  import InputDesign from "$lib/components/organisms/InputDesign.svelte";
+  import InputPeriod from "$lib/components/organisms/InputPeriod.svelte";
+  import InputGoal from "$lib/components/organisms/InputGoal.svelte";
+  import InputIndustry from "$lib/components/organisms/InputIndustry.svelte";
 
   export let layout
-
-  const layoutCategories = [
-    { alias: "Block", id: "block" },
-    { alias: "Radial", id: "radial" },
-  ]
 </script>
 
 <ul class="pitems-wrapper pa-wrapper">
 
   <li>
-    <PanelItem icon="layouts" title="visualizar como">
-      <InputGroup 
-        gridlayout="layout"
-        categories={layoutCategories} 
-        multiselect={false} 
-        bind:selected={layout}
-      />
-    </PanelItem>
+    <InputLayout bind:layout />
   </li>
 
   <li>
-    <PanelItem icon="period" title="período">
-      <YearSliderPicker min={2014} max={2023} bind:selected={$fyears} />
-    </PanelItem>
+    <InputPeriod />
   </li>
 
   <li>
-    <PanelItem icon="designs" title="categorias de design">
-      <InputGroup 
-        gridlayout="design"
-        categories={$categoriesEnriched.designs} 
-        direction='column' 
-        bind:selected={$fdesigns} 
-      />
-    </PanelItem>
+    <InputDesign />
   </li>
 
   <li>
-    <PanelItem icon="goals" title="objetivos do projeto">
-      <InputGroup 
-        gridlayout="goal"
-        categories={$categoriesEnriched.goals} 
-        direction='column' 
-        bind:selected={$fgoals} 
-      />
-    </PanelItem>
+    <InputGoal />
   </li>
 
   <li>
-    <PanelItem icon="industries" title="setores do mercado">
-      <Beeswarm 
-        categories={$categoriesEnriched.industries} 
-        bind:selected={$findustries} 
-      />
-    </PanelItem>
+    <InputIndustry />
   </li>
 </ul>
 

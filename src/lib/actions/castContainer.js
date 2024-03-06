@@ -5,7 +5,8 @@ import * as PIXI from "pixi.js"
 export default function castContainer(node, { 
   container, 
   parent=get(app).stage, 
-  hasMask=false 
+  hasMask=false,
+  destroy=true
 }) {
 
   if (!container) {
@@ -30,8 +31,8 @@ export default function castContainer(node, {
   function ticked() {
     const bbox = node.getBoundingClientRect()
 
-    const x = bbox.x + bbox.width/2
-    const y = bbox.y + bbox.height/2
+    const x = bbox.x + bbox.width/2 - parent.x
+    const y = bbox.y + bbox.height/2 - parent.y
 
     container.x = x
     container.y = y
@@ -50,11 +51,13 @@ export default function castContainer(node, {
 
   return {
     destroy: () => {
-      ticker.remove(ticked)
-      container.destroy({ children: true })
-
-      if (hasMask) {
-        mask.destroy()
+      if (destroy) {
+        ticker.remove(ticked)
+        container.destroy({ children: true })
+  
+        if (hasMask) {
+          mask.destroy()
+        }
       }
     }
   }

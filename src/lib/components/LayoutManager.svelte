@@ -42,6 +42,7 @@
   // ------------ Reactivity ------------
   $: {
     // If layout is changed
+
     if (layout != curLayout) {
       switchLayout(layout)
     }

@@ -1,6 +1,6 @@
 <script>
   import * as d3 from "d3";
-  import { getContext } from "svelte";
+  import { getContext, onDestroy } from "svelte";
   import { app } from "$lib/stores/canvas";
   import { gsap } from "gsap";
 
@@ -8,7 +8,7 @@
   export let r
 
   const graphics = getContext("graphics")
-  
+
   const bubble = { r }
 
   const tweenOptions = {
@@ -19,10 +19,16 @@
 
   $: gsap.to(bubble, { r: r, ...tweenOptions })
 
-  $app.ticker.add(() => {
+  function ticked() {
     graphics.clear()
     graphics.beginFill(0xDCDEFE)
     graphics.drawCircle(0, 0, bubble.r)
     graphics.endFill()
+  }
+
+  const ticker = $app.ticker.add(ticked)
+
+  onDestroy(() => {
+    ticker.remove(ticked)
   })
 </script>

@@ -4,6 +4,8 @@
   export let active = false
   export let hovered = false
 
+  export let backgroundColor = undefined
+
   const lineprop = .35
 </script>
 
@@ -14,6 +16,14 @@
   viewBox="0 0 {size} {size}"
 >
   <g transform="translate({size/2}, {size/2})">
+
+    {#if backgroundColor}
+      <circle 
+        r=8
+        fill={backgroundColor}
+      />
+    {/if}
+
 
     <circle
       class="main"
@@ -39,5 +49,7 @@
 
     margin: 0;
     padding: 0;
+    
+    overflow: visible;
   }
 </style>

@@ -2,6 +2,7 @@
   import { getContext, setContext } from "svelte";
   import * as PIXI from "pixi.js"
 
+  export let context
   export let drawFunc = undefined
   export let alpha = 1
   export let blendmode = 'NORMAL'
@@ -15,8 +16,7 @@
     drawFunc(graphics)
   }
   
-  const container = getContext('container')
-  container.addChild(graphics)
+  context.addChild(graphics)
 
   setContext('graphics', graphics)
 

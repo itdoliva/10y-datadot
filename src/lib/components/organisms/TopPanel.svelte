@@ -1,57 +1,101 @@
 <script>
   import * as PIXI from "pixi.js"
+  import Icon from "../atoms/Icon.svelte";
 
   import castContainer from "$lib/actions/castContainer"
-  import { fproducts, categoriesEnriched } from "$lib/stores/nodes";
 
   import PanelMenu from '$lib/components/organisms/PanelMenu.svelte';
-  import PanelItem from "$lib/components/molecules/PanelItem.svelte";
-  import InputGroup from "$lib/components/molecules/InputGroup.svelte";
+  import InputProduct from "./InputProduct.svelte";
 
-  const pbWrapperContainer = new PIXI.Container()
+  const productContainer = new PIXI.Container()
+  productContainer.name = "top-panel"
 
   let isCollapsed = false
 
 </script>
 
-<ul class="pb-wrapper">
+<div class="pb-wrapper">
 
-  <li 
-    class="pitems-wrapper"
-    class:collapsed={isCollapsed}
-    use:castContainer={{ container: pbWrapperContainer, hasMask: true }}
+  <ul>
+    <li 
+      class="pitems-wrapper"
+      class:collapsed={isCollapsed}
+      use:castContainer={{ container: productContainer, hasMask: true }}
+    >
+      <InputProduct parent={productContainer} />
+    </li>
+
+    <li class="pmenu-wrapper">
+      <PanelMenu />
+    </li>
+
+  </ul>
+
+  <div 
+    class="button-wrapper"
   >
-    <div>
-      <PanelItem icon="products" title="tipos de entrega">
-        <InputGroup
-          parent={pbWrapperContainer}
-          gridlayout="product"
-          categories={$categoriesEnriched.products}
-          bind:selected={$fproducts}
-        />
-      </PanelItem>
-    </div>
-  </li>
-
-  <li class="pmenu-wrapper">
-    <PanelMenu />
-    <!-- <button on:click={() => isCollapsed = !isCollapsed}>
-      HA
-    </button> -->
-  </li>
-
-</ul>
+    <button 
+      on:click={() => isCollapsed = !isCollapsed}
+      class:collapsed={isCollapsed}
+    >
+      <Icon icon="collapse"/>
+    </button>
+  </div>
+</div>
 
 
 <style lang="scss">
   .pb-wrapper {
-    list-style-type: none;
+    position: relative;
 
-    .pitems-wrapper {
-      padding-left: 1.6rem;
-      padding-bottom: .35rem;
-      border-bottom: 1px solid black;
+    ul {
+      list-style-type: none;
+
+      .pitems-wrapper {
+        padding-left: 1.6rem;
+        padding-bottom: .35rem;
+        border-bottom: 1px solid black;
+
+        transition: height .15s ease-in-out, padding .15s ease-in-out;
+
+        &.collapsed {
+          height: 0;
+          padding: 0;
+          display: none;
+        }
+      }
+
+    }
+
+    .button-wrapper {
+      position: absolute;
+      bottom: 0;
+      right: 4rem;
+      transform: translate(-50%, 50%);
+
+      width: 3rem;
+      height: 3rem;
+
+
+      button {
+        width: 100%;
+        height: 100%;
+
+        border: none;
+        background: none;
+        outline: none;
+
+        transform: rotate(0);
+        transition: transform .15s ease-in-out;
+        
+        &.collapsed {
+          transform: rotate(180deg);
+        }
+      }
+
     }
   }
+
+
 
 </style>

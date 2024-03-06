@@ -15,6 +15,7 @@
 	import InfoHover from '$lib/icons/InfoHover.svelte';
 	import Wireless from '$lib/icons/Wireless.svelte';
 	import Return from '$lib/icons/Return.svelte';
+	import Collapse from '$lib/icons/Collapse.svelte';
 
   export let icon
 
@@ -35,6 +36,7 @@
     infoActive: InfoActive,
     infoHover: InfoHover,
     return: Return,
+    collapse: Collapse
   }
 
 </script>

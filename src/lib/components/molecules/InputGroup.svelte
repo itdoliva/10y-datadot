@@ -4,14 +4,14 @@
   import BarTween from "$lib/components/atoms/BarTween.svelte";
 	import CheckIcon from '$lib/components/atoms/CheckIcon.svelte';
   import NumberTween from '$lib/components/atoms/NumberTween.svelte';
-  import Circle from '$lib/components/atoms/Circle.svelte';
-  import Container from '$lib/components/atoms/Container.svelte';
   import Graphics from '$lib/components/atoms/Graphics.svelte';
   import Bubble from '$lib/components/atoms/Bubble.svelte';
   import Icon from '$lib/components/atoms/Icon.svelte';
   import * as PIXI from "pixi.js";
 
   import templates from "$lib/templates"
+
+  import castContainer from "$lib/actions/castContainer"
 
   export let categories
   export let selected = []
@@ -24,8 +24,6 @@
 
   export let parent = undefined
 
-
-
 </script>
 
 <div class="input-group {direction} {gridlayout}">
@@ -33,6 +31,7 @@
     {#each categories as { id, name, alias, nNodes, pctNodes, color }, i}
     <!-- {@debug id, nNodes} -->
     {@const active = multiselect ? selected.includes(id) : selected === id}
+
       <li>
 
         <label 
@@ -40,41 +39,48 @@
           on:mouseenter={() => $hovered = id}
           on:mouseleave={() => $hovered = undefined}
         >
-          <div class="check-wrapper">
-            <CheckIcon active={active} hovered={$hovered === id} />
 
-            {#if gridlayout === "goal"}
-              <div class="circle-wrapper">
-                <Circle fill={color} number=1 range={[0, 8]} />
-              </div>
-            {/if}
+          <div class="check-wrapper">
+            <CheckIcon 
+              active={active} 
+              hovered={$hovered === id} 
+              backgroundColor={gridlayout === "goal" && color}
+            />
           </div>
 
-          {#if gridlayout === 'product'}
-            <div class="icon-wrapper">
-              <Container parent={parent}>
-                <Graphics blendmode="MULTIPLY" alpha=.9>
-                  <Bubble {id} {i} r={nNodes/3} />
-                </Graphics>
 
-                <Graphics drawFunc={templates[id]} />
-              </Container>
+          {#if gridlayout === 'product'}
+            {@const context = new PIXI.Container()}
+            <div 
+              class="icon-wrapper" 
+              use:castContainer={{ parent, container: context }}
+            >
+              <Graphics context={context} blendmode="MULTIPLY" alpha=.9>
+                <Bubble {id} {i} r={nNodes/3} />
+              </Graphics>
+
+              <Graphics context={context} drawFunc={templates[id]} />
             </div>
           {/if}
 
+
           {#if gridlayout === 'layout'}
-          <div class="icon-wrapper">
-            <Icon icon={id} />
-          </div>
-        {/if}
+            <div class="icon-wrapper">
+              <Icon icon={id} />
+            </div>
+          {/if}
+
 
           <div class="label-wrapper">
+
             {#if multiselect}
               <input type="checkbox" value={id} bind:group={selected}/>
             {:else}
               <input type="radio" value={id} bind:group={selected}/>
             {/if}
+
             <span>{alias}</span>
+
           </div>
 
 
@@ -91,6 +97,7 @@
         </label>
 
       </li>
+
     {/each}
   </ul>
 
@@ -112,166 +119,150 @@
       display: grid;
     }
 
-    &.layout {
-      ul {
-        grid-auto-columns: min-content !important;
-        gap: 2rem !important;
-      }
+    label {
+      font-size: var(--item-font-size);
+      text-transform: lowercase;
 
-      label {
-        grid-template-columns: min-content min-content;
-        grid-template-rows: 1.4rem 1fr;
-        grid-template-areas: 
-          "icon icon"
-          "check label";
-        row-gap: .4rem;
-      }
-    }
+      display: grid;
+      align-items: center;
+      column-gap: .4rem;
+    
 
-    &.design {
-      label {
-        grid-template-columns: min-content 1fr 2rem;
-        grid-template-rows: auto min-content;
-        grid-template-areas: 
-          "check label num"
-          "bar bar num";
-      }
-    }
-
-    &.goal {
-      label {
-        grid-template-columns: min-content 1fr;
-        grid-template-areas: "check label";
-      }
-    }
-
-    &.product {
-      grid-auto-columns: max-content !important;
-
-      ul {
-        grid-auto-columns: 96px !important;
-      }
-
-      label {
-        grid-template-rows: min-content 2.4rem auto;
-        grid-template-areas: 
-          "check"
-          "icon"
-          "label";
-
+      &.active {
         .label-wrapper {
-          text-align: center;
+          font-weight: 500;
         }
       }
-
-      .btn-wrapper {
-        align-self: start !important;
-        padding-top: calc(2.4rem + 10px);
-      }
-    }
-
-    &.simple {
-      label {
-        grid-template-columns: min-content 1fr;
-        grid-template-areas: "check label";
-      }
-    }
-
-    &.row {
-      grid-auto-flow: column;
-      margin-right: auto;
-
-      ul {
-        grid-auto-flow: column;
-        grid-auto-columns: 1fr;
-        gap: .25rem;
-      }
-
-      .btn-wrapper {
-        // grid-column: 1;
-        align-self: end;
+      
+      .check-wrapper {
+        grid-area: check;
 
         display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
-    }
-
-    &.column {
-      grid-auto-flow: row;
-
-      ul {
-        grid-auto-flow: row;
-        grid-auto-rows: min-content;
-        gap: .4rem;
-      }
-    }
-  }
-
-  input {
-    display: none;
-  }
-
-  label {
-    font-size: var(--item-font-size);
-    text-transform: lowercase;
-
-    display: grid;
-    align-items: center;
-    column-gap: .4rem;
-  
-
-    &.active {
       .label-wrapper {
-        font-weight: 500;
+        grid-area: label;
       }
-    }
-    
-    .check-wrapper {
-      grid-area: check;
-      
-      position: relative;
-      display: flex;
-      align-items: center;
 
-      justify-self: center;
+      .bar-wrapper {
+        grid-area: bar;
+      }
 
-      .circle-wrapper {
-        position: absolute;
-        pointer-events: none;
-
-        top: 0;
-        left: 0;
-        width: 100%;
+      .icon-wrapper {
+        position: relative;
+        grid-area: icon;
         height: 100%;
+      }
 
-        z-index: -1;
+      .number-wrapper {
+        grid-area: num;
+        text-align: right;
       }
     }
 
-    .label-wrapper {
-      grid-area: label;
+    input {
+      display: none;
     }
 
-    .bar-wrapper {
-      grid-area: bar;
+  }
+
+  .input-group.row {
+    grid-auto-flow: column;
+    margin-right: auto;
+
+    ul {
+      grid-auto-flow: column;
+      grid-auto-columns: 1fr;
+      gap: .25rem;
     }
 
-    .icon-wrapper {
-      position: relative;
-      grid-area: icon;
-
-      height: 100%;
+    .btn-wrapper {
+      align-self: end;
+      display: flex;
     }
 
-    .number-wrapper {
-      grid-area: num;
-      text-align: right;
+  }
+
+  .input-group.column {
+    grid-auto-flow: row;
+
+    ul {
+      grid-auto-flow: row;
+      grid-auto-rows: min-content;
+      gap: .4rem;
     }
   }
 
+  .input-group.simple {
+    label {
+      grid-template-columns: min-content 1fr;
+      grid-template-areas: "check label";
+    }
+  }
 
+  .input-group.layout {
+    ul {
+      grid-auto-columns: min-content !important;
+      gap: 2rem !important;
+    }
 
-  
+    label {
+      grid-template-columns: min-content min-content;
+      grid-template-rows: 1.4rem 1fr;
+      grid-template-areas: 
+        "icon icon"
+        "check label";
+      row-gap: .4rem;
+    }
+  }
 
-  
+  .input-group.design {
+    label {
+      grid-template-columns: min-content 1fr 2rem;
+      grid-template-rows: auto min-content;
+      grid-template-areas: 
+        "check label num"
+        "bar bar num";
+    }
+  }
+
+  .input-group.goal {
+    label {
+      grid-template-columns: min-content 1fr;
+      grid-template-areas: "check label";
+    }
+  }
+
+  .input-group.product {
+    grid-auto-columns: max-content !important;
+
+    ul {
+      grid-auto-columns: 96px !important;
+    }
+
+    label {
+      grid-template-rows: min-content 2.4rem auto;
+      grid-template-areas: 
+        "check"
+        "icon"
+        "label";
+
+      .label-wrapper {
+        text-align: center;
+      }
+
+      .check-wrapper {
+        align-self: center;
+      }
+    }
+
+    .btn-wrapper {
+      align-self: start !important;
+      padding-top: calc(2.4rem + 10px);
+    }
+  }
+
+ 
 </style>
