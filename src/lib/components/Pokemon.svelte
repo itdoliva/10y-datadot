@@ -1,5 +1,5 @@
 <script>
-	import { pixelRatio, complexityOn } from '$lib/stores/canvas';
+	import { app, pixelRatio, complexityOn } from '$lib/stores/canvas';
   import * as PIXI from "pixi.js"
   import { dataset, categories } from '$lib/stores/nodes';
   import templates from "$lib/templates"
@@ -33,7 +33,6 @@
   if (node.products.includes(14)) templates[14](graphics) // siteInstitutional
   if (node.products.includes(15)) templates[15](graphics) // siteEditorial
   if (node.designs.includes(22)) templates[22](graphics) // motion
-
 
   node.goals.forEach(goalId => {
     templates[goalId](parent)

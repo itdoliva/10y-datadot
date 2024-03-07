@@ -6,36 +6,17 @@ const {
   colEntranceUpTo
 } = layoutConfig
 
-export default function getPosBlock(nodes, settings, dimensions, update) {
-  console.log('getPosBlock', nodes.length, nodes.activeCount, dimensions.fw, dimensions.fh)
+export default function getPosBlock(nodes, dimensions, update) {
+  console.log((+(new Date())/1000).toFixed(3), 'getPosBlock', `nNodes: ${nodes.length} (${100*nodes.activeCount/nodes.length}%)\t viewport: ${dimensions.fw}, ${dimensions.fh}`)
 
-  const { rows, columns, padding, extent, maxRowsOnView, blockHeight } = getBlockConfig(nodes, dimensions)
-  
-  // The calculation below support block entrance animation
-  const columnDensities = randomDensity(columns)
-  const timeStepByRow = +(fullColEntranceDuration / maxRowsOnView).toFixed(4)
+  const config = getBlockConfig(nodes, dimensions)
+  const { rows, columns, padding, extent, columnDensities, timeStepByRow } = config
 
-  update.config({ rows, columns, columnDensities, timeStepByRow } )
   update.zoomExtent(extent)
 
-  const getDelay = (data, prev=false) => {
-    if (!data) return 0
-
-    const { row, column } = data
-
-    const delayConfig = prev 
-      ? settings.config.prev 
-      : settings.config.cur
-
-    const columnDelay = delayConfig.columnDensities[column] * colEntranceUpTo
-    const rowDelay = delayConfig.timeStepByRow * row
-
-    return +(columnDelay + rowDelay).toFixed(3)
-  }
-
-
   const { nodeSize, gap, fw, fh } = dimensions
-  return ({ i }) => {
+
+  function getPos({ i }) {
     // Calculate the node row and column indices for the given i
     const column = Math.floor(i % columns)
     const row = Math.floor(i / columns)
@@ -43,10 +24,17 @@ export default function getPosBlock(nodes, settings, dimensions, update) {
     const fx = column * (nodeSize + gap) + nodeSize/2 - fw/2 + padding.left
     const fy = row * (nodeSize + gap) + nodeSize/2 - fh/2 + padding.top
 
-    const delay = getDelay({ row, column })
+    // Calculate delay
+    const columnDelay = columnDensities[column] * colEntranceUpTo
+    const rowDelay = timeStepByRow * row
+    const delay = columnDelay + rowDelay
 
-    return { fx, fy, data: { row, column, delay, getDelay } }
+    return { fx, fy, data: { row, column, delay } }
   }
+
+  getPos.config = config
+
+  return getPos
 }
 
 
@@ -88,6 +76,11 @@ function getBlockConfig({ activeCount }, { nodeSize, gap, fw, fh }) {
   const extent = extentX.map((_, i) => [ extentX[i], extentY[i] ])
 
 
+  // The calculation below support block entrance animation
+  const columnDensities = randomDensity(columns)
+  const timeStepByRow = +(fullColEntranceDuration / maxRowsOnView).toFixed(4)
+
+
   return {
     rows,
     columns,
@@ -96,5 +89,7 @@ function getBlockConfig({ activeCount }, { nodeSize, gap, fw, fh }) {
     blockWidth,
     blockHeight,
     maxRowsOnView,
+    columnDensities,
+    timeStepByRow
   }
 }

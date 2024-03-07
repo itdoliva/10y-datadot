@@ -4,7 +4,7 @@
  -->
 
 <script>
-  import { getContext } from "svelte";
+  import { getContext, onMount } from "svelte";
   import { gsap } from "gsap";
 
   // Components
@@ -42,7 +42,6 @@
   // ------------ Reactivity ------------
   $: {
     // If layout is changed
-
     if (layout != curLayout) {
       switchLayout(layout)
     }
@@ -60,14 +59,13 @@
   function switchLayout(newLayout) {
 
     if (state !== 'selected') {
-      tlLayout.clear()
-      tlState.clear()
+      tlLayout.progress(1)
+      tlState.progress(1)
 
       tlState.add(() => {
         state = 'exit'
       }, `+=0`)
       
-  
       tlLayout.add(() => {
         curLayout = newLayout
         resetZoom()
@@ -92,7 +90,7 @@
     // console.log('filtered')
     const isExclusion = prevCount > $nodes.activeCount
 
-    tlState.clear()
+    tlState.progress(1)
     
     // First step on exclusion is to _filter_ out, then move
     // First step on inclusion is to _move_, then filter in
@@ -114,7 +112,7 @@
     console.log('\tswitchSelected')
     
     if (isActive) {
-      tlState.clear()
+      tlState.progress(1)
       state = 'selected'
     } else if (state === 'selected') {
       state = 'idle'
@@ -143,16 +141,25 @@
   state={state}
 />
 
-
 <ul
   style:position="absolute"
   style:bottom=0
   style:right=0
   style:z-index=10
   style:font-weight=700
-  style:color="yellow"
-  style:background="grey"
+  style:background="white"
 >
   <li>Layout: {curLayout.toUpperCase()}</li>
-  <li>State: {state.toUpperCase()}</li>
+  <li>State: 
+    <span 
+      style:color={(() => {
+        if (state === 'idle') return "black"
+        else if (state === "selected") return "purple"
+        else if (state === "filter") return "orange"
+        else if (state === "move") return "cornflowerblue"
+        else if (state === "entrance") return "green"
+        else if (state === "exit") return "crimson"
+      })()}
+    style:font-weight=700
+    >{state.toUpperCase()}</span></li>
 </ul>

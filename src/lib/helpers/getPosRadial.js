@@ -8,27 +8,28 @@ const {
   rotationOffset
 } = layoutConfig
 
-export default function getPosRadial(nodes, groupBy, settings, dimensions, update) {
+export default function getPosRadial(nodes, groupBy, dimensions, update) {
   console.log('\tgetPos radial', nodes.length, nodes.activeCount, dimensions.fw, dimensions.fh)
 
-  const {
-    extent,
-    grouped,
-    sectorRadiansScale,
-    pileRadiansScale,
-    maxStacks
-  } = getRadialConfig(nodes, groupBy, dimensions)
+  const config = getRadialConfig(nodes, groupBy, dimensions)
 
-  update.config({ grouped, sectorRadiansScale, pileRadiansScale, innerRadius, maxStacks })
+  const { 
+    extent, 
+    grouped, 
+    sectorRadiansScale, 
+    pileRadiansScale, 
+    maxStacks,
+    innerRadius
+  } = config
+
   update.zoomExtent(extent)
 
   const delayScale = d3.scaleLinear()
     .domain([0, 2*Math.PI])
     .range([0, maxDelayRadial])
 
-  const getDelay = ({ radians }) => delayScale(radians)
 
-  return (node) => {
+  function getPos(node) {
     // Get category of sector
     const catValue = node[groupBy]
 
@@ -45,10 +46,14 @@ export default function getPosRadial(nodes, groupBy, settings, dimensions, updat
 
     const rotation = radians + rotationOffset
 
-    const delay = getDelay({ radians })
+    const delay = delayScale(radians)
 
-    return { fx: 0, fy: radius, rotation, data: { radius, radians, rotation, delay, getDelay } }
+    return { fx: 0, fy: radius, rotation, data: { radius, radians, rotation, delay } }
   }
+
+  getPos.config = config
+
+  return getPos
 }
 
 
@@ -97,7 +102,8 @@ function getRadialConfig(nodes, groupBy, dimensions) {
     grouped,
     sectorRadiansScale,
     pileRadiansScale,
-    maxStacks
+    maxStacks,
+    innerRadius
   }
 
 }

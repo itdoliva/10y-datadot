@@ -3,7 +3,7 @@
  -->
 
 <script>
-  import { getContext, afterUpdate } from "svelte";
+  import { onMount, getContext, afterUpdate } from "svelte";
   import { app, figureHeight, complexityOn } from "$lib/stores/canvas";
   import { selected } from "$lib/stores/nodes";
   import { gsap } from "gsap";
@@ -36,11 +36,10 @@
 
   // PIXI Hierarchy
   const container = new PIXI.Container()
-  
   container.name = id
-
   scene.addChild(container)
 
+  // Events
   container.accessible = true
   container.cursor = 'pointer';
 
@@ -86,39 +85,43 @@
     container.scale.set(t.scale)
   })
 
+  $: if (!isEqual(pos, posTracker[0])) {
+    posTracker.splice(0, 0, pos) // Add new pos to the head of the arr
+    posTracker.pop() // Removes the arr tail
+    prevPos = posTracker[1] // Updates previousPos
+  }
 
   // On turn complexity on or off
   $: playComplexity($complexityOn)
 
-
   // On state change
-  $: if (state === 'selected') {
-    playSelected()
-  }
-  else if (state === 'idle') {
-    playIdle()
-  }
-  else if (state === 'exit') {
-    playExit()
-  } 
-  else if (state === 'entrance') {
-    playEntrance()
-  } 
-  else if (state === 'filter' && !simulationNode.hasActiveMatch()) {
-    playFilter()
-  }
-  else if (state === 'move') {
-    playMove()
-  }
+  $: handleState(state)
 
-
-  afterUpdate(() => {
-    if (!isEqual(pos, posTracker[0])) {
-      posTracker.splice(0, 0, pos) // Add new pos to the head of the arr
-      posTracker.pop() // Removes the arr tail
-      prevPos = posTracker[1] // Updates previousPos
-    }
+  onMount(() => {
+    handleState(state)
   })
+
+
+  function handleState(state) {
+    if (state === 'selected') {
+      playSelected()
+    }
+    else if (state === 'idle') {
+      playIdle()
+    }
+    else if (state === 'exit') {
+      playExit()
+    } 
+    else if (state === 'entrance') {
+      playEntrance()
+    } 
+    else if (state === 'filter' && !simulationNode.hasActiveMatch()) {
+      playFilter()
+    }
+    else if (state === 'move') {
+      playMove()
+    }
+  }
 
 
   function playSelected() {
@@ -129,13 +132,13 @@
     if (isSelected) {
       const { t } = simulationNode
 
-      tlAlpha.clear()
+      tlAlpha.progress(1)
       tlAlpha.fromTo(t,
         { alpha: 1 },
         { alpha: 0, duration: .3, ease: c.easeExit }
       )
 
-      tlScale.clear()
+      tlScale.progress(1)
       tlScale.fromTo(t,
         { scale: getScale($complexityOn) },
         { scale: 2, duration: .3, ease: c.easeExit }
@@ -150,26 +153,25 @@
   function playIdle() {
     log('idle (id: 0)')
 
-    tlPos.clear()
-    tlAlpha.clear()
+    tlPos.progress(1)
+    tlAlpha.progress(1)
 
     const { t, isActive } = simulationNode
 
     t.renderable = isActive()
 
     if (layout === 'block') {
-      tlPos.to(t, { x: pos.fx, y: pos.fy, delay: pos.data.delay, duration: .5 })
-      // t.x = pos.fx
-      // t.y = pos.fy
+      t.x = pos.fx
+      t.y = pos.fy
       t.pivotY = 0
       t.alpha = 1
       t.rotation = 0
     } 
     else if (layout === 'radial') {
-      tlPos.to(t, { x: 0, y: 0, pivotY: pos.fy, delay: pos.data.delay, duration: .5 })
-      // t.x = 0
-      // t.y = 0
-      // t.pivotY = pos.fy
+      log({t, pos})
+      t.x = 0
+      t.y = 0
+      t.pivotY = pos.fy
       t.alpha = 1
       t.rotation = pos.rotation
     }
@@ -187,11 +189,11 @@
 
     // Fall
     const y = pos.fy + $figureHeight*(Math.random()*.5 + .3)
-    tlPos.clear()
+    tlPos.progress(1)
     tlPos.to(t, { y, duration, delay: delayFall, ease: c.easeExit })
 
     // Fade Out
-    tlAlpha.clear()
+    tlAlpha.progress(1)
     tlAlpha.to(t, { alpha: 0, duration, delay: delayFadeOut, ease: c.easeFade })
   }
 
@@ -203,8 +205,8 @@
 
     const { delay } = pos.data
 
-    tlAlpha.clear()
-    tlRenderable.clear()
+    tlAlpha.progress(1)
+    tlRenderable.progress(1)
     
     t.renderable = isActive()
 
@@ -226,7 +228,7 @@
       t.x = 0
       t.y = 0
 
-      tlPos.clear()
+      tlPos.progress(1)
       tlPos.fromTo(t,
         { rotation: startRotation, pivotY: config.innerRadius },
         { rotation: pos.rotation, pivotY: pos.fy, delay, duration, ease: c.easeExit }
@@ -246,14 +248,15 @@
     const { t, isActive } = simulationNode
     const active = isActive()
 
-    const delay = active || !prevPos
+    const delay = active
       ? pos.data.delay // If cur = true, it's entering
-      : pos.data.getDelay(prevPos.data, true) // If cur = false, it's exiting
+      : prevPos.data.delay // If cur = false, it's exiting
 
-    tlRenderable.clear()
+    tlPos.progress(1)
+    tlAlpha.progress(1)
+    tlRenderable.progress(1)
 
     if (layout === 'block') {
-
       tlRenderable.add(() => {
         t.renderable = active
       }, `+=${delay.toFixed(2)}`)
@@ -265,13 +268,11 @@
         t.renderable = active
       }, `+=${(active ? delay : c.shifts).toFixed(2)}`)
 
-      tlAlpha.clear()
       tlAlpha.fromTo(t, 
         { alpha: +!active },
         { alpha: +active, delay, duration: c.maxDurationRadial, ease: c.easeExit }
       )
 
-      tlPos.clear()
       if (active) { // good
         tlPos.fromTo(t, 
           { rotation: pos.rotation - Math.PI/8, pivotY: config.innerRadius },
@@ -293,7 +294,9 @@
 
     const { t } = simulationNode
 
-    tlPos.clear()
+    tlPos.progress(1)
+    tlAlpha.progress(1)
+    tlRenderable.progress(1)
 
     if (layout === 'block') {
       const delay = pos.data.delay * .2
@@ -321,7 +324,7 @@
   function playComplexity(complexityOn) {
     const { t } = simulationNode
 
-    tlScale.clear()
+    tlScale.progress(1)
 
     tlScale.to(t, { 
       scale: getScale(complexityOn), 
@@ -342,4 +345,4 @@
 </script>
 
 
-<Pokemon parent={container} id={id}/>
+<Pokemon parent={container} id={id} />
