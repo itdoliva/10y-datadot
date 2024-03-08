@@ -9,6 +9,8 @@ c.shifts = 1
 
 c.maxDelayRadial = .7 * c.shifts
 
+c.easeDelay = d3.easeCubicInOut
+c.easeEntrance = d3.easeCubicInOut
 c.easeFade = d3.easeCubicInOut
 c.easeExit = d3.easeSinIn
 

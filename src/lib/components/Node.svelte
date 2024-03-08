@@ -12,7 +12,6 @@
   import Pokemon from './Pokemon.svelte';
   import { isEqual } from "lodash"
   import c from "$lib/config/layout"
-  import clockwiseAngle from "$lib/utility/clockwiseAngle";
   
 
   const shouldLog = true
@@ -128,9 +127,9 @@
     log('selected (id: 0)')
 
     const isSelected = $selected.id === id
+    const { t } = simulationNode
 
     if (isSelected) {
-      const { t } = simulationNode
 
       tlAlpha.progress(1)
       tlAlpha.fromTo(t,
@@ -146,6 +145,16 @@
       tlScale.add(() => {
         t.scale = getScale($complexityOn)
       })
+    }
+    
+    if (layout === "radial") {
+      // Set current simulation coordinates
+      tlPos.progress(1)
+      tlPos.to(t, { rotation: 0, duration: .5 })
+      t.pivotY = 0
+
+      simulationNode.x = Math.cos(pos.rotation) * pos.fy
+      simulationNode.y = Math.sin(pos.rotation) * pos.fy
     }
   }
 
@@ -231,12 +240,12 @@
       tlPos.progress(1)
       tlPos.fromTo(t,
         { rotation: startRotation, pivotY: config.innerRadius },
-        { rotation: pos.rotation, pivotY: pos.fy, delay, duration, ease: c.easeExit }
+        { rotation: pos.rotation, pivotY: pos.fy, delay, duration, ease: c.easeEntrance }
       )
 
       tlAlpha.fromTo(t, 
         { alpha: 0 },
-        { alpha: 1, delay, duration, ease: c.easeExit }
+        { alpha: 1, delay, duration, ease: c.easeEntrance }
       )
     }
   }
@@ -311,7 +320,7 @@
     }
     else if (layout === 'radial') {
       tlPos.to(t, { 
-        rotation: clockwiseAngle(prevPos.rotation, pos.rotation), 
+        rotation: pos.rotation, 
         pivotY: pos.fy, 
         delay: pos.data.delay, 
         duration: c.maxDurationRadial, 

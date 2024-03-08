@@ -1,6 +1,5 @@
 <!-- 
-  This component controls the layout, its variables, changes, and 
-  the final positions of the nodes based on the current layout
+  This component controls the layout and state
  -->
 
 <script>
@@ -13,7 +12,7 @@
   // Stores
   import { width, height, figureWidth, figureHeight } from "$lib/stores/canvas";
   import { zoomBehaviour } from "$lib/stores/zoom";
-  import { nodes, selected } from "$lib/stores/nodes"; 
+  import { nodes, selected, sortBy } from "$lib/stores/nodes"; 
 
   // Config
   import layoutConfig from "$lib/config/layout"
@@ -40,20 +39,28 @@
 
 
   // ------------ Reactivity ------------
-  $: {
-    // If layout is changed
-    if (layout != curLayout) {
-      switchLayout(layout)
-    }
+  $: resort($sortBy)
 
-    // Data filtered
-    if (prevCount != $nodes.activeCount) {
-      filtered()
-    }
+  // If layout is changed
+  $: if (layout != curLayout) {
+    switchLayout(layout)
+  }
+
+  // Data filtered
+  $: if (prevCount != $nodes.activeCount) {
+    filtered()
   }
 
   $: updateExtents(curLayout, $width, $height, $figureWidth, $figureHeight)
   $: switchSelected($selected.active)
+
+
+  function resort() {
+    tlState
+      .progress(1)
+      .add(() => state = 'move')
+      .add(() => state = 'idle', `+=${shifts}`)
+  }
 
 
   function switchLayout(newLayout) {

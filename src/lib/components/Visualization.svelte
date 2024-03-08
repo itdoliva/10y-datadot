@@ -4,7 +4,7 @@
   import * as d3 from "d3";
   
   import { app, width, height, figureWidth, figureHeight }  from '$lib/stores/canvas';
-  import { cameraOffsetX, cameraOffsetY, zoomBehaviour, zoom } from "$lib/stores/zoom";
+  import { cameraOffset, cameraOffsetX, cameraOffsetY, zoomBehaviour, zoom } from "$lib/stores/zoom";
 
   const root = new PIXI.Container()
   root.name = "viz"
@@ -46,7 +46,7 @@
     d3.select($app.view)
       .call(zoomBehaviour)
       .on("wheel", e => {
-        e.preventDefault()
+        console.log(zoomBehaviour)
       })
   })
 
@@ -60,7 +60,6 @@
     d3.select($app.view)
       .transition()
       .duration(duration)
-      .ease(d3.easeCubicInOut)
       .call(zoomBehaviour.transform, d3.zoomIdentity)
   }
 

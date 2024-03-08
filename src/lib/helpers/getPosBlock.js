@@ -3,7 +3,8 @@ import layoutConfig from "$lib/config/layout"
 
 const { 
   fullColEntranceDuration,
-  colEntranceUpTo
+  colEntranceUpTo,
+  easeDelay
 } = layoutConfig
 
 export default function getPosBlock(nodes, dimensions, update) {
