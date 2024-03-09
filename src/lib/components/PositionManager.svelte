@@ -23,22 +23,6 @@
 
   const { resetZoom } = getContext("viz")
   
-  // ----- IDLE POS CALCULATOR -----
-  let getPos
-
-  const getPosFactory = (layout, nodes, groupBy, dimensions, update) => {
-    const { fw, fh } = dimensions
-    
-    if (fw + fh === 0) {
-      return
-    }
-
-    getPos = layout === 'block'
-      ? getPosBlock(nodes, dimensions, update)
-      : getPosRadial(nodes, groupBy, dimensions, update)
-  }
-
-
   // ----- SIMULATION -----
 
   // Dummy node used for repelling other nodes
@@ -59,7 +43,7 @@
   const forceX = d3.forceX().x(forceXPos).strength(0.005)
   const forceY = d3.forceY().y(forceYPos).strength(0.005)
 
-  const simulation = d3.forceSimulation()
+  d3.forceSimulation()
     .alphaTarget(0.3) // stay hot
     .velocityDecay(0.25) // low friction
     .force("charge", d3.forceManyBody().strength(-5))
@@ -69,10 +53,28 @@
     .on("tick", ticked)
     .nodes(simulationNodes)
 
-  const tlDummy = gsap.timeline()
-    .pause()
-    .eventCallback('onUpdate', () => forceCollide.radius(forceCollideRadius))
+    dummyNode.tl
+      .eventCallback('onUpdate', () => forceCollide.radius(forceCollideRadius))
 
+
+  // ----- IDLE POS CALCULATOR -----
+
+  const setNodeIdlePositions = (layout, nodes, groupBy, dimensions, update) => {
+    const { fw, fh } = dimensions
+    
+    if (fw + fh === 0) {
+      return
+    }
+
+    const getPos = layout === 'block'
+      ? getPosBlock(nodes, dimensions, update)
+      : getPosRadial(nodes, groupBy, dimensions, update)
+
+    simulationNodes.forEach(simulationNode => {
+      simulationNode.setPos(getPos)
+    })
+
+  }
 
   $: dimensions = {
     fw: $figureWidth,
@@ -84,9 +86,9 @@
   $: console.log((+(new Date())/1000).toFixed(3), $figureWidth, $figureHeight)
 
   // When selected statement is triggered
-  $: selectedTriggered(state === "selected")
+  $: dummyNode.playSwitchSelected(state === "selected")
 
-  $: getPosFactory(layout, $nodes, $sortBy, dimensions, { 
+  $: setNodeIdlePositions(layout, $nodes, $sortBy, dimensions, { 
     zoomExtent: updateZoomExtent 
   })
 
@@ -99,43 +101,13 @@
     forceY.y(forceYPos)
   }
 
-    
-
-
-  // // Layouts
-
-
-
-  function selectedTriggered(isSelected) {
-    // This is supposed to be called only when 
-    // the state selected is entered or exited
-    // State changes from one state to another that is not selected should not trigger it.
-    
-    if (isSelected && !tlDummy.isActive()) {
-      tlDummy.restart()
-        .fromTo(dummyNode, 
-          { fx: $selected.x, fy: $selected.y },
-          { fx: 0 - $cameraOffset.x, fy: 0 - $cameraOffset.y, duration: .300, ease: d3.easeCubicOut })
-        .fromTo(dummyNode, 
-          { r: 0 },
-          { r: Math.max($figureWidth, $figureHeight) * .4, duration: .150, ease: d3.easeCubicOut }, '<=')
-    }
-
-    else if (!isSelected) {
-      tlDummy.clear().pause()
-      dummyNode.r = 0
-      forceCollide.radius(forceCollideRadius)
-    }
-  }
-
 
   function ticked() {
     // This is the function that position the nodes on the canvas
 
-    
-    if (!getPos) {
-      return
-    }
+    return simulationNodes.forEach(simulationNode => {
+      simulationNode.tick()
+    })
 
     if (state === 'selected') {
       simulationNodes.forEach(simulationNode => {
@@ -147,14 +119,14 @@
         else if (simulationNode.id !== -1) {
           simulationNode.fx = undefined
           simulationNode.fy = undefined
-          simulationNode.t.x = simulationNode.x
-          simulationNode.t.y = simulationNode.y
+          simulationNode.tweenCoord.x = simulationNode.x
+          simulationNode.tweenCoord.y = simulationNode.y
         }
         // Dummy Node
         else {
-          simulationNode.r = dummyNode.r
-          simulationNode.fx = dummyNode.fx
-          simulationNode.fy = dummyNode.fy
+          // simulationNode.r = dummyNode.r
+          // simulationNode.fx = dummyNode.fx
+          // simulationNode.fy = dummyNode.fy
         }
       })
     }
@@ -185,18 +157,14 @@
 </script>
 
 
-{#if getPos}
-  {#each $dataset as node (node.id)}
-    {#if node.id !== -1}
-      {@const simulationNode = simulationNodes.find(d => d.id === node.id)}
-      <Node 
-        id={node.id}
-        simulationNode={simulationNode}
-        pos={getPos(simulationNode.getRef())}
-        layout={layout}
-        state={state}
-        config={getPos.config}
-      />
-    {/if}
-  {/each}
-{/if}
+{#each $dataset as node (node.id)}
+  {#if node.id !== -1}
+    {@const simulationNode = simulationNodes.find(d => d.id === node.id)}
+    <Node 
+      id={node.id}
+      simulationNode={simulationNode}
+      layout={layout}
+      state={state}
+    />
+  {/if}
+{/each}

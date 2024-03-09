@@ -17,25 +17,21 @@ export default function getPosBlock(nodes, dimensions, update) {
 
   const { nodeSize, gap, fw, fh } = dimensions
 
-  function getPos({ i }) {
+  return function ({ i }) {
     // Calculate the node row and column indices for the given i
     const column = Math.floor(i % columns)
     const row = Math.floor(i / columns)
 
-    const fx = column * (nodeSize + gap) + nodeSize/2 - fw/2 + padding.left
-    const fy = row * (nodeSize + gap) + nodeSize/2 - fh/2 + padding.top
+    const x = column * (nodeSize + gap) + nodeSize/2 - fw/2 + padding.left
+    const y = row * (nodeSize + gap) + nodeSize/2 - fh/2 + padding.top
 
     // Calculate delay
     const columnDelay = columnDensities[column] * colEntranceUpTo
     const rowDelay = timeStepByRow * row
     const delay = columnDelay + rowDelay
 
-    return { fx, fy, data: { row, column, delay } }
+    return { x, y, theta: 0, radius: 0, delay, config }
   }
-
-  getPos.config = config
-
-  return getPos
 }
 
 
@@ -83,6 +79,7 @@ function getBlockConfig({ activeCount }, { nodeSize, gap, fw, fh }) {
 
 
   return {
+    layout: "block",
     rows,
     columns,
     padding,

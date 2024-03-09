@@ -27,9 +27,9 @@ export default function getPosRadial(nodes, groupBy, dimensions, update) {
   const delayScale = d3.scaleLinear()
     .domain([0, 2*Math.PI])
     .range([0, maxDelayRadial])
+  
 
-
-  function getPos(node) {
+  return function (node) {
     // Get category of sector
     const catValue = node[groupBy]
 
@@ -48,12 +48,14 @@ export default function getPosRadial(nodes, groupBy, dimensions, update) {
 
     const delay = delayScale(radians)
 
-    return { fx: 0, fy: radius, rotation, data: { radius, radians, rotation, delay } }
+    return { 
+      x: 0, 
+      y: 0, 
+      radius, 
+      theta: rotation, 
+      delay, config 
+    }
   }
-
-  getPos.config = config
-
-  return getPos
 }
 
 
@@ -97,6 +99,7 @@ function getRadialConfig(nodes, groupBy, dimensions) {
   grouped.forEach((v) => v.diffPiles = totalPiles - v.nPiles)
 
   return {
+    layout: "radial",
     padding,
     extent,
     grouped,
