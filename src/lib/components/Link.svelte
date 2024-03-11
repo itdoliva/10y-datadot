@@ -37,6 +37,7 @@
 
   // PIXI Hierarchy
   const context = new PIXI.Graphics()
+  context.renderable = false
 
   context.blendMode = PIXI.BLEND_MODES.MULTIPLY
 
