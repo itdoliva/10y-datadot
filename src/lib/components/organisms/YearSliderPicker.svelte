@@ -12,7 +12,7 @@
   let w
   let h
   let isBehaviourSet = false
-  let hovered = false
+  let hoveredFilter = false
 
   const handlerR = 4
   const pad = { left: 8, right: 8 }
@@ -96,21 +96,21 @@
             class:unclickable={i === 1 && drag[0] === max}
             transform="translate({year2pos(year)}, 0)"
             data-index={i}
-            on:mouseenter={() => hovered = i}
-            on:mouseleave={() => hovered = false}
+            on:mouseenter={() => hoveredFilter = i}
+            on:mouseleave={() => hoveredFilter = false}
           >
             <g 
               class="handler"
             >
               <circle
                 class="main"
-                fill={hovered === i ? '#8D95FB' : i === 0 ? "transparent" : "black"}
+                fill={hoveredFilter === i ? '#8D95FB' : i === 0 ? "transparent" : "black"}
                 stroke="black"
                 stroke-width=1
                 r={(10-2*1)/2}
               />
 
-              {#if hovered !== i}
+              {#if hoveredFilter !== i}
                 <circle
                   class="inner"
                   r=1 

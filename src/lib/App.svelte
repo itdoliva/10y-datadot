@@ -1,5 +1,5 @@
 <script>
-	import { app, hovered } from '$lib/stores/canvas.js';
+	import { app, hoveredFilter } from '$lib/stores/canvas.js';
 	import { selected } from '$lib/stores/nodes.js';
   import "./pixi.js"
 

@@ -3,10 +3,11 @@ import * as d3 from "d3";
 import { isEqual, cloneDeep } from "lodash";
 import { gsap } from "gsap";
 import { get } from "svelte/store";
-import { nodes, selected } from "../stores/nodes"; 
+import { nodeSize, nodes, selected } from "../stores/nodes"; 
 import { complexityOn, figureHeight, figureWidth } from "../stores/canvas";
 import { cameraOffset } from "../stores/zoom";
 import c from "../config/layout"
+import Simulation from "./Simulation";
 
 interface NodeRenderAttributes {
   x: number;
@@ -35,7 +36,10 @@ interface TweenCoordinates {
 
 
 export class SimulationNode {
+  public simulation: Simulation;
   public id: number;
+  public clientId: number;
+  public projectId: number;
 
   public layout: "block" | "radial";
 
@@ -74,8 +78,18 @@ export class SimulationNode {
   private onSelectedState: boolean;
   private isSelected: boolean;
 
-  constructor(id: number) {
+  constructor(simulation: Simulation, id: number, clientId?: number, projectId?: number) {
+    this.simulation = simulation
+
     this.id = id
+
+    if (clientId) {
+      this.clientId = clientId
+    }
+
+    if (projectId) {
+      this.projectId = projectId
+    }
 
     this.tlCoord = gsap.timeline()
     this.tlAttr = gsap.timeline()
@@ -410,17 +424,6 @@ export class SimulationNode {
       })
   }
 
-  // public getCoordinates = () => {
-  //   const { x, y, theta, radius } = this.tweenCoord
-
-  //   return this.layout === "block"
-  //     ? { x, y }
-  //     : {
-  //       x: (Math.cos(theta) * radius) + x,
-  //       y: (Math.sin(theta) * radius) + y
-  //     }
-  // }
-
   public tick = () => {
     // Selected State & Selected Node
     if (this.onSelectedState && this.isSelected) {
@@ -449,6 +452,12 @@ export class SimulationNode {
     }
   }
 
+  public getRadius = (): number => {
+    return this.isActive()
+      ? get(nodeSize)
+      : 0
+  }
+
 }
 
 
@@ -458,18 +467,25 @@ export class DummySimulationNode extends SimulationNode {
 
   public tl: gsap.core.Timeline;
 
-  constructor() {
-    super(-1)
+  constructor(simulation: Simulation) {
+    super(simulation, -1)
 
     this.fx = 0;
     this.fy = 0;
     this.r = 0;
 
-    this.tl = gsap.timeline().pause()
+    this.tl = gsap.timeline()
+      .eventCallback('onUpdate', simulation.updateCollideRadius)
+      .pause()
+
   }
 
   public isActive = () => {
     return true
+  }
+
+  public getRadius = () => {
+    return this.r
   }
 
   public setPos = () => {

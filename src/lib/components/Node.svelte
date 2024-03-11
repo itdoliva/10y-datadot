@@ -4,7 +4,7 @@
 
 <script>
   import { onMount, getContext } from "svelte";
-  import { app, complexityOn } from "$lib/stores/canvas";
+  import { app, complexityOn, hoveredNode } from "$lib/stores/canvas";
   import { selected } from "$lib/stores/nodes";
   import * as PIXI from "pixi.js"
   import Pokemon from './Pokemon.svelte';
@@ -14,7 +14,6 @@
   export let id
   export let simulationNode
 
-  export let layout
   export let state
 
 
@@ -25,9 +24,18 @@
   container.name = id
   scene.addChild(container)
 
+
   // Events
   container.accessible = true
   container.cursor = 'pointer';
+
+  container.onpointerenter = () => {
+    hoveredNode.set(simulationNode)
+  }
+
+  container.onpointerleave = () => {
+    hoveredNode.set()
+  }
 
   container.onpointerup = () => {
     selected.set($selected.active

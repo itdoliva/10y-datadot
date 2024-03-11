@@ -1,13 +1,15 @@
 <script>
   import App from "$lib/App.svelte";
   import "$lib/scss/global.scss";
-  import { dataset, nodes, categories } from "$lib/stores/nodes"
+  import { dataset, nodes, categories, projects, clients } from "$lib/stores/nodes"
   import { width, height, pixelRatio } from "$lib/stores/canvas"
 
   export let data
 
-  console.log(data.nodes)
+  console.log({ projects: data.projects, clients: data.clients })
 
+  clients.set(data.clients)
+  projects.set(data.projects)
   categories.set(data.categories)
   dataset.set(data.nodes)
 </script>

@@ -9,8 +9,9 @@ export const pixelRatio = writable(1);
 export const figureWidth = writable(0);
 export const figureHeight = writable(0);
 
-export const hovered = writable({ active: false })
+export const hoveredFilter = writable({ active: false })
+export const hoveredNode = writable()
 
 export const complexityOn = writable(false)
-export const linkProjectOn = writable(false)
 export const linkClientOn = writable(false)
+export const linkProjectOn = writable(false)

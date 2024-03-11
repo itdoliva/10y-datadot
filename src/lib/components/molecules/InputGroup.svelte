@@ -1,5 +1,5 @@
 <script>
-  import { app, hovered } from '$lib/stores/canvas.js';
+  import { app, hoveredFilter } from '$lib/stores/canvas.js';
   import Button from "$lib/components/atoms/Button.svelte";
   import BarTween from "$lib/components/atoms/BarTween.svelte";
 	import CheckIcon from '$lib/components/atoms/CheckIcon.svelte';
@@ -36,14 +36,14 @@
 
         <label 
           class:active={active}
-          on:mouseenter={() => $hovered = id}
-          on:mouseleave={() => $hovered = undefined}
+          on:mouseenter={() => $hoveredFilter = id}
+          on:mouseleave={() => $hoveredFilter = undefined}
         >
 
           <div class="check-wrapper">
             <CheckIcon 
               active={active} 
-              hovered={$hovered === id} 
+              hoveredFilter={$hoveredFilter === id} 
               backgroundColor={gridlayout === "goal" && color}
             />
           </div>

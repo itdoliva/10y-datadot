@@ -2,7 +2,7 @@
   export let size = 10
   export let strokewidth = 1
   export let active = false
-  export let hovered = false
+  export let hoveredFilter = false
 
   export let backgroundColor = undefined
 
@@ -27,7 +27,7 @@
 
     <circle
       class="main"
-      fill={active ? "black" : hovered ? "#8D95FB" : "transparent"}
+      fill={active ? "black" : hoveredFilter ? "#8D95FB" : "transparent"}
       stroke="black"
       stroke-width={strokewidth}
       r={(size-2*strokewidth)/2}
@@ -35,7 +35,7 @@
 
     {#if active}
       <line x1={-size*lineprop} x2={size*lineprop} y1=0 y2=0 stroke="#8D95FB" stroke-width=1.5/>
-    {:else if !hovered}
+    {:else if !hoveredFilter}
       <circle r=1 />
     {/if}
 

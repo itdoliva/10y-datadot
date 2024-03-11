@@ -23,6 +23,8 @@
   $: linkProjectOn.set(activeFeatures.includes('link-project'))
   $: linkClientOn.set(activeFeatures.includes('link-client'))
 
+  // $: console.log(activeFeatures, $linkClientOn, $linkProjectOn)
+
   function unselectAll() {
     fyears.set([ 2014, 2023 ])
     fdesigns.set([])

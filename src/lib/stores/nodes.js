@@ -1,6 +1,8 @@
 import { writable, derived, readable } from "svelte/store";
 import { width } from "$lib/stores/canvas"
 
+export const clients = writable([])
+export const projects = writable([])
 export const dataset = writable([])
 export const categories = writable({})
 
