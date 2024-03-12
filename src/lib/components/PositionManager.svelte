@@ -81,7 +81,7 @@
     id={project.id}
     color={0X818AFC}
     linkNodes={simulation.getNodesByProjectId(project.id)}
-    isLinkOn={$linkProjectOn && state === "idle"}
+    isLinkOn={$linkProjectOn && (state === "idle" || state === "selected")}
   />
 {/each}
 
@@ -91,7 +91,7 @@
     id={client.id}
     color={0x83BF00}
     linkNodes={simulation.getNodesByClientId(client.id)}
-    isLinkOn={$linkClientOn && state === "idle"}
+    isLinkOn={$linkClientOn && (state === "idle" || state === "selected")}
   />
 {/each}
 

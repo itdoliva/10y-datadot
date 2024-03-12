@@ -85,7 +85,7 @@
 
 
   function toggleHovered(isHovered) {
-    target.lineWidth = isHovered ? 12 : 3
+    target.lineWidth = isHovered ? 12 : 1
     target.alpha = isHovered ? .85 : .15
     target.circleRadius = isHovered ? 30 : 0
 

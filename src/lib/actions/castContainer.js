@@ -6,7 +6,8 @@ export default function castContainer(node, {
   context, 
   parent=get(app).stage, 
   hasMask=false,
-  destroy=true
+  destroy=true,
+  centered=true
 }) {
 
   if (!context) {
@@ -31,8 +32,16 @@ export default function castContainer(node, {
   function ticked() {
     const bbox = node.getBoundingClientRect()
 
-    const x = bbox.x + bbox.width/2 - parent.x
-    const y = bbox.y + bbox.height/2 - parent.y
+    let xOffset = 0
+    let yOffset = 0
+
+    if (centered) {
+      xOffset += bbox.width/2
+      yOffset += bbox.height/2
+    }
+
+    const x = bbox.x - parent.x + xOffset
+    const y = bbox.y - parent.y + yOffset
 
     context.x = x
     context.y = y
@@ -43,7 +52,7 @@ export default function castContainer(node, {
 
       mask.clear()
       mask.beginFill(0x000000)
-      mask.drawRect(-bbox.width/2, -bbox.height/2, bbox.width, bbox.height)
+      mask.drawRect(-xOffset, -yOffset, bbox.width, bbox.height)
       mask.endFill()
     }
   }

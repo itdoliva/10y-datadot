@@ -20,24 +20,23 @@
   const { scene } = getContext("viz")
 
   // PIXI Hierarchy
-  const container = new PIXI.Container()
-  container.name = id
-  scene.addChild(container)
+  const context = new PIXI.Container()
+  context.name = id
+  scene.addChild(context)
 
 
   // Events
-  container.accessible = true
-  container.cursor = 'pointer';
+  context.cursor = 'pointer';
 
-  container.onpointerenter = () => {
+  context.onpointerenter = () => {
     hoveredNode.set(simulationNode)
   }
 
-  container.onpointerleave = () => {
+  context.onpointerleave = () => {
     hoveredNode.set()
   }
 
-  container.onpointerup = () => {
+  context.onpointerup = () => {
     selected.set($selected.active
       ? { active: false }
       : {
@@ -48,7 +47,7 @@
       })
   }
 
-  $: container.eventMode = $selected.active && $selected.id === id 
+  $: context.eventMode = $selected.active && $selected.id === id 
     ? 'none' 
     : 'static'
 
@@ -57,13 +56,13 @@
   $app.ticker.add(() => {
     const { attr } = simulationNode
 
-    container.x = attr.x
-    container.y = attr.y
+    context.x = attr.x
+    context.y = attr.y
 
-    container.rotation = attr.rotation
-    container.renderable = attr.renderable
-    container.alpha = attr.alpha
-    container.scale.set(attr.scale)
+    context.rotation = attr.rotation
+    context.renderable = attr.renderable
+    context.alpha = attr.alpha
+    context.scale.set(attr.scale)
   })
 
   onMount(() => {
@@ -81,4 +80,4 @@
 </script>
 
 
-<Pokemon parent={container} id={id} />
+<Pokemon parent={context} id={id} />
