@@ -4,8 +4,8 @@
 
 <script>
   import { onMount, getContext } from "svelte";
-  import { app, complexityOn, hoveredNode } from "$lib/stores/canvas";
-  import { selected } from "$lib/stores/nodes";
+  import { app, complexityOn, hoveredNode} from "$lib/stores/canvas";
+  import { selected, nodeSize  } from "$lib/stores/nodes";
   import * as PIXI from "pixi.js"
   import Pokemon from './Pokemon.svelte';
   
@@ -22,8 +22,10 @@
   // PIXI Hierarchy
   const context = new PIXI.Container()
   context.name = id
-  scene.addChild(context)
 
+  context.hitArea = scene.node.hitArea
+
+  scene.addChild(context)
 
   // Events
   context.cursor = 'pointer';
@@ -74,6 +76,8 @@
 
   // On state change
   $: simulationNode.playState(state)
+
+  // On NodeSize Change
 
 
 

@@ -1,17 +1,21 @@
 <script>
   import { onMount, setContext } from 'svelte'
-	import castContainer from '$lib/actions/castContainer';
   import * as PIXI from "pixi.js"
   import * as d3 from "d3";
   
-  
-  import { app, width, height, figureWidth, figureHeight }  from '$lib/stores/canvas';
-  import { cameraOffset, cameraOffsetX, cameraOffsetY, zoomBehaviour, zoom } from "$lib/stores/zoom";
+	import castContainer from '$lib/actions/castContainer';
+  import { app, figureWidth, figureHeight }  from '$lib/stores/canvas';
+  import { cameraOffsetX, cameraOffsetY, zoomBehaviour, zoom } from "$lib/stores/zoom";
+  import { nodeSize } from "$lib/stores/nodes";
 
   const root = new PIXI.Container()
   const scene = new PIXI.Container()
   root.name = "viz"
   scene.name = "scene"
+
+  scene.node = {
+    hitArea: new PIXI.Rectangle()
+  }
   
   root.addChild(scene)
 
@@ -19,11 +23,14 @@
   $: scene.y = $figureHeight/2 + $cameraOffsetY
   $: scene.scale.set($zoom)
 
+  $: updateNodeHitArea($nodeSize)
+
+
   onMount(() => {
     d3.select($app.view)
       .call(zoomBehaviour)
       .on("wheel", e => {
-        console.log(zoomBehaviour)
+        e.preventDefault()
       })
   })
 
@@ -38,6 +45,13 @@
       .transition()
       .duration(duration)
       .call(zoomBehaviour.transform, d3.zoomIdentity)
+  }
+
+  function updateNodeHitArea(nodeSize) {
+    scene.node.hitArea.x = -nodeSize/2
+    scene.node.hitArea.y = -nodeSize/2
+    scene.node.hitArea.width = nodeSize
+    scene.node.hitArea.height = nodeSize
   }
 
 </script>
