@@ -3,6 +3,9 @@ import { get } from "svelte/store";
 import { SimulationNode, DummySimulationNode } from "./SimulationNode";
 import { cameraOffset } from "../stores/zoom";
 
+import getPosBlock from "./getPosBlock";
+import getPosRadial from "./getPosRadial";
+
 export default class Simulation {
   public dummyNode: DummySimulationNode;
   private nodes: SimulationNode[];
@@ -81,7 +84,17 @@ export default class Simulation {
     return this.nodes.filter(d => d.projectId === projectId)
   }
 
-  public updateNodesSetPos = (getPos) => {
+  public setNodeIdlePositions = (layout, nodes, groupBy, dimensions, update) => {
+    const { fw, fh } = dimensions
+  
+    if (fw + fh === 0) {
+      return
+    }
+  
+    const getPos = layout === 'block'
+      ? getPosBlock(nodes, dimensions, update)
+      : getPosRadial(nodes, groupBy, dimensions, update)
+
     this.nodes.forEach(node => node.setPos(getPos))
   }
 }

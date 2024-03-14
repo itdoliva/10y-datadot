@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js"
-import getRegPolyPoints from "$lib/helpers/getRegPolyPoints";
+import getRegPolyPoints from "$lib/templates/helpers/getRegPolyPoints";
 import { get } from 'svelte/store';
 import { nodeSize, lineWidth } from "$lib/stores/nodes"
 

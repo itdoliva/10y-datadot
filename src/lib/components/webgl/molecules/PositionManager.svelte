@@ -1,6 +1,7 @@
  <script>
-	import Simulation from '$lib/components/Simulation';
   import { getContext } from "svelte";
+  
+  import Simulation from '$lib/simulation/Simulation';
 
   // Components
   import Node from "$lib/components/webgl/molecules/Node.svelte";
@@ -11,10 +12,6 @@
   import { dataset, projects, clients, nodes, nodeSize, gap, sortBy, selected } from "$lib/stores/nodes"; 
   import { zoomBehaviour, cameraOffset } from "$lib/stores/zoom";
 
-  // Helpers
-  import getPosRadial from "$lib/helpers/getPosRadial"
-  import getPosBlock from "$lib/helpers/getPosBlock"
-
   // Exports
   export let layout
   export let state
@@ -23,23 +20,6 @@
   
   // ----- SIMULATION -----
   const simulation = new Simulation($dataset)
-
-
-  // ----- IDLE POS CALCULATOR -----
-  const setNodeIdlePositions = (layout, nodes, groupBy, dimensions, update) => {
-    const { fw, fh } = dimensions
-    
-    if (fw + fh === 0) {
-      return
-    }
-
-    const getPos = layout === 'block'
-      ? getPosBlock(nodes, dimensions, update)
-      : getPosRadial(nodes, groupBy, dimensions, update)
-
-    simulation.updateNodesSetPos(getPos)
-
-  }
 
   $: dimensions = {
     fw: $figureWidth,
@@ -53,11 +33,11 @@
   // When selected statement is triggered
   $: simulation.dummyNode.playSwitchSelected(state === "selected")
 
-  $: setNodeIdlePositions(layout, $nodes, $sortBy, dimensions, { 
+  $: simulation.setNodeIdlePositions(layout, $nodes, $sortBy, dimensions, { 
     zoomExtent: updateZoomExtent 
   })
 
-  $: if ($figureWidth && $figureHeight) {
+  $: if ($figureWidth || $figureHeight) {
     simulation.updateCollideRadius()
   } 
 
