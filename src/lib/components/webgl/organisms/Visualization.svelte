@@ -7,6 +7,10 @@
   import { app, figureWidth, figureHeight }  from '$lib/stores/canvas';
   import { cameraOffsetX, cameraOffsetY, zoomBehaviour, zoom } from "$lib/stores/zoom";
   import { nodeSize } from "$lib/stores/nodes";
+  
+  import LayoutManager from '$lib/components/webgl/molecules/LayoutManager.svelte';
+
+  export let layout
 
   const root = new PIXI.Container()
   const scene = new PIXI.Container()
@@ -62,7 +66,8 @@
   bind:clientHeight={$figureHeight}
   use:castContainer={{ context: root, hasMask: true, centered: false }}
 />
-<slot/>
+
+<LayoutManager bind:layout />
 
 
 <style>

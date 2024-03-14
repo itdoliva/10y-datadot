@@ -1,10 +1,38 @@
 <script>
-	import Icon from './../atoms/Icon.svelte';
+	import Icon from '$lib/components/dom/atoms/Icon.svelte';
   export let title
+
+  let active = false
+
+
+
+  function handlePointerEnter(e) {
+    active = true
+    e.stopPropagation()
+  }
+  
+  function handlePointerLeave(e) {
+    active = false
+    e.stopPropagation()
+  }
+
+  function handlePointerUp(e) {
+    active = !active
+    e.stopPropagation()
+  }
+
 </script>
 
-<div class="dropdown">
-  <button class="link">
+<div 
+  class="dropdown" 
+  class:active
+  on:pointerenter={handlePointerEnter}
+  on:pointerleave={handlePointerLeave}
+>
+  <button 
+    class="link"
+    on:pointerup={handlePointerUp}
+  >
     <div class="icon-wrapper">
       <Icon icon='caret' />
     </div>
@@ -21,16 +49,18 @@
     width: 100%;
     height: 100%;
 
-    & > .link:focus + .dropdown-menu,
-    &:hover > .dropdown-menu {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
+    &.active {
+      .dropdown-menu {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
 
-    & > .link:focus > .icon-wrapper,
-    &:hover .link .icon-wrapper {
-      transform: rotate(0);
+      .link {
+        .icon-wrapper {
+          transform: rotate(0);
+        }
+      }
     }
 
     .link {
@@ -68,7 +98,8 @@
       left: -1px;
       top: 100%;
       background-color: hsla(0, 0%, 100%, .9);
-      border: 1px solid black;
+      border: 1px solid black;        
+      
       pointer-events: none;
       opacity: 0;
       transform: translateY(-.15rem);

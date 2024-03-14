@@ -1,10 +1,10 @@
  <script>
-	import Simulation from './Simulation.ts';
+	import Simulation from '$lib/components/Simulation';
   import { getContext } from "svelte";
 
   // Components
-  import Node from "$lib/components/Node.svelte";
-  import Link from '$lib/components/Link.svelte';
+  import Node from "$lib/components/webgl/molecules/Node.svelte";
+  import Link from '$lib/components/webgl/atoms/Link.svelte';
 
   // Stores
   import { figureWidth, figureHeight, linkProjectOn, linkClientOn } from "$lib/stores/canvas";

@@ -1,17 +1,21 @@
 <script>
   import { app, hoveredFilter } from '$lib/stores/canvas.js';
-  import Button from "$lib/components/atoms/Button.svelte";
-  import BarTween from "$lib/components/atoms/BarTween.svelte";
-	import CheckIcon from '$lib/components/atoms/CheckIcon.svelte';
-  import NumberTween from '$lib/components/atoms/NumberTween.svelte';
-  import Graphics from '$lib/components/atoms/Graphics.svelte';
-  import Bubble from '$lib/components/atoms/Bubble.svelte';
-  import Icon from '$lib/components/atoms/Icon.svelte';
   import * as PIXI from "pixi.js";
+
+  import Button from "$lib/components/dom/atoms/Button.svelte";
+  import BarTween from "$lib/components/dom/atoms/BarTween.svelte";
+	import CheckIcon from '$lib/components/dom/atoms/CheckIcon.svelte';
+  import NumberTween from '$lib/components/dom/atoms/NumberTween.svelte';
+  import Icon from '$lib/components/dom/atoms/Icon.svelte';
+  
+  import Bubble from '$lib/components/webgl/atoms/Bubble.svelte';
+  import Graphics from '$lib/components/webgl/atoms/Graphics.svelte';
+
+  import castContainer from "$lib/actions/castContainer"
+
 
   import templates from "$lib/templates"
 
-  import castContainer from "$lib/actions/castContainer"
 
   export let categories
   export let selected = []

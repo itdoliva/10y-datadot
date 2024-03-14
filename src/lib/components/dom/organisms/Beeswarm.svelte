@@ -5,8 +5,8 @@
 
   import { categories, categoriesEnriched } from "$lib/stores/nodes";
 
-  import Button from "$lib/components/atoms/Button.svelte";
-  import BSBubble from "$lib/components/atoms/BSBubble.svelte";
+  import Button from "$lib/components/dom/atoms/Button.svelte";
+  import BSBubble from "$lib/components/dom/atoms/BSBubble.svelte";
 
   export let selected = []
 

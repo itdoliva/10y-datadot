@@ -7,8 +7,6 @@
 
   let canvas
 
-  
-
   onMount(() => {
     app = new PIXI.Application({ 
       roundPixels: true,
@@ -23,7 +21,6 @@
 
     PIXI.Assets.add({ alias: 'petal', src: '/petal.png'})
   })
-
 
 </script>
 

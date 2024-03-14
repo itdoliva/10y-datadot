@@ -1,7 +1,7 @@
 <script>
   // Components
-	import PanelItem from '$lib/components/molecules/PanelItem.svelte';
-  import InputGroup from "$lib/components/molecules/InputGroup.svelte";
+	import PanelItem from '$lib/components/dom/molecules/PanelItem.svelte';
+  import InputGroup from "$lib/components/dom/molecules/InputGroup.svelte";
 
   export let layout
   

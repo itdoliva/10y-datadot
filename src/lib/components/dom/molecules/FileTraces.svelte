@@ -1,6 +1,6 @@
 <script>
   import { selected, dataset } from "$lib/stores/nodes";
-  import FileTrace from "$lib/components/atoms/FileTrace.svelte";
+  import FileTrace from "$lib/components/webgl/atoms/FileTrace.svelte";
 
   const node = $dataset.find(d => d.id === $selected.id)
 

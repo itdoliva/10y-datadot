@@ -1,9 +1,9 @@
 <script>
-  import InputLayout from "$lib/components/organisms/InputLayout.svelte";
-  import InputDesign from "$lib/components/organisms/InputDesign.svelte";
-  import InputPeriod from "$lib/components/organisms/InputPeriod.svelte";
-  import InputGoal from "$lib/components/organisms/InputGoal.svelte";
-  import InputIndustry from "$lib/components/organisms/InputIndustry.svelte";
+  import InputLayout from "$lib/components/dom/organisms/InputLayout.svelte";
+  import InputDesign from "$lib/components/dom/organisms/InputDesign.svelte";
+  import InputPeriod from "$lib/components/dom/organisms/InputPeriod.svelte";
+  import InputGoal from "$lib/components/dom/organisms/InputGoal.svelte";
+  import InputIndustry from "$lib/components/dom/organisms/InputIndustry.svelte";
 
   export let layout
 </script>

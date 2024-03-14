@@ -1,10 +1,11 @@
 <script>
-  import Button from "../atoms/Button.svelte";
-  import DropdownMenu from "../molecules/DropdownMenu.svelte";
-  import InputGroup from "../molecules/InputGroup.svelte";
-  import PlayButton from "../atoms/PlayButton.svelte";
   import { fyears, fdesigns, fgoals, findustries, fproducts, nodes, sortBy } from "$lib/stores/nodes";
   import { complexityOn, linkProjectOn, linkClientOn } from "$lib/stores/canvas";
+  
+  import Button from "$lib/components/dom/atoms/Button.svelte";
+  import DropdownMenu from "$lib/components/dom/molecules/DropdownMenu.svelte";
+  import InputGroup from "$lib/components/dom/molecules/InputGroup.svelte";
+  import PlayButton from "$lib/components/dom/molecules/PlayButton.svelte";
 
   const sortCategories = [
     { alias: "data", id: "year" },

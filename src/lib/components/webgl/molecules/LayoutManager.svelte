@@ -7,7 +7,7 @@
   import { gsap } from "gsap";
 
   // Components
-  import PositionManager from "./PositionManager.svelte";
+  import PositionManager from "$lib/components/webgl/molecules/PositionManager.svelte";
 
   // Stores
   import { width, height, figureWidth, figureHeight } from "$lib/stores/canvas";

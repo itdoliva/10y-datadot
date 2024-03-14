@@ -2,6 +2,7 @@
   import { onDestroy } from "svelte";
   import * as PIXI from "pixi.js"
   import gsap from "gsap";
+  
   import castContainer from '$lib/actions/castContainer';
   import templates from "$lib/templates";
 	import { app } from '$lib/stores/canvas';

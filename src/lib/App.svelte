@@ -1,20 +1,24 @@
 <script>
 	import { app, hoveredFilter } from '$lib/stores/canvas.js';
 	import { selected } from '$lib/stores/nodes.js';
+
   import "./pixi.js"
 
-  import Pixi from "$lib/components/Pixi.svelte";
-  import LayoutManager from "$lib/components/LayoutManager.svelte";
-  import Visualization from '$lib/components/Visualization.svelte';
-  import File from '$lib/components/organisms/File.svelte';
-  import LeftPanel from '$lib/components/organisms/LeftPanel.svelte';
-  import TopPanel from '$lib/components/organisms/TopPanel.svelte';
+  import File from '$lib/components/dom/organisms/File.svelte';
+  import LeftPanel from '$lib/components/dom/organisms/LeftPanel.svelte';
+  import TopPanel from '$lib/components/dom/organisms/TopPanel.svelte';
+
+  import Pixi from "$lib/components/webgl/organisms/Pixi.svelte";
+  import Visualization from '$lib/components/webgl/organisms/Visualization.svelte';
 
   let layout = 'block'
 
 </script>
 
 <div class="root">
+
+  <Pixi bind:app={$app}/>
+
 
   {#if $app}
     <div class="pa-container">
@@ -26,15 +30,21 @@
     </div>
 
     <div class="viz-container">
-      <Visualization>
-        <LayoutManager bind:layout />
-      </Visualization>
-
+      <Visualization bind:layout />
       <File />
     </div>
   {/if}
 
-  <Pixi bind:app={$app}/>
+
+  <!-- <div 
+    style:position="absolute"
+    style:bottom=0
+    style:right=0
+    style:width="400px"
+    style:height="400px"
+    style:background="red"
+    style:z-index=4000
+  /> -->
 
 </div>
 

@@ -3,8 +3,8 @@
   import { findustries } from "$lib/stores/nodes";
 
   // Components
-	import PanelItem from '$lib/components/molecules/PanelItem.svelte';
-  import Beeswarm from "$lib/components/organisms/Beeswarm.svelte";
+	import PanelItem from '$lib/components/dom/molecules/PanelItem.svelte';
+  import Beeswarm from "$lib/components/dom/organisms/Beeswarm.svelte";
 </script>
 
 <PanelItem icon="industries" title="setores do mercado">

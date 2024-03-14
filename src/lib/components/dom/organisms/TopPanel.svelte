@@ -1,11 +1,11 @@
 <script>
   import * as PIXI from "pixi.js"
-  import Icon from "../atoms/Icon.svelte";
-
+  
   import castContainer from "$lib/actions/castContainer"
-
-  import PanelMenu from '$lib/components/organisms/PanelMenu.svelte';
-  import InputProduct from "./InputProduct.svelte";
+  
+  import Icon from "$lib/components/dom/atoms/Icon.svelte";
+  import PanelMenu from '$lib/components/dom/organisms/PanelMenu.svelte';
+  import InputProduct from "$lib/components/dom/organisms/InputProduct.svelte";
 
   const productContainer = new PIXI.Container()
   productContainer.name = "top-panel"

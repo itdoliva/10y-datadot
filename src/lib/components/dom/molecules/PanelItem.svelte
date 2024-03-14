@@ -1,6 +1,6 @@
 <script>
   import Icon
-   from "../atoms/Icon.svelte";
+  from "$lib/components/dom/atoms/Icon.svelte";
   export let title
   export let icon = undefined
 </script>

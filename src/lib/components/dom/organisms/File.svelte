@@ -1,8 +1,9 @@
 <script>
   import { fly } from "svelte/transition";
   import { selected } from "$lib/stores/nodes";
-  import FileTraces from "$lib/components/molecules/FileTraces.svelte";
-  import FileDescription from "$lib/components/molecules/FileDescription.svelte";
+
+  import FileTraces from "$lib/components/dom/molecules/FileTraces.svelte";
+  import FileDescription from "$lib/components/dom/molecules/FileDescription.svelte";
 
 
 </script>

@@ -7,7 +7,8 @@
   import { app, complexityOn, hoveredNode} from "$lib/stores/canvas";
   import { selected, nodeSize  } from "$lib/stores/nodes";
   import * as PIXI from "pixi.js"
-  import Pokemon from './Pokemon.svelte';
+  
+  import Pokemon from '$lib/components/webgl/atoms/Pokemon.svelte';
   
 
 
@@ -24,13 +25,14 @@
   context.name = id
 
   context.hitArea = scene.node.hitArea
+  context.accessibleChildren = false
 
   scene.addChild(context)
 
   // Events
   context.cursor = 'pointer';
 
-  context.onpointerenter = () => {
+  context.onpointerenter = (e) => {
     hoveredNode.set(simulationNode)
   }
 
