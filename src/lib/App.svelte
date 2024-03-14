@@ -37,6 +37,8 @@
 
 
   <!-- <div 
+    on:pointerover={e => e.stopPropagation()}
+    on:pointerenter={e => e.stopPropagation()}
     style:position="absolute"
     style:bottom=0
     style:right=0

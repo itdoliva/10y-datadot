@@ -45,13 +45,10 @@
     simulation.updateCoordPos()
   }
 
-
   function updateZoomExtent(extent, reset=true) {
     zoomBehaviour.translateExtent(extent)
     if (reset) resetZoom(0)
   }
-
-
 
 </script>
 

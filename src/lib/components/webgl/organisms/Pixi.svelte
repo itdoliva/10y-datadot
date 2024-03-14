@@ -2,17 +2,28 @@
 	import { width, height } from '$lib/stores/canvas';
   import { onMount } from 'svelte'
   import * as PIXI from "pixi.js"
+  import BackgroundVertex from "$lib/bg.vert?raw";
+  import BackgroundFragment from "$lib/bg.frag?raw";
 
   export let app
 
   let canvas
+
+  console.log(BackgroundFragment)
+
+  const bgFilter = new PIXI.Filter(BackgroundVertex, BackgroundFragment, {
+    iTime: 0.0,
+  })
+
+  const meshGradient = new PIXI.Graphics()
+  meshGradient.filters = [ bgFilter ]
+
 
   onMount(() => {
     app = new PIXI.Application({ 
       roundPixels: true,
       view: canvas, 
       resizeTo: window, 
-      backgroundColor: 0xE9FAFE,
     })
 
     app.stage.name = "stage"
@@ -20,6 +31,17 @@
     globalThis.__PIXI_APP__ = app
 
     PIXI.Assets.add({ alias: 'petal', src: '/petal.png'})
+
+    app.stage.addChild(meshGradient)
+
+    app.ticker.add((delta) => {
+      bgFilter.uniforms.iTime += .025 * delta;
+
+      meshGradient.clear()
+      meshGradient.beginFill(0xFFFFFF)
+      meshGradient.drawRect(0, 0, app.screen.width, app.screen.height)
+      meshGradient.endFill()
+    });
   })
 
 </script>
