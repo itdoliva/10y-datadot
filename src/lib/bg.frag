@@ -4,6 +4,7 @@ varying vec2 vTextureCoord;
 varying vec2 vResolution;
 
 uniform float iTime;
+uniform float iRatio;
 
 mat2 rotationMatrix(float theta) {
   float s = sin(theta);
@@ -40,8 +41,7 @@ float noise(vec2 p) {
 
 void main(void) {
   vec2 uv = vTextureCoord;
-  float ratio = 1.2;
-  //float ratio = vResolution.x / vResolution.y;
+  //float ratio = 1.2;
 
   vec2 tuv = uv;
   tuv -= .5;
@@ -49,9 +49,9 @@ void main(void) {
   // rotate with Noise
   float degree = noise(vec2(iTime*.1, tuv.x * tuv.y));
 
-  tuv.y *= 1. / ratio;
+  tuv.y *= 1. / iRatio;
   tuv *= rotationMatrix(radians((degree -.5) * 720. + 180.));
-  tuv.y *= ratio;
+  tuv.y *= iRatio;
 
   // Wave warp with sin
   float frequency = 5.;

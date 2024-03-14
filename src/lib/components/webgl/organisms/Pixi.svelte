@@ -13,6 +13,7 @@
 
   const bgFilter = new PIXI.Filter(BackgroundVertex, BackgroundFragment, {
     iTime: 0.0,
+    iRatio: 1.0,
   })
 
   const meshGradient = new PIXI.Graphics()
@@ -24,6 +25,7 @@
       roundPixels: true,
       view: canvas, 
       resizeTo: window, 
+      backgroundColor: 0xFFFFFF
     })
 
     app.stage.name = "stage"
@@ -36,6 +38,7 @@
 
     app.ticker.add((delta) => {
       bgFilter.uniforms.iTime += .025 * delta;
+      bgFilter.uniforms.iRatio = app.screen.width / app.screen.height;
 
       meshGradient.clear()
       meshGradient.beginFill(0xFFFFFF)
