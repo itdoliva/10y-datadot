@@ -1,11 +1,11 @@
 import * as PIXI from "pixi.js";
 import * as d3 from "d3";
-import { isEqual, cloneDeep } from "lodash";
 import { gsap } from "gsap";
+import { isEqual, cloneDeep } from "lodash";
 import { get } from "svelte/store";
 import { nodeSize, nodes, selected } from "../stores/nodes"; 
 import { complexityOn, figureHeight, figureWidth } from "../stores/canvas";
-import { cameraOffset } from "../stores/zoom";
+import { cameraOffsetX, cameraOffsetY } from "../stores/zoom";
 import c from "../config/layout"
 import Simulation from "./Simulation";
 
@@ -23,8 +23,8 @@ interface IdleProperties {
   y: number;
   radius: number;
   theta: number;
-  delay: number;
-  config: any;
+  active: boolean;
+  time: number;
 }
 
 interface TweenCoordinates {
@@ -32,6 +32,12 @@ interface TweenCoordinates {
   y: number;
   radius: number;
   theta: number;
+}
+
+interface AnimationControl {
+  running: boolean;
+  idleProps?: IdleProperties;
+  next?: gsap.core.Timeline;
 }
 
 
@@ -63,17 +69,17 @@ export class SimulationNode {
   public fx: number | undefined;
   public fy: number | undefined;
 
+  // Hold the coordinate variables that transition in, out and between idleProps
   private tweenCoord: TweenCoordinates;
+
+  // Animation
+  private animation: AnimationControl;
 
   // Idle Props
   private idlePropsTracker: IdleProperties[] = [];
-  public idleProps: IdleProperties;
-  public idlePropsPrev: IdleProperties;
+  private idleProps: IdleProperties;
+  private idlePropsPrev: IdleProperties;
 
-  // Timelines
-  public tlCoord: gsap.core.Timeline;
-  public tlAttr: gsap.core.Timeline;
-  
   // Selected
   private onSelectedState: boolean;
   private isSelected: boolean;
@@ -83,6 +89,8 @@ export class SimulationNode {
 
     this.id = id
 
+    this.animation = { running: false }
+
     if (clientId) {
       this.clientId = clientId
     }
@@ -91,8 +99,6 @@ export class SimulationNode {
       this.projectId = projectId
     }
 
-    this.tlCoord = gsap.timeline()
-    this.tlAttr = gsap.timeline()
   }
 
 
@@ -116,166 +122,150 @@ export class SimulationNode {
     return this.isActive() === this.attr.renderable
   }
 
-  public setPos = (getPos) => {
-    this.log("setPos")
+  public setIdleProps = (idlePropsNew, hasLayoutChanged) => {
+    // this.log("setIdleProps")
 
-    const idleProps = getPos(this.getRef())
-    const idlePropsPrev = this.idlePropsTracker[0]
+    // Check if new position is the same from the previous one
+    // If so, do nothing
+    const idlePropsCur = this.idlePropsTracker[0]
 
-    if (isEqual(idleProps, idlePropsPrev)) {
+    idlePropsNew.active = this.isActive()
+
+    if (isEqual(idlePropsNew, idlePropsCur)) {
       return
     }
 
-    const { x, y, theta, radius, config } = idleProps
-
-    if (config.layout !== this.layout) {
-      this.tweenCoord = { x, y, theta, radius }
+    // If layout has changed
+    if (hasLayoutChanged || !this.tweenCoord) {
+      const newTweenCoord = { ...idlePropsNew }
+      delete newTweenCoord.active
+      this.tweenCoord = newTweenCoord
     }
 
-    this.layout = idleProps.config.layout
+    if (this.animation.running) {
+      this.idlePropsTracker.splice(0, 0, idlePropsNew, <IdleProperties>this.animation.idleProps)
+    }
+    else {
+      this.idlePropsTracker.splice(0, 0, idlePropsNew) // Add new pos to the head of the arr // this.simulation.inplaceIdleProps ? 1 : 
+    }
 
-    this.idlePropsTracker.splice(0, 0, idleProps) // Add new pos to the head of the arr
     this.idlePropsTracker = this.idlePropsTracker.slice(0, 2) // Removes the arr tail
 
-    this.idleProps = idleProps // Updates currentPos
+    this.idleProps = idlePropsNew // Updates currentPos
     this.idlePropsPrev = this.idlePropsTracker[1] // Updates previousPos
+
+
+
+    if (idlePropsNew.delay > 1) {
+      console.warn(this.id, 'has high delay', idlePropsNew)
+    }
+
+    // this.log(this.idlePropsTracker)
   }
 
   public getScale = () => {
     return get(complexityOn) ? this.getRef().complexity : 1
   }
 
-  public playState = (state: string) => {
-    this.log("playState")
-
-    if (!this.idleProps) {
-      return this.log("\terror")
-    }
-
-    this.onSelectedState = state === 'selected'
-    this.isSelected = this.onSelectedState && (<any>get(selected)).id === this.id
-
-    if (this.onSelectedState) {
-      this.playSelected()
-    }
-    else if (state === 'entrance') {
-      this.playEntrance()
-    } 
-    else if (state === 'idle') {
-      this.playIdle()
-    }
-    else if (state === 'exit') {
-      this.playExit()
-    } 
-    else if (state === 'filter' && !this.hasActiveMatch()) {
-      this.playFilter()
-    }
-    else if (state === 'move') {
-      this.playMove()
-    }
-  }
-
   public playSelected = () => {
     this.log('selected')
+    
+    // This function only affects the selected node, 
+    // since the position from other nodes are set by the simulation
 
     if (!this.isSelected) {
       return
     }
 
     const { tlAttr, attr } = this
-    const scale = this.getScale()
 
     tlAttr
-      .progress(1)
-      .fromTo(attr,
-        { 
-          alpha: 1, 
-          scale
-        },
-        { 
-          alpha: 0, 
-          scale: 2,
+      .tweenTo(1, { duration: .15 })
+      .then(() => {
+        tlAttr
+          .clear()
+          .to(attr, {
+            alpha: 0,
+            scale: 2,
 
-          duration: .3,
-          ease: c.easeExit,
-          onComplete: () => attr.scale = scale
-        })
+            duration: .3,
+            ease: c.easeExit,
+            onComplete: () => attr.scale = this.getScale()
+          })
+      })
   }
 
-  public playEntrance = () => {
-    this.log('entrance')
+  public makeChainedTimeline = (overwrite: string | boolean = true): gsap.core.Timeline => {
+    const isRunning = this.animation.running
 
-    const { tlCoord, tlAttr, tweenCoord, attr, idleProps } = this
-    const { delay } = idleProps
+    this.log("\tmakeChainedTimeline:", isRunning)
 
-    tlAttr.progress(1)
-    tlCoord.progress(1)
-    
-    attr.renderable = this.isActive()
+    const tl = gsap.timeline({ 
+      overwrite,
+      paused: isRunning,
 
-    if (this.layout === 'block') {
-      tweenCoord.x = idleProps.x
-      tweenCoord.y = idleProps.y
+      onStart: () => {
+        this.animation.running = true
+        this.animation.idleProps = this.idleProps
 
-      attr.alpha = 0
-      attr.rotation = 0
-      
-      tlAttr.add(() => {
-        attr.alpha = 1
-      }, `+=${delay.toFixed(2)}`)
+        this.log("\tonStart:", isRunning)
+      },
 
+      onComplete: () => {
+        this.animation.running = false
+        this.animation.idleProps = undefined
+        this.animation.next?.play()
+
+        tl.kill()
+
+        this.log("\tonComplete:", isRunning)
+      }
+    })
+
+    if (isRunning) {
+      this.animation.next = tl
     }
 
-    else if (this.layout === 'radial') {
+    return tl
+  }
+
+
+  public chainEntrance = () => {
+    const { simulation, attr, tweenCoord, idleProps } = this
+    const { x, y, theta, radius, time } = idleProps
+    const delay = time
+
+    const active = this.isActive()
+
+    const tl = gsap.timeline({ overwrite: true })
+
+    if (simulation.command.layout === "block") {
+      tl
+      .set(tweenCoord, { x, y, radius, theta })
+      .set(attr, { alpha: 0, rotation: 0, renderable: active })
+      .set(attr, { alpha: 1 }, delay.toFixed(2))
+    }
+
+    else {
       const duration = c.maxDurationRadial
+      const ease = c.easeEntrance
 
-      tlCoord.fromTo(tweenCoord,
-        { 
-          theta: <number>idleProps.theta - Math.PI/8,
-          radius: idleProps.config.innerRadius,
-        },
-        { 
-          theta: <number>idleProps.theta,
-          radius: idleProps.radius,
-          
-          delay, 
-          duration, 
-          ease: c.easeEntrance 
-        })
-
-      tlAttr.fromTo(attr, 
-        { alpha: 0 },
-        { alpha: 1, delay, duration, ease: c.easeEntrance }
-      )
-    }
-  }
-
-  public playIdle = () => {
-    this.log('idle')
-
-    const { tlAttr, tlCoord, attr, tweenCoord, idleProps } = this
-
-    tlCoord.progress(1)
-    tlAttr.progress(1)
-
-    attr.renderable = this.isActive()
-    attr.alpha = 1
-
-    if (this.layout === 'block') {
-      tweenCoord.x = idleProps.x
-      tweenCoord.y = idleProps.y
-      tweenCoord.theta = 0
-    } 
-    else if (this.layout === 'radial') {
-      tweenCoord.theta = idleProps.theta
+      tl
+      .set(tweenCoord, { x: 0, y: 0, radius: radius - 24, theta: theta - Math.PI/8 })
+      .set(attr, { alpha: 0, rotation: theta + Math.PI, renderable: active })
+      .to(tweenCoord, { radius, theta, delay, duration, ease })
+      .to(attr, { alpha: 1, rotation: theta + Math.PI, duration, ease }, "<")
     }
 
+    tl.eventCallback("onComplete", () => {
+      tl.kill()
+    })
+
+    return tl
   }
 
-  public playExit = () => {
-    this.log('exit')
-    
-    const { tlCoord, tweenCoord, tlAttr, attr, idleProps } = this
+  public chainExit = () => {
+    const { attr, tweenCoord, idleProps } = this
 
     const delayFall = Math.random() * .5
     const delayFadeOut = Math.max(0, delayFall - Math.random()*.15)
@@ -283,145 +273,277 @@ export class SimulationNode {
 
     const y = idleProps.y + get(figureHeight)*(Math.random()*.5 + .3)
 
-    // Fall
-    tlCoord
-      .progress(1)
-      .to(tweenCoord, { 
-        y, 
+    const tl = gsap.timeline({ overwrite: true })
 
-        duration, 
-        delay: delayFall, 
-        ease: c.easeExit,
-        onComplete: () => {
-          tweenCoord.y -= y
-        }
+    tl.to(attr, { alpha: 0, duration, delay: delayFadeOut, ease: c.easeFade })
+    tl.to(tweenCoord, { y, duration, delay: delayFall - delayFadeOut, ease: c.easeExit }, "<")
+
+    tl.eventCallback("onComplete", () => {
+      tl.kill()
+    })
+
+    return tl
+  }
+
+  public chainFilterOut = () => {
+    // Filter Out -> Move Remaining
+    const { simulation, tweenCoord, attr, idleProps, idlePropsPrev } = this
+
+    const { x, y, theta, radius, time } = idleProps
+
+    const tl = this.makeChainedTimeline()
+
+    // BLOCK
+    if (simulation.command.layout === "block") {
+      tl
+      .set(attr, { 
+        renderable: idleProps.active,
+        delay: idlePropsPrev.time * c.filterDuration
       })
+      .to(tweenCoord, { 
+        x, 
+        y, 
+        duration: c.filterDuration, 
+        delay: c.filterBetweenGap, 
+        ease: d3.easeQuadInOut
+      }, "<")
+    }
 
-    // Fade Out
-    tlAttr
-      .progress(1)
+    // RADIAL
+    else {
+      const delayHalf1 = idlePropsPrev.time * c.filterHalf1
+      const durationStepHalf2 = c.filterHalf2/2
+
+      // Filtered out
+      if (idlePropsPrev.active && !idleProps.active) {
+
+        tl
+        .to(tweenCoord, { 
+          theta: idlePropsPrev.theta + Math.PI/8, 
+          radius: idlePropsPrev.radius + 24, 
+
+          duration: c.filterHalf1, 
+          delay: delayHalf1,
+          ease: d3.easeQuadIn
+        })
+        .to(attr, { 
+          alpha: 0, 
+
+          duration: c.filterHalf1,
+          ease: d3.easeCubicIn
+        }, "<")
+        .set(attr, { renderable: false })
+      }
+
+      // Moved
+      else {
+        tl
+        // Fade out and rotate back
+        .to(attr, { 
+          alpha: 0, 
+          duration: durationStepHalf2, 
+          delay: delayHalf1 + c.filterBetweenGap , 
+          ease: d3.easeCubicIn
+        })
+        .to(tweenCoord, { 
+          theta: idlePropsPrev.theta - Math.PI/24, 
+          radius: idlePropsPrev.radius - 24, 
+          duration: durationStepHalf2, 
+          ease: d3.easeQuadIn
+        }, "<")
+
+        // Fade in new position while rotating on
+        .set(tweenCoord, { 
+          theta: theta - Math.PI/8, 
+          radius: radius - 24
+        })
+        .to(tweenCoord, { theta,
+           radius, 
+           duration: durationStepHalf2,
+           ease: d3.easeQuadOut
+        })
+        .to(attr, { 
+          alpha: 1, 
+          duration: durationStepHalf2 ,
+          ease: d3.easeCubicOut
+        }, "<")
+      }
+    }
+
+
+    return tl
+  }
+
+  public chainFilterIn = () => {
+    // Move Existing -> Filter In
+    const { simulation, tweenCoord, attr, idleProps, idlePropsPrev } = this
+
+    const { x, y, theta, radius, active, time } = idleProps
+
+    const tl = this.makeChainedTimeline("auto")
+
+    const ease = d3.easeQuadInOut
+
+    // BLOCK
+    if (simulation.command.layout === "block") {
+
+      // Move Existing
+      if (idlePropsPrev.active && active) {
+
+        tl.to(tweenCoord, { 
+          x, 
+          y, 
+          ease, 
+          duration: c.filterHalf2,
+          delay: idlePropsPrev.time * c.filterHalf1
+        })
+
+      }
+
+      // Waterfall In
+      else {
+        tl
+        .set(tweenCoord, { 
+          x, 
+          y 
+        })
+        .set(attr, { 
+          renderable: active, 
+          delay: (time * c.filterDuration) + c.filterHalf1 + c.filterBetweenGap 
+        })
+      }
+    }
+
+    // RADIAL
+    else {
+
+      tl
+      // Fade out and rotate back
       .to(attr, { 
         alpha: 0, 
 
+        duration: .15, 
+        delay: ease(time) * c.filterHalf1 
+      })
+      .to(tweenCoord, { 
+        theta: idlePropsPrev.theta - Math.PI/24, 
+        radius: idlePropsPrev.radius + 24, 
+        
+        duration: .15, 
+        ease 
+      }, "<")
+      
+      // Fade in new position while rotating on
+      .set(tweenCoord, { 
+        theta: theta - Math.PI/24, 
+        radius: radius 
+      })
+      .set(attr, { 
+        alpha: 0, 
+        renderable: active, 
+        rotation: theta,
+        delay: .03 
+      })
+      .to(tweenCoord, { 
+        theta, 
+        duration: .15, 
+        ease, 
+        delay: ease(time) * c.filterHalf2,
+      })
+      .to(attr, { 
+        alpha: 1, 
+        duration: .15 
+      }, "<")
+
+
+    }
+
+    return tl
+  }
+
+  public chainSort = () => {
+    // Move Existing -> Filter In
+    const { simulation, tweenCoord, attr, idleProps, idlePropsPrev } = this
+
+    const { x, y, theta, radius, active, time } = idleProps
+
+    const tl = this.makeChainedTimeline()
+
+    const ease = d3.easeQuadInOut
+
+    // BLOCK
+    if (simulation.command.layout === "block") {
+
+      tl.to(tweenCoord, { 
+        x, 
+        y, 
+        ease, 
+        duration: c.filterHalf2,
+        delay: idlePropsPrev.time * c.filterHalf1
+      })
+
+    }
+
+    // RADIAL
+    else {
+      const duration = c.filterHalf2 
+
+      tl
+      // Fade out and rotate back
+      .to(attr, { 
+        alpha: 0, 
+        duration: .15, 
+        delay: time 
+      })
+      .to(tweenCoord, { 
+        theta: idlePropsPrev.theta - Math.PI/24, 
+        radius: idlePropsPrev.radius + 24, 
+        duration: .15, 
+        ease 
+      }, "<")
+      
+      // Fade in new position while rotating on
+      .set(attr, { 
+        alpha: 0, 
+        rotation: theta + Math.PI, 
+        renderable: active 
+      })
+      .set(tweenCoord, { 
+        theta: theta - Math.PI/24, 
+        radius: radius 
+      })
+      .to(tweenCoord, { 
+        theta, 
         duration, 
-        delay: delayFadeOut, 
-        ease: c.easeFade 
+        ease, 
+        delay: time 
       })
+      .to(attr, { 
+        alpha: 1, 
+        duration
+      }, "<")
+
+    }
+
+    return tl
   }
 
-  public playFilter = () => {
-    this.log('filter')
-    
-    const { tlCoord, tweenCoord, tlAttr, attr, idleProps, idlePropsPrev } = this
-    
-    const active = this.isActive()
-    const isEntering = active
 
-    const delay = isEntering
-      ? idleProps.delay
-      : idlePropsPrev.delay
-
-    tlCoord.progress(1)
-    tlAttr.progress(1)
-
-    if (this.layout === 'block') {
-      tlAttr.add(() => {
-        attr.renderable = active
-      }, `+=${delay.toFixed(2)}`)
-    }
-
-    else if (this.layout === 'radial') {
-
-      tlAttr
-        .add(() => {
-          attr.renderable = active
-        }, `+=${(isEntering ? delay : c.shifts).toFixed(2)}`)
-        .fromTo(attr, 
-          { alpha: +!active },
-          { 
-            alpha: +active, 
-            
-            delay, 
-            duration: c.maxDurationRadial, 
-            ease: c.easeExit 
-          })
-    
-
-      if (isEntering) { // good
-        tlCoord.fromTo(tweenCoord, 
-          { theta: idleProps.theta - Math.PI/8 },
-          { 
-            theta: idleProps.theta, 
-            
-            delay, 
-            duration: c.maxDurationRadial, 
-            ease: c.easeExit 
-          })
-      } 
-      else { // not good
-        tlCoord.fromTo(tweenCoord, 
-          { theta: idleProps.theta },
-          { 
-            theta: idlePropsPrev.theta + Math.PI/8, 
-
-            duration: c.maxDurationRadial, 
-            delay, 
-            ease: c.easeExit 
-          })
-      }
-
-    }
-  }
-
-  public playMove = () => {
-    this.log('move')
-
-    const { tlCoord, tlAttr, tweenCoord, idleProps } = this
-
-    tlCoord.progress(1)
-    tlAttr.progress(1)
-
-    if (idleProps.delay > 1) {
-      console.log(this)
-    }
-
-    if (this.layout === 'block') {
-      const delay = idleProps.delay * .2
-
-      tlCoord.to(tweenCoord, { 
-        x: idleProps.x, 
-        y: idleProps.y, 
-
-        delay, 
-        duration: c.shifts-delay, 
-        ease: c.easeExit 
-      })
-    }
-    else if (this.layout === 'radial') {
-      tlCoord.to(tweenCoord, { 
-        theta: idleProps.theta, 
-
-        delay: idleProps.delay, 
-        duration: c.maxDurationRadial, 
-        ease: c.easeExit 
-      })
-    }
-  }
 
   public playComplexity = () => {
-    this.log('complexity')
+    // this.log('complexity')
 
-    const { tlAttr, attr } = this
+    // const { tlAttr, attr } = this
 
-    tlAttr
-      .progress(1)
-      .to(attr, { 
-        scale: this.getScale(), 
+    // tlAttr
+    //   .progress(1)
+    //   .to(attr, { 
+    //     scale: this.getScale(), 
 
-        delay: Math.random() * .7,
-        duration: .3, 
-        ease: c.easeExit 
-      })
+    //     delay: Math.random() * .7,
+    //     duration: .3, 
+    //     ease: c.easeExit 
+    //   })
   }
 
   public tick = () => {
@@ -430,7 +552,7 @@ export class SimulationNode {
 
     }
     // Selected State & Non-Selected Node
-    else if (this.onSelectedState) {
+    else if (this.onSelectedState && !this.isSelected) {
       this.fx = undefined
       this.fy = undefined
       this.attr.x = this.x
@@ -440,7 +562,7 @@ export class SimulationNode {
     else if (this.tweenCoord) {
       const { x, y, theta, radius } = this.tweenCoord
 
-      if (this.layout === "block") {
+      if (this.simulation.command.layout === "block") {
         this.fx = this.attr.x = x
         this.fy = this.attr.y = y
       }
@@ -448,7 +570,6 @@ export class SimulationNode {
         this.fx = this.attr.x = Math.cos(theta) * radius + x
         this.fy = this.attr.y = Math.sin(theta) * radius + y
       }
-
     }
   }
 
@@ -488,7 +609,7 @@ export class DummySimulationNode extends SimulationNode {
     return this.r
   }
 
-  public setPos = () => {
+  public setIdleProps = () => {
     return
   }
 
@@ -510,8 +631,8 @@ export class DummySimulationNode extends SimulationNode {
             fy: (<any>get(selected)).y 
           },
           { 
-            fx: -get(cameraOffset).x, 
-            fy: -get(cameraOffset).y, 
+            fx: -get(cameraOffsetX), 
+            fy: -get(cameraOffsetY), 
             duration: .300, 
             ease: d3.easeCubicOut
           })
@@ -521,7 +642,7 @@ export class DummySimulationNode extends SimulationNode {
             r: Math.max(get(figureWidth), get(figureHeight)) * .4, 
             duration: .150, 
             ease: d3.easeCubicOut 
-          }, '<=')
+          }, '<')
     }
 
     else if (!stateSelectedOn) {

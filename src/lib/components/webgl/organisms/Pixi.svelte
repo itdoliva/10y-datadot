@@ -9,8 +9,6 @@
 
   let canvas
 
-  console.log(BackgroundFragment)
-
   const bgFilter = new PIXI.Filter(BackgroundVertex, BackgroundFragment, {
     iTime: 0.0,
     iRatio: 1.0,

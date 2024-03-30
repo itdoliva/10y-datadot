@@ -1,5 +1,7 @@
 import { writable, derived, readable } from "svelte/store";
-import { width } from "$lib/stores/canvas"
+import * as d3 from "d3"
+
+import { width } from "./canvas"
 
 export const clients = writable([])
 export const projects = writable([])
@@ -8,13 +10,13 @@ export const categories = writable({})
 
 export const sortBy = writable('year')
 export const fyears = writable()
-export const fdesigns = writable()
-export const fgoals = writable()
-export const findustries = writable()
-export const fproducts = writable()
+export const fdesigns = writable([])
+export const fgoals = writable([])
+export const findustries = writable([])
+export const fproducts = writable([])
+
 
 export const selected = writable({ active: false })
-
 export const nodes = derived(
   [ dataset, fyears, findustries, fdesigns, fgoals, fproducts, categories, sortBy ], 
   ([ $dataset, $years, $industries, $designs, $goals, $products, $categories, $sortBy ]) => {
@@ -36,7 +38,10 @@ export const nodes = derived(
     )
     .map((item, i) => ({ ...item, i }))
 
-    newNodes.activeCount = newNodes.filter(d => d.active).length
+    newNodes.activeIds = newNodes.filter(d => d.active).map(d => d.id).sort(d3.ascending)
+    newNodes.activeCount = newNodes.activeIds.length
+    newNodes.activePct = newNodes.activeCount / newNodes.length
+
 
     return newNodes
 })

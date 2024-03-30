@@ -5,12 +5,15 @@
   
 	import castContainer from '$lib/actions/castContainer';
   import { app, figureWidth, figureHeight }  from '$lib/stores/canvas';
-  import { cameraOffsetX, cameraOffsetY, zoomBehaviour, zoom } from "$lib/stores/zoom";
+  import { cameraOffsetX, cameraOffsetY, zoom } from "$lib/stores/zoom";
   import { nodeSize } from "$lib/stores/nodes";
   
   import LayoutManager from '$lib/components/webgl/molecules/LayoutManager.svelte';
+  import ZoomController from "$lib/simulation/ZoomController"
 
   export let layout
+
+  let zoomController
 
   const root = new PIXI.Container()
   const scene = new PIXI.Container()
@@ -31,25 +34,16 @@
 
 
   onMount(() => {
-    d3.select($app.view)
-      .call(zoomBehaviour)
-      .on("wheel", e => {
-        e.preventDefault()
-      })
+    zoomController = new ZoomController($app.view)
   })
 
   setContext('viz', { 
     root, 
     scene,
-    resetZoom
+    getZoomController: () => zoomController
   })
 
-  function resetZoom(duration=1000) {
-    d3.select($app.view)
-      .transition()
-      .duration(duration)
-      .call(zoomBehaviour.transform, d3.zoomIdentity)
-  }
+
 
   function updateNodeHitArea(nodeSize) {
     scene.node.hitArea.x = -nodeSize/2

@@ -24,22 +24,3 @@ export const zoom = writable(1)
 // Panning e Zooming support
 export const isDragging = writable(false)
 
-export const zoomBehaviour = d3.zoom()
-  .on("start", onZoomStart)
-  .on("end", onZoomEnd)
-  .on("zoom", zoomed)
-
-
-function onZoomStart() {https://open.spotify.com/track/4ZbrvxwWPNX0MgbubsqbZG
-  isDragging.set(true)
-}
-
-function onZoomEnd() {
-  isDragging.set(false)
-}
-
-function zoomed(e) {
-  const { transform } = e
-  zoom.set(transform.k)
-  cameraOffset.set(transform.x, transform.y)
-}

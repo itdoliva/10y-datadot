@@ -70,14 +70,14 @@
   })
 
   onMount(() => {
-    simulationNode.playState(state)
+    // simulationNode.playState(state)
   })
 
   // On turn complexity on or off
   $: simulationNode.playComplexity($complexityOn)
 
   // On state change
-  $: simulationNode.playState(state)
+  // $: simulationNode.playState(state)
 
   // On NodeSize Change
 

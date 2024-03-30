@@ -6,7 +6,7 @@
   import castContainer from '$lib/actions/castContainer';
   import templates from "$lib/templates";
 	import { app } from '$lib/stores/canvas';
-  import { categories } from '$lib/stores/nodes.js';
+  import { categories } from '$lib/stores/nodes';
   
   export let id
 

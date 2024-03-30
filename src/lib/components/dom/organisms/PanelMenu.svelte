@@ -63,7 +63,7 @@
 
   <li class="unselectall-btn">
     <Button 
-      disabled={$nodes.length === $nodes.activeCount}
+      disabled={$fdesigns.length + $fgoals.length + $findustries.length + $fproducts.length === 0}
       onClick={unselectAll}
     >
       X 
