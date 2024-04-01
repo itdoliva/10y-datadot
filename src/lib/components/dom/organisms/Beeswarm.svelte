@@ -9,6 +9,7 @@
   import BSBubble from "$lib/components/dom/atoms/BSBubble.svelte";
 
   export let selected = []
+  export let disabled
 
   let w
   let h
@@ -86,6 +87,10 @@
 
   
   function toggle(id) {
+    if (disabled) {
+      return
+    }
+    
     if (selected.includes(id)) {
       const index = selected.indexOf(id)
       selected.splice(index, 1)

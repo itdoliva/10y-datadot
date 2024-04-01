@@ -21,6 +21,7 @@
   export let selected = []
   export let multiselect = true
   export let unselectBtn = multiselect
+  export let disabled = false
 
   export let gridlayout = 'simple'
 
@@ -78,9 +79,9 @@
           <div class="label-wrapper">
 
             {#if multiselect}
-              <input type="checkbox" value={id} bind:group={selected}/>
+              <input type="checkbox" value={id} {disabled} bind:group={selected}/>
             {:else}
-              <input type="radio" value={id} bind:group={selected}/>
+              <input type="radio" value={id} {disabled} bind:group={selected}/>
             {/if}
 
             <span>{alias}</span>

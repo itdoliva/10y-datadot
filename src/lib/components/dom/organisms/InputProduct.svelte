@@ -1,6 +1,7 @@
 <script>
   // Store
   import { fproducts, categoriesEnriched } from "$lib/stores/nodes";
+  import { isSwitchingLayout } from "$lib/stores/canvas"
 
   // Components
 	import PanelItem from '$lib/components/dom/molecules/PanelItem.svelte';
@@ -14,6 +15,7 @@
     parent={parent}
     gridlayout="product"
     categories={$categoriesEnriched.products}
+    disabled={$isSwitchingLayout}
     bind:selected={$fproducts}
   />
 </PanelItem>

@@ -5,6 +5,7 @@
   export let max
   export let step = 1
   export let selected = [ min, max ]
+  export let disabled
 
   const drag = [ min, max ]
 
@@ -49,6 +50,9 @@
     .range(years)
 
   function dragged(e) {
+    if (disabled) {
+      return
+    }
     const i = +this.getAttribute('data-index')
     const newYear = pos2year(e.x)
     if (i === 0) {
@@ -59,6 +63,10 @@
   }
 
   function dragEnd() {
+    if (disabled) {
+      return
+    }
+    
     selected = drag
   }
 

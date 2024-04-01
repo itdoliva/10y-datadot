@@ -51,9 +51,7 @@
       })
   }
 
-  $: context.eventMode = $selected.active && $selected.id === id 
-    ? 'none' 
-    : 'static'
+  $: context.eventMode = $selected.active ? 'none' : 'static'
 
 
   // Variables

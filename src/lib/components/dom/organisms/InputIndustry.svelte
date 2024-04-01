@@ -1,6 +1,7 @@
 <script>
   // Store
   import { findustries } from "$lib/stores/nodes";
+  import { isSwitchingLayout } from "$lib/stores/canvas"
 
   // Components
 	import PanelItem from '$lib/components/dom/molecules/PanelItem.svelte';
@@ -9,6 +10,7 @@
 
 <PanelItem icon="industries" title="setores do mercado">
   <Beeswarm 
+    disabled={$isSwitchingLayout}
     bind:selected={$findustries} 
   />
 </PanelItem>

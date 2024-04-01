@@ -76,18 +76,20 @@ export class SimulationNode {
   private animation: AnimationControl;
 
   // Idle Props
-  private idlePropsTracker: IdleProperties[] = [];
+  private idlePropsTracker: IdleProperties[];
   private idleProps: IdleProperties;
   private idlePropsPrev: IdleProperties;
 
   // Selected
-  private onSelectedState: boolean;
-  private isSelected: boolean;
+  public onSelectedState: boolean;
+  public isSelected: boolean;
 
   constructor(simulation: Simulation, id: number, clientId?: number, projectId?: number) {
     this.simulation = simulation
 
     this.id = id
+
+    this.idlePropsTracker = []
 
     this.animation = { running: false }
 
@@ -122,7 +124,7 @@ export class SimulationNode {
     return this.isActive() === this.attr.renderable
   }
 
-  public setIdleProps = (idlePropsNew, hasLayoutChanged) => {
+  public setIdleProps = (idlePropsNew) => {
     // this.log("setIdleProps")
 
     // Check if new position is the same from the previous one
@@ -136,13 +138,16 @@ export class SimulationNode {
     }
 
     // If layout has changed
-    if (hasLayoutChanged || !this.tweenCoord) {
+    if (!this.tweenCoord) {
       const newTweenCoord = { ...idlePropsNew }
       delete newTweenCoord.active
       this.tweenCoord = newTweenCoord
     }
 
-    if (this.animation.running) {
+    if (this.idlePropsTracker.length === 0) {
+      this.idlePropsTracker.splice(0, 0, idlePropsNew, idlePropsNew)
+    }
+    else if (this.animation.running) {
       this.idlePropsTracker.splice(0, 0, idlePropsNew, <IdleProperties>this.animation.idleProps)
     }
     else {
@@ -154,6 +159,7 @@ export class SimulationNode {
     this.idleProps = idlePropsNew // Updates currentPos
     this.idlePropsPrev = this.idlePropsTracker[1] // Updates previousPos
 
+    this.log(this.idlePropsTracker)
 
 
     if (idlePropsNew.delay > 1) {
@@ -163,37 +169,31 @@ export class SimulationNode {
     // this.log(this.idlePropsTracker)
   }
 
-  public getScale = () => {
-    return get(complexityOn) ? this.getRef().complexity : 1
+  public getScale = (complexityOn) => {
+    return complexityOn ? this.getRef().complexity : 1
   }
 
-  public playSelected = () => {
-    this.log('selected')
-    
-    // This function only affects the selected node, 
-    // since the position from other nodes are set by the simulation
+  public toggleSelected = (selected) => {
+    this.isSelected = selected.id === this.id
 
-    if (!this.isSelected) {
-      return
+    const { attr, simulation, getScale } = this
+
+    if (this.isSelected) {
+      gsap.timeline({ overwrite: true })
+      .to(attr, {
+        alpha: 0,
+        scale: 2,
+        duration: .3,
+        ease: d3.easeQuadInOut
+      })
+      .set(attr, { scale: getScale(get(complexityOn)) })
     }
 
-    const { tlAttr, attr } = this
-
-    tlAttr
-      .tweenTo(1, { duration: .15 })
-      .then(() => {
-        tlAttr
-          .clear()
-          .to(attr, {
-            alpha: 0,
-            scale: 2,
-
-            duration: .3,
-            ease: c.easeExit,
-            onComplete: () => attr.scale = this.getScale()
-          })
-      })
+    if (!simulation.onSelectedState) {
+      
+    }
   }
+
 
   public makeChainedTimeline = (overwrite: string | boolean = true): gsap.core.Timeline => {
     const isRunning = this.animation.running
@@ -228,7 +228,6 @@ export class SimulationNode {
 
     return tl
   }
-
 
   public chainEntrance = () => {
     const { simulation, attr, tweenCoord, idleProps } = this
@@ -465,6 +464,8 @@ export class SimulationNode {
     // Move Existing -> Filter In
     const { simulation, tweenCoord, attr, idleProps, idlePropsPrev } = this
 
+    this.log(idleProps, idlePropsPrev)
+
     const { x, y, theta, radius, active, time } = idleProps
 
     const tl = this.makeChainedTimeline()
@@ -528,35 +529,33 @@ export class SimulationNode {
     return tl
   }
 
+  public playComplexity = (complexityOn: boolean) => {
+    this.log('complexity')
 
+    const { attr, getScale } = this
 
-  public playComplexity = () => {
-    // this.log('complexity')
+    const scale = getScale(complexityOn)
 
-    // const { tlAttr, attr } = this
-
-    // tlAttr
-    //   .progress(1)
-    //   .to(attr, { 
-    //     scale: this.getScale(), 
-
-    //     delay: Math.random() * .7,
-    //     duration: .3, 
-    //     ease: c.easeExit 
-    //   })
+    gsap.timeline({ overwrite: "auto" })
+    .to(attr, {
+      scale,
+      delay: Math.random() * .7,
+      duration: .3,
+      ease: d3.easeQuadInOut
+    })
   }
 
   public tick = () => {
     // Selected State & Selected Node
-    if (this.onSelectedState && this.isSelected) {
+    if (this.simulation.onSelectedState && this.isSelected) {
 
     }
     // Selected State & Non-Selected Node
-    else if (this.onSelectedState && !this.isSelected) {
+    else if (this.simulation.onSelectedState && !this.isSelected) {
       this.fx = undefined
       this.fy = undefined
-      this.attr.x = this.x
-      this.attr.y = this.y
+      this.attr.x = this.tweenCoord.x = this.x
+      this.attr.y = this.tweenCoord.y = this.y
     }
     // Other states
     else if (this.tweenCoord) {
@@ -586,19 +585,12 @@ export class SimulationNode {
 export class DummySimulationNode extends SimulationNode {
   public r: number;
 
-  public tl: gsap.core.Timeline;
-
   constructor(simulation: Simulation) {
     super(simulation, -1)
 
     this.fx = 0;
     this.fy = 0;
     this.r = 0;
-
-    this.tl = gsap.timeline()
-      .eventCallback('onUpdate', simulation.updateCollideRadius)
-      .pause()
-
   }
 
   public isActive = () => {
@@ -617,42 +609,46 @@ export class DummySimulationNode extends SimulationNode {
     return
   }
 
-  public playSwitchSelected = (stateSelectedOn: boolean) => {
-    // This is supposed to be called only when 
-    // the state selected is entered or exited
-    // State changes from one state to another that is not selected should not trigger it.
-    
-    if (stateSelectedOn && !this.tl.isActive()) {
-      this.tl
-        .restart()
-        .fromTo(this,
-          { 
-            fx: (<any>get(selected)).x, 
-            fy: (<any>get(selected)).y 
-          },
-          { 
-            fx: -get(cameraOffsetX), 
-            fy: -get(cameraOffsetY), 
-            duration: .300, 
-            ease: d3.easeCubicOut
-          })
-        .fromTo(this,
-          { r: 0 },
-          { 
-            r: Math.max(get(figureWidth), get(figureHeight)) * .4, 
-            duration: .150, 
-            ease: d3.easeCubicOut 
-          }, '<')
+  public toggleSelected = (selected) => {
+    const { onSelectedState, updateCollideRadius } = this.simulation
+
+    const tl = gsap.timeline({ 
+      overwrite: "auto",
+      onUpdate: updateCollideRadius
+    })
+
+
+    if (onSelectedState) {
+      const targetX = -get(cameraOffsetX)
+      const targetY = -get(cameraOffsetY)
+      const targetR = Math.max(get(figureWidth), get(figureHeight)) * .4
+      
+      tl
+      .fromTo(this, 
+        { 
+          fx: selected.x,
+          fy: selected.y,
+        },
+        {
+          fx: targetX,
+          fy: targetY,
+
+          duration: .3,
+          ease: d3.easeQuadInOut
+        }
+      )
+      .fromTo(this,
+        { r: 0 },
+        {
+          r: targetR,
+          duration: .15,
+          ease: d3.easeCubicInOut
+        }, "<")
+
     }
 
-    else if (!stateSelectedOn) {
-      this.tl
-        .clear()
-        .add(() => {
-          this.r = 0
-        })
-        .pause()
-      
+    else {
+      tl.set(this, { r: 0 })
     }
   }
 

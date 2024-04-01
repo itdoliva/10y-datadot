@@ -15,3 +15,5 @@ export const hoveredNode = writable()
 export const complexityOn = writable(false)
 export const linkClientOn = writable(false)
 export const linkProjectOn = writable(false)
+
+export const isSwitchingLayout = writable(false)

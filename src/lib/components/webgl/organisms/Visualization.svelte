@@ -61,7 +61,9 @@
   use:castContainer={{ context: root, hasMask: true, centered: false }}
 />
 
-<LayoutManager bind:layout />
+{#if $figureWidth + $figureHeight > 0}
+  <LayoutManager bind:layout />
+{/if}
 
 
 <style>

@@ -9,7 +9,7 @@
   import Link from '$lib/components/webgl/atoms/Link.svelte';
 
   // Stores
-  import { width, height, figureWidth, figureHeight, linkProjectOn, linkClientOn } from "$lib/stores/canvas";
+  import { width, height, figureWidth, figureHeight, complexityOn, linkProjectOn, linkClientOn } from "$lib/stores/canvas";
   import { cameraOffsetX, cameraOffsetY } from "$lib/stores/zoom";
   import { nodes, selected, sortBy, dataset, projects, clients, nodeSize, gap } from "$lib/stores/nodes"; 
 
@@ -41,18 +41,17 @@
   $: simulation.resorted($sortBy)
 
   // If data is filtered
-  $: if (
-    prevActiveIds.length !== $nodes.activeIds.length ||
-    d3.zip(prevActiveIds, $nodes.activeIds).some(([ a, b ]) => a !== b)
-  ) {
+  $: if (d3.zip(prevActiveIds, $nodes.activeIds).some(([ a, b ]) => a !== b)) {
     const isExclusion = prevActiveIds.length > $nodes.activeCount
     simulation.filtered(isExclusion)
-
     prevActiveIds = $nodes.activeIds
   }
 
   // When selected statement is triggered
-  $: simulation.toggleSelected($selected.active)
+  $: simulation.toggleSelected($selected)
+
+  // When toggle complexity
+  $: simulation.toggleComplexity($complexityOn)
 
 
 

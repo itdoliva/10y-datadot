@@ -8,12 +8,12 @@ import { dataset, nodes, nodeSize, gap, sortBy } from "../stores/nodes";
 import getPosBlock from "./getPosBlock";
 import getPosRadial from "./getPosRadial";
 import c from "../config/layout";
-import { figureHeight, figureWidth } from "../stores/canvas";
+import { figureHeight, figureWidth, isSwitchingLayout } from "../stores/canvas";
 
 import { Node, Nodes } from "../types/node"
 
 export type Layout = "radial" | "block";
-export type State = "idle" | "entrance" | "exit" | "filter-in" | "filter-out" | "selected" | "sort";
+export type State = "idle" | "entrance" | "exit" | "filter-in" | "filter-out" | "sort" | "selected" | "selected-out";
 
 export interface Command {
   layout: Layout;
@@ -35,6 +35,8 @@ export default class Simulation {
   public forceX;
   public forceY;
 
+  public onSelectedState: boolean;
+
 
   constructor(initLayout: Layout, initState: State) {
 
@@ -44,8 +46,6 @@ export default class Simulation {
     }
 
     this.inplaceIdleProps = false;
-
-    this.updateIdleProps()
 
     this.dummyNode = new DummySimulationNode(this);
 
@@ -71,9 +71,8 @@ export default class Simulation {
       .nodes(this.nodes)
       .on("tick", this.ticked)
 
+    this.updateIdleProps()
     this.playState()
-    
-
   }
 
   // PRIVATE
@@ -123,7 +122,7 @@ export default class Simulation {
 
       delete idleProps.id
 
-      node.setIdleProps(idleProps, false) // const hasLayoutChanged = false // this.command.layout !== layout
+      node.setIdleProps(idleProps) // const hasLayoutChanged = false // this.command.layout !== layout
     })
   }
 
@@ -156,38 +155,10 @@ export default class Simulation {
     return this.nodes.filter(d => d.projectId === projectId)
   }
 
-  public playState = (updateIdleProps=false) => {
-    console.log('playState:', this.command.state)
-
-    const { layout, state } = this.command
-
-    if (updateIdleProps) {
-      this.updateIdleProps()
-    }
-
-    if (!layout || !this.config) {
-      return
-    }
-
+  public toggleComplexity = (complexityOn: true) => {
     const targetNodes = this.nodes.slice(1)
 
-
-    if (state === "entrance") {
-      targetNodes.forEach((node) => node.chainEntrance())
-    }
-    else if (state === "exit") {
-      targetNodes.forEach((node) => node.chainExit())
-    }
-    else if (state === "filter-in") {
-      targetNodes.forEach((node) => node.chainFilterIn())
-    }
-    else if (state === "filter-out") {
-      targetNodes.forEach((node) => node.chainFilterOut())
-    }
-    else if (state === "sort") {
-      targetNodes.forEach((node) => node.chainSort())
-    }
-
+    targetNodes.forEach(node => node.playComplexity(complexityOn))
   }
 
   public getLayout(): Layout {
@@ -214,9 +185,11 @@ export default class Simulation {
 
     if (command.state !== "selected") {
       gsap.timeline({ overwrite: true })
+        .call(() => isSwitchingLayout.set(true))
         .set(command, { state: "exit", onComplete: playState })
         .set(command, { layout: newLayout, state: "entrance", delay, onComplete: playState, onCompleteParams: [ true ] })
         .set(command, { state: "idle", onComplete: playState, delay })
+        .call(() => isSwitchingLayout.set(false))
     }
     else {
       command.layout = newLayout
@@ -253,21 +226,63 @@ export default class Simulation {
 
   }
 
-  public toggleSelected(isSelectedActive) {
-    console.log('toggleSelected')
-    const { command, playState } = this
+  public playState = (updateIdleProps=false) => {
+    console.log('playState:', this.command.state)
 
-    if ( isSelectedActive ) {
-      gsap.set(command, { state: "selected", onComplete: playState, overwrite: true })
-      
-      this.dummyNode.playSwitchSelected(true)
+    const { layout, state } = this.command
+
+    if (updateIdleProps) {
+      this.updateIdleProps()
     }
-    else {
-      if ( command.state === "selected" ) {
-        gsap.set(command, { state: "idle", onComplete: playState, overwrite: true })
-      }
 
-      this.dummyNode.playSwitchSelected(false)
+    if (!layout || !this.config) {
+      return
+    }
+
+    const targetNodes = this.nodes.slice(1)
+
+
+    if (state === "entrance") {
+      targetNodes.forEach((node) => node.chainEntrance())
+    }
+    else if (state === "exit") {
+      targetNodes.forEach((node) => node.chainExit())
+    }
+    else if (state === "filter-in") {
+      targetNodes.forEach((node) => node.chainFilterIn())
+    }
+    else if (state === "filter-out") {
+      targetNodes.forEach((node) => node.chainFilterOut())
+    }
+    else if (state === "sort") {
+      targetNodes.forEach((node) => node.chainSort())
+    }
+
+  }
+
+  public playSelected = (selected) => {
+    this.nodes.forEach((node) => node.toggleSelected(selected))
+  }
+
+  public toggleSelected(selected) {
+    console.log('toggleSelected', selected)
+
+    this.onSelectedState = selected.active
+
+    const { command, onSelectedState, playState, playSelected } = this
+
+    const tl = gsap.timeline({ overwrite: true })
+
+    if ( onSelectedState ) {
+      tl
+      .set(command, { state: "selected", onComplete: playSelected, onCompleteParams: [ selected ] })
+    }
+    else if ( command.state === "selected" ) {
+      tl
+      .call(() => isSwitchingLayout.set(true))
+      .set(command, { state: "exit", onComplete: playState })
+      .set(command, { state: "entrance", onComplete: playState, delay: c.shifts })
+      .call(() => isSwitchingLayout.set(false))
     }
   }
 
