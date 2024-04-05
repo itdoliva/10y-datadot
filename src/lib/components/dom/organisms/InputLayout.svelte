@@ -1,25 +1,21 @@
 <script>
   // Components
 	import PanelItem from '$lib/components/dom/molecules/PanelItem.svelte';
-  import InputGroup from "$lib/components/dom/molecules/InputGroup.svelte";
+  import InputGroupLayout from "$lib/components/dom/molecules/InputGroupLayout.svelte";
 
   import { isSwitchingLayout } from "$lib/stores/canvas"
 
   export let layout
+  export let direction = "column"
   
-  const layoutCategories = [
-    { alias: "Block", id: "block" },
-    { alias: "Radial", id: "radial" },
-  ]
-
 </script>
 
-<PanelItem icon="layouts" title="visualizar como">
-  <InputGroup 
-    gridlayout="layout"
-    categories={layoutCategories} 
-    multiselect={false}
+<PanelItem icon="layouts" title="visualizar como" {direction}>
+
+  <InputGroupLayout 
+    {direction}
     disabled={$isSwitchingLayout}
     bind:selected={layout}
   />
+
 </PanelItem>

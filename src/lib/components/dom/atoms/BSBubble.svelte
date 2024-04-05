@@ -86,26 +86,26 @@
       }
 
       .label-background {
-        fill: var(--color-secondary);
+        fill: var(--clr-seconday);
       }
 
     }
 
     circle.outer-circle {
-      stroke: var(--color-accent);
+      stroke: var(--clr-accent);
       // fill: transparent;
       stroke-width: 1.5;
     }
 
     circle.inner-circle {
-      fill: var(--color-accent);
+      fill: var(--clr-accent);
     }
 
   }
 
   .bs-bubble:hover, .bs-bubble.active {
     circle.outer-circle {
-      fill: var(--color-accent);
+      fill: var(--clr-accent);
     }
 
     .text-content {

@@ -5,15 +5,17 @@
 
   // Components
 	import PanelItem from '$lib/components/dom/molecules/PanelItem.svelte';
-  import InputGroup from "$lib/components/dom/molecules/InputGroup.svelte";
+  import InputGroupGoal from "$lib/components/dom/molecules/InputGroupGoal.svelte";
+
+  export let nColumns = 1
+
 </script>
 
 <PanelItem icon="goals" title="objetivos do projeto">
-  <InputGroup 
-    gridlayout="goal"
+  <InputGroupGoal 
     categories={$categoriesEnriched.goals} 
-    direction='column' 
     disabled={$isSwitchingLayout}
+    {nColumns}
     bind:selected={$fgoals} 
   />
 </PanelItem>

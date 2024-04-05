@@ -2,11 +2,13 @@
   import App from "$lib/App.svelte";
   import "$lib/scss/global.scss";
   import { dataset, nodes, categories, projects, clients } from "$lib/stores/nodes"
-  import { width, height, pixelRatio } from "$lib/stores/canvas"
+  import { width, height, pixelRatio, app } from "$lib/stores/canvas"
+
+  import Pixi from "$lib/components/webgl/organisms/Pixi.svelte";
 
   export let data
 
-  console.log({ projects: data.projects, clients: data.clients })
+  // console.log({ projects: data.projects, clients: data.clients })
 
   clients.set(data.clients)
   projects.set(data.projects)
@@ -20,7 +22,10 @@
   bind:devicePixelRatio={$pixelRatio} 
 />
 
-{#if $nodes.length > 0}
+<!-- Background Canvas -->
+<Pixi bind:app={$app}/>
+
+{#if $nodes.length > 0 && $app}
   <App />
 {/if}
 

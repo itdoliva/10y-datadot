@@ -1,53 +1,76 @@
 <script>
-  import Icon
-  from "$lib/components/dom/atoms/Icon.svelte";
+  import Icon from "$lib/components/dom/atoms/Icon.svelte";
+  
   export let title
   export let icon = undefined
+  export let direction = "column"
+
 </script>
 
-<div class="panel-item-wrapper">
-  {#if icon}
-    <div class="icon">
-      <Icon {icon} />
+<div class="container {direction}">
+  <div class="panel-item">
+
+    {#if icon}
+      <div class="panel-item__icon">
+        <Icon {icon} />
+      </div>
+    {/if}
+
+    <h6 class="panel-item__title">{title}</h6>
+
+    <div class="panel-item__body">
+      <slot />
+
     </div>
-  {/if}
-
-  <h6 class="title">{title}</h6>
-
-  <div class="body">
-    <slot />
   </div>
 </div>
 
 <style lang="scss">
-  div.panel-item-wrapper {
-    display: grid;
+  div.container {
+    width: 100%;
+
+    display: flex;
     
-    grid-template-columns: 1.2rem 1fr;
-    grid-template-rows: max-content min-content;
-    grid-template-areas: 
-      "icon title"
-      "body body";
+    .panel-item {
+      
+      display: grid;
+      gap: .8rem;
 
-    gap: .8rem;
-  }
+      &__icon { grid-area: icon; }
+      &__title { grid-area: title; }
+      &__body { grid-area: body; }
 
-  .icon {
-    grid-area: icon;
-  }
-
-  .title {
-    grid-area: title;
-
-    align-self: center;
+      &__title {
+        align-self: center;
   
-    margin: 0;
-    font-size: var(--title-font-size);
-    font-weight: 500;
-  }
+        margin: 0;
+        font-size: var(--fs-title);
+        font-weight: 500;
+      }
+    }
 
-  .body {
-    grid-area: body;
+    &.column {
+      align-items: stretch;
+      width: 100%;
+
+      .panel-item {
+        grid-template-columns: 1.2rem 1fr;
+        grid-template-rows: max-content min-content;
+        grid-template-areas: 
+          "icon title"
+          "body body";
+      }
+    }
+
+    &.row {
+      justify-content: center;
+      
+      .panel-item {
+        grid-template-columns: 1.2rem max-content max-content;
+        grid-template-areas:
+          "icon title body";
+      }
+    }
   }
 
 

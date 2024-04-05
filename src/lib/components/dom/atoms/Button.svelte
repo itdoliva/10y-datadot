@@ -3,17 +3,12 @@
   export let disabled = false
 </script>
 
-<button
-  {disabled}
+<button 
+  class="clean-btn"
+  disabled={disabled} 
   on:click={onClick}
 >
-  {#if $$slots.text}
-    <slot />
-    <span><slot name="text"/></span>
-  {:else}
-    <span><slot /></span>
-	{/if}
-  
+  <slot />
 </button>
 
 <style lang="scss">
@@ -22,43 +17,35 @@
     height: 100%;
     padding: 0;
 
-
     display: flex;
     align-items: center;
     gap: .2rem;
 
-
-    font-family: var(--font-family);
-    font-size: var(--btn-font-size);
+    font-family: var(--ff-general);
+    font-size: var(--fs-btn);
     font-weight: 300;
 
-    outline: none;
-    background: none;
-    border: none;
+    color: var(--clr-accent);
+
+    white-space: nowrap;
+
     cursor: pointer;
-    color: var(--color-accent);
 
-    span {
-      font-family: inherit;
-      font-weight: inherit;
+    &:not(:disabled) {
+      &:active,
+      &:hover {
+        font-weight: 600;
+      }
 
-      text-decoration: underline;
-      
-      white-space: nowrap;
+      &:active {
+        color: #DCDEFE;
+      }
+    }
+
+    &:disabled {
+      color: #DCDEFE;
+      cursor: default;
     }
   }
 
-  button:not(:disabled):hover {
-    font-weight: 600;
-  }
-
-  button:not(:disabled):active {
-    font-weight: 600;
-    color: #DCDEFE;
-  }
-
-  button:disabled {
-    color: #DCDEFE;
-    cursor: default;
-  }
 </style>

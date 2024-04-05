@@ -39,7 +39,7 @@
 >
   <svg>
     <line x1=0 x2={w} y1={h/2} y2={h/2} stroke="black" stroke-dasharray="1 3"/>
-    <line x1=0 x2={$bw} y1={h/2} y2={h/2} stroke="var(--color-accent)" stroke-width=2/>
+    <line x1=0 x2={$bw} y1={h/2} y2={h/2} stroke="var(--clr-accent)" stroke-width=2/>
   </svg>
 </div>
 

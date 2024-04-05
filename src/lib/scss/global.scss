@@ -1,20 +1,26 @@
 @import url(./_fonts.scss);
 
 :root {
-  --title-font-size: 10.5px;
-  --item-font-size: 10px;
-  --btn-font-size: 10px;
-  --panel-text-transform: lowercase;
-  --font-family: 'Rational', 'sans-serif';
+  --fs-label: clamp(.625rem, .45rem + 1.25vw, 14px);
+  --fs-btn: var(--fs-label);
+  --fs-title: calc(var(--fs-label) * 1.05);
 
-  --color-black: #1C1C1C;
-  --color-accent: #818afa;
-  --color-accent-low: #DCDEFE;
-  --color-secondary: #CEFC6E;
+  --iw-title: max(1.2rem, 1rem + .25vw);
+
+  --ff-general: 'Rational', 'sans-serif';
+
+  --clr-white: #FFFFFF;
+  --clr-black: #1C1C1C;
+  --clr-black-fade-out: rgba(28, 28, 28, 0.75);
+  --clr-gray: cornflowerblue;
+  --clr-accent: #818afa;
+  --clr-accent-low: #DCDEFE;
+  --clr-accent-hover: #8D95FB;
+  --clr-seconday: #CEFC6E;
 }
 
 * {
-  font-family: var(--font-family);
+  font-family: var(--ff-general);
   font-weight: 300;
 }
 
@@ -36,8 +42,9 @@ body {
   margin: 0;
   padding: 0;
 
-  width: 100vw;
+  width: 100%;
   height: 100vh;
+  height: 100svh;
 
   -ms-overflow-style: none; /* for Internet Explorer, Edge */
   scrollbar-width: none; /* for Firefox */
@@ -62,10 +69,22 @@ ul {
   height: 8px;
   border-radius: 50%;
 
-  // background-color: var(--color-accent-low); /* ou que isso seja adicionado ao "caminho" da barra */
+  // background-color: var(--clr-accent-low); /* ou que isso seja adicionado ao "caminho" da barra */
 }
 
 /* Adiciona a barra arrastável */
 *::-webkit-scrollbar-thumb {
     background: black;
 }
+
+button.clean-btn {
+  outline: none;
+  background: none;
+  border: none;
+}
+
+
+
+  // -webkit-user-select: none; /* Safari */
+  // -ms-user-select: none; /* IE 10 and IE 11 */
+  // user-select: none; /* Standard syntax */

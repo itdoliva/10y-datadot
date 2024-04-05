@@ -1,54 +1,61 @@
 <script>
+  // DOM Elements
+  import Button from "$lib/components/dom/atoms/Button.svelte";
   import Icon from "$lib/components/dom/atoms/Icon.svelte";
+  
 
   let active = false
+
+  function onClick() {
+    active = !active
+  }
 </script>
 
-<button on:click={() => active = !active} class:active>
-  <Icon icon={active ? "pause" : "play"} />
-  <span>play my vis!</span>
-  <Icon icon="wireless" />
-</button>
+<Button {onClick}>
+  <div class="container" class:active>
+    <Icon icon={active ? "pause" : "play"} />
+    <span>play my vis!</span>
+    <Icon icon="wireless" />
+  </div>
+</Button>
 
 <style lang="scss">
-  button {
+
+  .container {
+    --icn-width: calc(var(--fs-label)*1.5);
+
     width: 100%;
     height: 100%;
 
-    display: grid;
-    grid-template-columns: 1rem 1fr 1rem;
-    align-items: center;
-    gap: .6rem;
     padding: 0 1rem;
 
-    outline: none;
-    border: none;
+    display: grid;
+    grid-template-columns: var(--icn-width) min-content var(--icn-width);
+    align-items: center;
+    gap: .6rem;
 
-    font-size: .75rem;
+    font-size: var(--fs-label);
     font-weight: 600;
     font-style: italic;
 
-    cursor: pointer;
-
-    background: black;
-    fill: var(--color-accent);
-    color: var(--color-accent);
+    background: var(--clr-black);
+    fill: var(--clr-accent);
+    color: var(--clr-accent);
 
     &.active {
-      background: var(--color-accent);
-      fill: black;
-      color: black;
+      background: var(--clr-accent);
+      fill: var(--clr-black);
+      color: var(--clr-black);
     }
 
-    &:not(.active):hover {
-      background: black;
-      fill: var(--color-accent-low);
-      color: var(--color-accent-low);
+    &:not(.active) {
+      &.hover {
+        background: var(--clr-black);
+        fill: var(--clr-accent-low);
+        color: var(--clr-accent-low);
+      }
     }
-
+    
   }
 
-  span {
-    white-space: nowrap;
-  }
 </style>

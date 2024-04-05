@@ -5,17 +5,18 @@
 
   // Components
 	import PanelItem from '$lib/components/dom/molecules/PanelItem.svelte';
-  import InputGroup from "$lib/components/dom/molecules/InputGroup.svelte";
+  import InputGroupProduct from "$lib/components/dom/molecules/InputGroupProduct.svelte";
 
   export let parent
+  export let nColumns = 1
 </script>
 
 <PanelItem icon="products" title="tipos de entrega">
-  <InputGroup
+  <InputGroupProduct
     parent={parent}
-    gridlayout="product"
     categories={$categoriesEnriched.products}
     disabled={$isSwitchingLayout}
+    {nColumns}
     bind:selected={$fproducts}
   />
 </PanelItem>

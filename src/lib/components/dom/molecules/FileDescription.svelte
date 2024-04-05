@@ -106,11 +106,11 @@
         width: 2.8rem;
         height: 2.8rem;
 
-        stroke: var(--color-black);
+        stroke: var(--clr-black);
         stroke-width: 1.15px;
 
         &:hover {
-          stroke: var(--color-accent);
+          stroke: var(--clr-accent);
           stroke-width: 1.5px;
         }
       }
