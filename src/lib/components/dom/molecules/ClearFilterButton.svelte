@@ -6,12 +6,21 @@
   export let disabled
 </script>
 
-<Button {onClick} {disabled}>
-  <span>selecionar tudo</span>
+<Button {onClick} {disabled}
+  colorDefault="var(--clr-accent)"
+  colorActive="var(--clr-accent)"
+  colorHover="var(--clr-accent)"
+  colorDisabled="var(--clr-accent-low)"
+>
+  <p class:disabled={disabled}>selecionar tudo</p>
 </Button>
 
 <style lang="scss">
-  span {
+  p {
     text-decoration: underline;
+
+    &:not(.disabled):hover {
+      font-weight: 700;
+    }
   }
 </style>

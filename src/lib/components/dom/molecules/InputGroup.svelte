@@ -1,34 +1,24 @@
 <script>
   // Stores
-  import { app, hoveredFilter } from '$lib/stores/canvas.js';
+  import { hoveredFilter } from '$lib/stores/canvas.js';
 
   // DOM Components
   import ClearFilterButton from "$lib/components/dom/molecules/ClearFilterButton.svelte";
   import BarTween from "$lib/components/dom/atoms/BarTween.svelte";
 	import CheckIcon from '$lib/components/dom/atoms/CheckIcon.svelte';
   import NumberTween from '$lib/components/dom/atoms/NumberTween.svelte';
-  import Icon from '$lib/components/dom/atoms/Icon.svelte';
-  
-  // WEBGL Components
-  import Bubble from '$lib/components/webgl/atoms/Bubble.svelte';
-  import Graphics from '$lib/components/webgl/atoms/Graphics.svelte';
-
-  // Actions
-  import castContainer from "$lib/actions/castContainer"
-
-  // Functions
-  import templates from "$lib/templates"
-
 
   export let categories
   export let selected = []
   export let multiselect = true
   export let unselectBtn = multiselect
   export let disabled = false
+  export let onDark = false
 
   export let gridlayout = 'simple'
 
   export let direction = 'row'
+
 
 
 </script>
@@ -48,6 +38,7 @@
 
           <div class="item__check">
             <CheckIcon 
+              {onDark}
               active={active} 
               hoveredFilter={$hoveredFilter === id} 
             />
@@ -60,7 +51,7 @@
           {:else}
             <input type="radio" value={id} {disabled} bind:group={selected}/>
           {/if}
-            <span>{alias}</span>
+            <span class:on-dark={onDark}>{alias}</span>
           </div>
 
 
@@ -98,6 +89,8 @@
     display: grid;
     gap: 0;
 
+    width: 100%;
+
     .input-group {
       display: grid;
 
@@ -130,6 +123,7 @@
           &_number {
             text-align: right;
           }
+
         }
 
         &.active {
@@ -161,6 +155,7 @@
 
     &.column {
       grid-auto-flow: row;
+      grid-template-columns: max-content;
 
       .input-group {
         grid-auto-flow: row;
@@ -181,6 +176,7 @@
     }
 
     &.design {
+      grid-template-columns: none;
       .input-group {
         &__item {
           .item {

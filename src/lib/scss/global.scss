@@ -13,14 +13,14 @@
   --clr-white: #FFFFFF;
   --clr-black: #1C1C1C;
   --clr-black-fade-out: rgba(28, 28, 28, 0.5);
-  --clr-gray: cornflowerblue;
+  --clr-gray: #c7c7c7;
   --clr-accent: #818afa;
   --clr-accent-low: #DCDEFE;
   --clr-accent-hover: #8D95FB;
   --clr-seconday: #CEFC6E;
   
   @include md {
-      --fs-label: max(.625rem, .15rem + .45vw);
+    --fs-label: max(.625rem, .15rem + .45vw);
   }
 }
 
@@ -87,6 +87,10 @@ button.clean-btn {
   outline: none;
   background: none;
   border: none;
+}
+
+.on-dark {
+  color: var(--clr-white);
 }
 
 

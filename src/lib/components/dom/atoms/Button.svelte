@@ -1,11 +1,20 @@
 <script>
   export let onClick
   export let disabled = false
+
+  export let colorDefault = "var(--clr-accent)"
+  export let colorActive = "var(--clr-white)"
+  export let colorHover = "var(--clr-white)"
+  export let colorDisabled = "var(--clr-gray)"
 </script>
 
 <button 
   class="clean-btn"
-  disabled={disabled} 
+  disabled={disabled}
+  style:--clr-default={colorDefault}
+  style:--clr-active={colorActive}
+  style:--clr-hover={colorHover}
+  style:--clr-disabled={colorDisabled}
   on:click={onClick}
 >
   <slot />
@@ -25,25 +34,24 @@
     font-size: var(--fs-btn);
     font-weight: 300;
 
-    color: var(--clr-accent);
+    color: var(--clr-default);
 
     white-space: nowrap;
 
     cursor: pointer;
 
     &:not(:disabled) {
-      // &:active,
-      // &:hover {
-      //   font-weight: 600;
-      // }
-
       &:active {
-        color: #DCDEFE;
+        color: var(--clr-active) !important;
+      }
+
+      &:hover {
+        color: var(--clr-hover);
       }
     }
 
     &:disabled {
-      color: #DCDEFE;
+      color: var(--clr-disabled);
       cursor: default;
     }
   }

@@ -1,9 +1,16 @@
 <script>
-  import App from "$lib/App.svelte";
+  // Libraries
+  import { onMount } from "svelte";
+
+  // Files
   import "$lib/scss/global.scss";
+  
+  // Stores
   import { dataset, nodes, categories, projects, clients } from "$lib/stores/nodes"
   import { width, height, pixelRatio, app } from "$lib/stores/canvas"
-
+  
+  // Components
+  import App from "$lib/App.svelte";
   import Pixi from "$lib/components/webgl/organisms/Pixi.svelte";
 
   export let data
@@ -14,6 +21,7 @@
   projects.set(data.projects)
   categories.set(data.categories)
   dataset.set(data.nodes)
+
 </script>
 
 <svelte:window
@@ -21,6 +29,11 @@
   bind:innerHeight={$height} 
   bind:devicePixelRatio={$pixelRatio} 
 />
+
+
+<svelte:head>
+  <title>10 anos • datadot design studio</title>
+</svelte:head>
 
 <!-- Background Canvas -->
 <Pixi bind:app={$app}/>

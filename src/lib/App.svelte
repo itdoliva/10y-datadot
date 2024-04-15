@@ -121,6 +121,7 @@
   
 
   {:else}
+
   <header class="top-container">
     <section class="input-product" 
       class:collapsed={isTopMenuCollapsed} 
@@ -155,7 +156,12 @@
       <li class="panel-menu__item collapse-btn no-border">
         <div class="collapse-btn__wrapper">
           <div class="rotate" class:collapsed={isTopMenuCollapsed}>
-            <Button onClick={toggleTopMenuCollapse}>
+            <Button 
+              onClick={toggleTopMenuCollapse}
+              colorDefault="var(--clr-white)"
+              colorHover="var(--clr-accent)"
+              colorActive="var(--clr-accent-low)"
+            >
               <Icon icon="collapse"/>
             </Button>
           </div>
@@ -195,59 +201,6 @@
 
 
   {/if}
-  <!-- <div class="pa-container">
-
-    <ul class="pitems-wrapper pa-wrapper">
-      <li>
-        <InputLayout bind:layout />
-      </li>
-    
-      <li>
-        <InputPeriod /> 
-      </li>
-    
-      <li>
-        <InputDesign />
-      </li>
-    
-      <li>
-        <InputGoal />
-      </li>
-    
-      <li>
-        <InputIndustry />
-      </li>
-    </ul>
-
-  </div> -->
-  <!-- <div class="pb-container">
-    
-    <div class="pb-wrapper">
-
-      <ul>
-        <li class="pitems-wrapper" class:collapsed={isTopMenuCollapsed} use:castContainer={{ context: productContainer, hasMask: true }} >
-          <InputProduct parent={productContainer} />
-        </li>
-
-        <li class="pmenu-wrapper">
-          <PanelMenu />
-        </li>
-
-      </ul>
-
-      <div 
-        class="button-wrapper"
-      >
-        <button class:collapsed={isTopMenuCollapsed} on:click={toggleTopMenuCollapse}>
-          <Icon icon="collapse"/>
-        </button>
-      </div>
-    </div>
-  </div> -->
-  <!-- <div class="viz-container">
-      <Visualization bind:layout />
-      <File />
-    </div> -->
 </div>
 
 
@@ -498,10 +451,12 @@
               top: 100%;
               transform: translate(0, -50%);
               
-              width: calc(3.6*var(--fs-label));
+              width: calc(2.6*var(--fs-label));
               
               .rotate {
                 transition: transform .15s ease-in-out;
+                transform: rotate(0);
+                transform-origin: center;
 
                 &.collapsed {
                   transform: rotate(180deg);

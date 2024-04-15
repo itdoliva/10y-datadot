@@ -7,8 +7,6 @@
   // Stores
 	import { lineWidth } from '$lib/stores/nodes.js';
 
-
-
   export let x
   export let y
   export let r

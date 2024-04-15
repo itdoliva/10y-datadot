@@ -120,7 +120,7 @@
 
         <defs>
           <filter x="0" y="0" width="1" height="1" id="text-bg">
-            <feFlood flood-color="#CEFC6E" result="bg" />
+            <feFlood flood-color="var(--clr-accent-low)" result="bg" />
             <feMerge>
               <feMergeNode in="bg"/>
               <feMergeNode in="SourceGraphic"/>

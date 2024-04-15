@@ -23,7 +23,41 @@
 
 </script>
 
-<Button {disabled} onClick={clearFilters}>
-  X 
-  <span style:text-decoration="underline">LIMPAR FILTROS</span>
+<Button {disabled} onClick={clearFilters}
+  colorDefault="var(--clr-accent)"
+  colorActive="var(--clr-accent)"
+  colorHover="var(--clr-accent)"
+  colorDisabled="var(--clr-accent-low)"
+>
+  <div class:disabled={disabled}>
+    <p>
+      X 
+      <span style:text-decoration="underline">LIMPAR FILTROS</span>
+    </p>
+  </div> 
+  
 </Button>
+
+<style lang="scss">
+  div {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: center;
+    align-items: center;
+
+    p {
+      span {
+        font-weight: inherit;
+      }
+    }
+
+    &:not(.disabled):hover {
+
+      p {
+        font-weight: 700;
+      }
+    }
+  }
+</style>

@@ -27,6 +27,7 @@
     categories={featCategories}
     multiselect={true}
     unselectBtn={false}
+    onDark={true}
     bind:selected={activeFeatures}
   />
 </DropdownMenu>

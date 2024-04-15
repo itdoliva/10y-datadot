@@ -1,55 +1,116 @@
 <script>
-  export let size = 10
-  export let strokewidth = 1
   export let active = false
   export let hoveredFilter = false
+  export let onDark = false
 
   export let backgroundColor = undefined
 
-  const lineprop = .35
+  let size
+  
 </script>
 
-<svg 
-  style:--size={size + "px"}
-  width={size}
-  height={size}
-  viewBox="0 0 {size} {size}"
->
-  <g transform="translate({size/2}, {size/2})">
+<div class="container check-icon" bind:clientWidth={size}>
+  {#if size}
+    <svg 
+      width={size} 
+      height={size} 
+      viewBox="0 0 {size} {size}"
+      class:active={active}
+      class:hovered={!active && hoveredFilter}
+      class:on-dark={onDark}
+    >
 
-    {#if backgroundColor}
-      <circle 
-        r=8
-        fill={backgroundColor}
-      />
-    {/if}
+      <g class="check" transform="translate({size/2}, {size/2})">
 
+        {#if backgroundColor}
+          <circle class="check__goal" fill={backgroundColor} />
+        {/if}
 
-    <circle
-      class="main"
-      fill={active ? "black" : hoveredFilter ? "#8D95FB" : "transparent"}
-      stroke="black"
-      stroke-width={strokewidth}
-      r={(size-2*strokewidth)/2}
-    />
+        <circle class="check__point" />
+        <circle class="check__main" />
 
-    {#if active}
-      <line x1={-size*lineprop} x2={size*lineprop} y1=0 y2=0 stroke="#8D95FB" stroke-width=1.5/>
-    {:else if !hoveredFilter}
-      <circle r=1 />
-    {/if}
+        {#if active}
+          <line class="check__minus" x1={-size*.35} x2={size*.35} y1=0 y2=0 />
+        {/if}
 
-  </g>
-</svg>
+      </g>
+
+    </svg>
+  {/if}
+</div>
 
 <style lang="scss">
-  svg {
-    width: var(--size);
-    height: var(--size);
+  .container {
+    width: var(--fs-label);
+    display: flex;
+    flex-direction: center;
+    align-items: center;
 
-    margin: 0;
-    padding: 0;
-    
-    overflow: visible;
+    svg {
+      --clr-outline: var(--clr-black);
+      --clr-fill-selected: var(--clr-black);
+      --clr-fill-hover: var(--clr-accent);
+      --clr-minus: var(--clr-accent);
+
+      width: 100%;
+      aspect-ratio: 1;
+  
+      margin: 0 auto;
+      padding: 0;
+      
+      overflow: visible;
+
+      &.on-dark {
+        --clr-outline: var(--clr-accent);
+        --clr-fill-selected: var(--clr-accent);
+        --clr-fill-hover: var(--clr-accent);
+        --clr-minus: var(--clr-black);
+      }
+
+      .check {
+
+        &__goal {
+          r: calc(.8*var(--fs-label));
+        }
+
+        &__point {
+          r: calc(.1*var(--fs-label));
+          fill: var(--clr-outline);
+        }
+
+        &__main {
+          fill: transparent;
+          stroke: var(--clr-outline);
+          r: calc(.4*var(--fs-label));
+          stroke-width: calc(.1*var(--fs-label));
+        }
+        &__minus {
+          stroke: var(--clr-minus);
+          stroke-width: calc(.2*var(--fs-label));
+        }
+
+      }
+
+      &.active {
+        .check {
+          &__main {
+            fill: var(--clr-fill-selected);
+          }
+
+        }
+      }
+
+      &.hovered {
+        .check {
+          &__main {
+            fill: var(--clr-fill-hover);
+          }
+        }
+      }
+
+
+      
+  
+    }
   }
 </style>

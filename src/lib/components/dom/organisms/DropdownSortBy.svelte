@@ -17,6 +17,7 @@
     direction="column"
     categories={sortCategories}
     multiselect={false}
+    onDark={true}
     bind:selected={$sortBy}
   />
 </DropdownMenu>

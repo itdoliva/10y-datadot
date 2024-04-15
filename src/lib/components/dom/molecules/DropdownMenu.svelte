@@ -46,11 +46,12 @@
     width: 100%;
     height: 100%;
 
+
     .button {
       padding: 0 1rem;
 
       display: grid;
-      grid-template-columns: min-content 1fr;
+      grid-template-columns: max-content max-content;
       align-items: center;
 
       width: 100%;
@@ -84,7 +85,9 @@
       left: -1px;
       top: 100%;
       background-color: hsla(0, 0%, 100%, .9);
-      border: 1px solid black;        
+      border: 1px solid var(--clr-black);
+
+      background: var(--clr-black);
       
       pointer-events: none;
       opacity: 0;
