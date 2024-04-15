@@ -1,56 +1,44 @@
 <script>
+  // Libraries
   import { onMount } from "svelte";
   import { tweened } from "svelte/motion";
+  import * as d3 from "d3"
+
+  // Stores
+	import { lineWidth } from '$lib/stores/nodes.js';
+
 
 
   export let x
   export let y
   export let r
-  export let pct
-  export let label
+  export let tweenDelay
+  export let percentage
+  export let alias
   export let fill = 'transparent'
   export let active
-  export let onClick
 
-  const r_t = tweened(r, { duration: 150 })
+  const r_t = tweened(r, { duration: 300, delay: tweenDelay, ease: d3.easeQuadInOut })
 
   $: $r_t = r
 
 </script>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<g 
-  class="bs-bubble" 
-  class:active
-  transform="translate({x}, {y})"
-  on:click={onClick}
->
+<g class="bs-bubble" class:active transform="translate({x}, {y})">
 
-  <circle class="outer-circle" r={$r_t} fill={fill} />
-  <circle class="inner-circle" r=3 />
+  <circle class="circle outer" r={$r_t} {fill} stroke-width={$lineWidth} />
+  <circle class="circle inner" r={2.4*$lineWidth} />
 
-  <g class="text-content" font-size="1rem">
+  <g class="text" font-size="1rem">
 
-    {#if pct > 0}
-    <text 
-      class="pct" 
-      text-anchor="middle" 
-      dominant-baseline="middle"
-      dy="-.15em"
-    >
-      {Math.round(pct*100)}%
-    </text> 
+    {#if percentage > 0}
+      <text class="text__percentage" text-anchor="middle" dominant-baseline="middle" dy="-.15em">
+        {Math.round(percentage*100)}%
+      </text> 
     {/if}
 
-    <text 
-      class="label" 
-      text-anchor="middle" 
-      dominant-baseline="middle"
-      dy="1.35em"
-      filter="url(#text-bg)"
-    >
-      {label}
+    <text class="text__alias" text-anchor="middle" dominant-baseline="middle" dy="1.35em" filter="url(#text-bg)">
+      {alias}
     </text>
 
 
@@ -61,11 +49,19 @@
 <style lang="scss">
   .bs-bubble {
 
-    circle {
+    .circle {
       z-index: 0;
+
+      &.outer {
+        stroke: var(--clr-accent);
+      }
+
+      &.inner {
+        fill: var(--clr-accent);
+      }
     }
 
-    .text-content {
+    .text {
       z-index: 1;
       -webkit-user-select: none; /* Safari */
       -ms-user-select: none; /* IE 10 and IE 11 */
@@ -75,41 +71,32 @@
 
       opacity: 0;
 
-      .pct {
+      &__percentage {
         font-weight: 700;
+        font-size: calc(2*var(--fs-label));
       }
 
-      .label {
+      &__alias {
         text-transform: lowercase;
-        font-size: .6rem;
+        font-size: var(--fs-label);
         font-weight: 500;
       }
 
-      .label-background {
-        fill: var(--clr-seconday);
+    }
+
+    &:hover, &.active {
+      .circle {
+        &.outer {
+          fill: var(--clr-accent);
+        }
       }
 
+      .text {
+        opacity: 1;
+      }
     }
 
-    circle.outer-circle {
-      stroke: var(--clr-accent);
-      // fill: transparent;
-      stroke-width: 1.5;
-    }
-
-    circle.inner-circle {
-      fill: var(--clr-accent);
-    }
 
   }
 
-  .bs-bubble:hover, .bs-bubble.active {
-    circle.outer-circle {
-      fill: var(--clr-accent);
-    }
-
-    .text-content {
-      opacity: 1;
-    }
-  }
 </style>

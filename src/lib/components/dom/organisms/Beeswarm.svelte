@@ -5,7 +5,7 @@
   import textures from "textures";
 
   // Stores
-  import { categoriesEnriched, nodeSize } from "$lib/stores/nodes";
+  import { categoriesEnriched, nodeSize, lineWidth } from "$lib/stores/nodes";
 
   // DOM Components
   import ClearFilterButton from "$lib/components/dom/molecules/ClearFilterButton.svelte";
@@ -22,27 +22,31 @@
 
   const texture = textures
     .circles()
-    .size(10)
-    .radius(1)
+    .size($nodeSize/2)
+    .radius($lineWidth)
     .complement()
     .fill("#818afa")
 
+  const forceCollide = d3.forceCollide().strength(.6)
+
+  const simulation = d3.forceSimulation()
+    .alphaTarget(0.3) // stay hot
+    .velocityDecay(0.25) // low friction
+    .force("center", d3.forceCenter(0, 0))
+    .force("charge", d3.forceManyBody().strength(30))
+    .force("collide", forceCollide)
+  
 
   $: areaScale = d3.scaleLinear()
     .domain([0, 1])
     .range([0, 20000 * ($nodeSize/10)])
 
-  $: rScale = (v) => {
-    return Math.sqrt(areaScale(v)/(2*Math.PI)) + 5
-  }
-    
-  const collideRadius = (d) => {
-    return rScale(d.pctNodes) + 5
-  }
+  $: rScale = (v) => Math.sqrt(areaScale(v)/(2*Math.PI)) + 5
 
-  const forceCollide = d3.forceCollide()
-    .radius(collideRadius)
-    .strength(.6)
+  $: collideRadius = (d) => rScale(d.pctNodes) + 5
+
+  $: forceCollide.radius(collideRadius)
+
 
 
   onMount(() => {
@@ -51,24 +55,14 @@
 
     simulationNodes = $categoriesEnriched.industries.map((d, i, arr) => ({
       ...d,
-      x: (w * i/(arr.length-1)) + w * (-.2 + Math.random()*.4), 
-      y: (h * i/(arr.length-1)) + h * (-.2 + Math.random()*.4),
+      x: getRandomAxisPosition(i, arr.length, w),
+      y: getRandomAxisPosition(i, arr.length, h),
       r: rScale(d.pctNodes),
     }))
 
-    simulationNodes.tick = 0
-
-    d3.forceSimulation()
-      .alphaTarget(0.3) // stay hot
-      .velocityDecay(0.25) // low friction
-      .force("center", d3.forceCenter(0, 0))
-      .force("charge", d3.forceManyBody().strength(30))
-      .force("collide", forceCollide)
+    simulation
       .nodes(simulationNodes)
-      .on("tick", () => {
-        simulationNodes.tick += .0001
-        simulationNodes = [...simulationNodes]
-      })
+      .on("tick", () => simulationNodes = [...simulationNodes])
 
     forceCollide.radius(collideRadius)
 
@@ -83,29 +77,32 @@
       simulationNode.pctNodes = industry.pctNodes
     })
 
-    simulationNodes.tick += .001
-
     forceCollide.radius(collideRadius)
+  }
+
+
+  function getRandomAxisPosition(i, nNodes, size) {
+    return (size * i/(nNodes-1)) + size * (-.2 + Math.random() * .4)
   }
 
   
   function toggle(id) {
-    if (disabled) {
-      return
-    }
+    if (disabled) return
     
     if (selected.includes(id)) {
       const index = selected.indexOf(id)
       selected.splice(index, 1)
-    } else {
+    } 
+    else {
       selected.push(id)
     }
+
     selected = [...selected]
 
     forceCollide.radius(collideRadius)
   }
 
-  function sortNodes(id) {
+  function bringToFront(id) {
     simulationNodes = [
       ...simulationNodes.filter(d => d.id !== id),
       simulationNodes.find(d => d.id === id)
@@ -116,7 +113,7 @@
 </script>
 
 
-<div class="beeswarm-wrapper">
+<div class="container beeswarm">
   <div class="svg-wrapper" bind:clientWidth={w} bind:clientHeight={h}>
     <svg bind:this={svg}>
       {#if w && h && simulationNodes}
@@ -132,23 +129,21 @@
         </defs>
 
         <g class="chart" transform="translate({w/2}, {h/2})">
-          {#each simulationNodes as { x, y, r, pctNodes, id, alias } (id)}
-          <!-- svelte-ignore a11y-mouse-events-have-key-events -->
-          <!-- svelte-ignore a11y-no-static-element-interactions -->
-          <g on:mouseover={() => sortNodes(id)}>
-            <BSBubble 
-              x={x} 
-              y={y} 
-              r={r} 
-              pct={pctNodes}
-              label={alias}
-              fill={texture.url()}
-              active={selected.includes(id)}
-              onClick={() => toggle(id)}
-            />
+          {#each simulationNodes as { id, x, y, r, pctNodes, alias }, i (id)}
+          {@const fill = texture.url()}
+          {@const active = selected.includes(id)}
+          {@const tweenDelay = i * 15}
+            <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <g 
+              on:mouseover={() => bringToFront(id)}
+              on:click={() => toggle(id)}
+            >
+              <BSBubble {x} {y} {r} {tweenDelay} percentage={pctNodes} {alias} {fill} {active} />
+            </g>
+            {/each}
           </g>
-          {/each}
-        </g>
         {/if}
       </svg>
   </div>
@@ -160,9 +155,8 @@
 </div>
 
 <style lang="scss">
-  .beeswarm-wrapper {
-    aspect-ratio: 1.71;
-
+  .container {
+    aspect-ratio: .91;
     display: grid;
     grid-template-rows: 1fr min-content;
   }
