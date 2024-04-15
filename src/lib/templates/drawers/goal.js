@@ -38,7 +38,7 @@ export function goalTemplateFactory(goalId) {
       .then(asset => new PIXI.Sprite(asset))
   
     sprite.anchor.set(...anchor)
-    sprite.scale.set(get(pixelRatio) / 2)
+    sprite.scale.set(get(nodeSize) / 25)
     sprite.tint = new PIXI.Color(goal.color).toNumber()
     sprite.blendMode = PIXI.BLEND_MODES.MULTIPLY
 
