@@ -105,6 +105,7 @@ export class SimulationNode {
 
 
   public log = (...args: any[]) => {
+    return
     return this.id === 0 ? console.log(...args) : undefined
   }
 
@@ -610,11 +611,11 @@ export class DummySimulationNode extends SimulationNode {
   }
 
   public toggleSelected = (selected) => {
-    const { onSelectedState, updateCollideRadius } = this.simulation
+    const { onSelectedState, updateForceCollideRadius } = this.simulation
 
     const tl = gsap.timeline({ 
       overwrite: "auto",
-      onUpdate: updateCollideRadius
+      onUpdate: updateForceCollideRadius
     })
 
 

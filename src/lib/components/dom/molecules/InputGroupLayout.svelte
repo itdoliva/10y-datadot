@@ -145,7 +145,7 @@
       .input-group {
         grid-auto-flow: column;
         grid-auto-columns: 1fr;
-        gap: .25rem;
+        gap: calc(1.2*var(--fs-label));
 
         &__item {
           .item {

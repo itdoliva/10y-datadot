@@ -1,24 +1,37 @@
-import randomDensity from "$lib/utility/randomDensity"
-import layoutConfig from "$lib/config/layout"
+// Functions
+import randomDensity from "../utility/randomDensity"
+
+// Files
+import layoutConfig from "../config/layout"
+
+// Types
+import { Node, Nodes } from "../types/node"
+import { Dimensions, BlockConfigData, LayoutConfig } from "./interfaces";
+
 
 const { 
   fullColEntranceMaxDuration,
   colEntranceUpTo,
 } = layoutConfig
 
-export default function getPosBlock(nodes, dimensions) {
+
+export default function getPosBlock(nodes: Nodes, dimensions: Dimensions): [ any, LayoutConfig ] {
   const config = computeConfig(nodes.activeCount, dimensions)
   const posDataset = makePositionDataset(nodes.filter(d => d.active), dimensions, config)
 
   return [ posDataset, config ]
 }
 
-function makePositionDataset(nodes, { fw, fh, nodeSize, gap }, { rows, columns, padding }) {
+function makePositionDataset(nodes: Node[], dimensions: Dimensions, config: LayoutConfig) {
+  const { fw, fh, nodeSize, gap } = dimensions
+  const { padding } = config
+  const { rows, columns } = <BlockConfigData>config.data
+
   // The calculation below support block entrance animation
   const columnDensities = randomDensity(columns)
   const timeStepByRow = +(fullColEntranceMaxDuration / rows).toFixed(4)
 
-  const getTime = (colIndex, rowIndex) => (
+  const getTime = (colIndex: number, rowIndex: number): number => (
     columnDensities[colIndex] * colEntranceUpTo + // column delay
     timeStepByRow * rowIndex // row delay
   )
@@ -41,7 +54,8 @@ function makePositionDataset(nodes, { fw, fh, nodeSize, gap }, { rows, columns, 
   })
 }
 
-function computeConfig(nActiveNodes, { nodeSize, gap, fw, fh }) {
+function computeConfig(nActiveNodes: number, dimensions: Dimensions) {
+  const { nodeSize, gap, fw, fh } = dimensions
   const aspectRatio = fw / fh
 
   let rows = Math.ceil(Math.sqrt(nActiveNodes / aspectRatio))
@@ -74,8 +88,7 @@ function computeConfig(nActiveNodes, { nodeSize, gap, fw, fh }) {
   const extent = extentX.map((_, i) => [ extentX[i], extentY[i] ])
 
   return {
-    rows,
-    columns,
+    data: { rows, columns },
     padding,
     extent,
   }

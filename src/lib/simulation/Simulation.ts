@@ -1,15 +1,24 @@
+// Libraries
 import * as d3 from "d3";
 import { gsap } from "gsap";
 import { get } from "svelte/store";
 
+// Classes
 import { SimulationNode, DummySimulationNode } from "./SimulationNode";
-import { dataset, nodes, nodeSize, gap, sortBy } from "../stores/nodes";
+import ZoomController from "./ZoomController";
 
-import getPosBlock from "./getPosBlock";
-import getPosRadial from "./getPosRadial";
-import c from "../config/layout";
+// Stores
+import { dataset, nodes, nodeSize, gap, sortBy } from "../stores/nodes";
 import { figureHeight, figureWidth, isSwitchingLayout } from "../stores/canvas";
 
+// Functions
+import getPosBlock from "./getPosBlock";
+import getPosRadial from "./getPosRadial";
+
+// Files
+import c from "../config/layout";
+
+// Types
 import { Node, Nodes } from "../types/node"
 
 export type Layout = "radial" | "block";
@@ -25,6 +34,10 @@ export default class Simulation {
   public dummyNode: DummySimulationNode;
   private nodes: SimulationNode[];
 
+  // ZoomController account for defining the zoomTranslateExtent
+  // whenever a new Layout is calculated
+  private zoomController: ZoomController; 
+
   public command: Command;
   public config;
   
@@ -38,12 +51,14 @@ export default class Simulation {
   public onSelectedState: boolean;
 
 
-  constructor(initLayout: Layout, initState: State) {
+  constructor(initLayout: Layout, initState: State, zoomController: ZoomController) {
 
     this.command = {
       layout: initLayout,
       state: initState
     }
+
+    this.zoomController = zoomController;
 
     this.inplaceIdleProps = false;
 
@@ -77,7 +92,7 @@ export default class Simulation {
 
   // PRIVATE
   private forceCollideRadius = (node: SimulationNode) => {
-    console.log('*forceCollideRadius')
+    // console.log('*forceCollideRadius')
     return node.getRadius()
   }
 
@@ -86,7 +101,7 @@ export default class Simulation {
   }
 
   private getDimensions = () => {
-    console.log('*getDimensions')
+    // console.log('*getDimensions')
     return {
       fw: get(figureWidth),
       fh: get(figureHeight),
@@ -95,8 +110,8 @@ export default class Simulation {
     }
   }
 
-  private updateIdleProps = () => {
-    console.log('*updateIdleProps')
+  private updateIdleProps = () => { //{ curNodes, sortBy, dimensions }
+    // console.log('*updateIdleProps')
     const nodes_ = <Nodes>get(nodes)
     const groupBy = get(sortBy)
     const dimensions = this.getDimensions()
@@ -124,34 +139,36 @@ export default class Simulation {
 
       node.setIdleProps(idleProps) // const hasLayoutChanged = false // this.command.layout !== layout
     })
+
+    this.zoomController.translateExtent(config.extent)
   }
 
 
 
   // PUBLIC
-  public updateCollideRadius = () => {
-    console.log('updateCollideRadius')
+  public updateForceCollideRadius = () => {
+    // console.log('updateForceCollideRadius')
     this.forceCollide.radius(this.forceCollideRadius)
   }
 
-  public updateCoordPos = (xPos: number, yPos: number) => {
-    console.log('updateCoordPos')
+  public updateForceXY = (xPos: number, yPos: number) => {
+    // console.log('updateForceXY')
     this.forceX.x(xPos)
     this.forceY.y(yPos)
   }
 
   public getNodeById = (id: number) => {
-    console.log('getNodeById')
+    // console.log('getNodeById')
     return this.nodes.find(d => d.id === id)
   }
 
   public getNodesByClientId = (clientId: number) => {
-    console.log('getNodesByClientId')
+    // console.log('getNodesByClientId')
     return this.nodes.filter(d => d.clientId === clientId)
   }
 
   public getNodesByProjectId = (projectId: number) => {
-    console.log('getNodesByProjectId')
+    // console.log('getNodesByProjectId')
     return this.nodes.filter(d => d.projectId === projectId)
   }
 
@@ -162,17 +179,17 @@ export default class Simulation {
   }
 
   public getLayout(): Layout {
-    console.log('getLayout')
+    // console.log('getLayout')
     return this.command.layout
   }
 
   public getState(): State {
-    console.log('getState')
+    // console.log('getState')
     return this.command.state
   }
 
   public switchLayout(newLayout: Layout) {
-    console.log('switchLayout')
+    // console.log('switchLayout')
     const curLayout = this.command.layout
 
     if (newLayout === curLayout) {
@@ -197,7 +214,7 @@ export default class Simulation {
   }
 
   public resorted() {
-    console.log('resorted')
+    // console.log('resorted')
     // Should be called once the node sorting is changed
     const { command, playState } = this
 
@@ -211,7 +228,7 @@ export default class Simulation {
   }
 
   public filtered(isExclusion: boolean) {
-    console.log('filtered')
+    // console.log('filtered')
     const { command, playState } = this
 
     const delay = c.shifts
@@ -227,7 +244,7 @@ export default class Simulation {
   }
 
   public playState = (updateIdleProps=false) => {
-    console.log('playState:', this.command.state)
+    // console.log('playState:', this.command.state)
 
     const { layout, state } = this.command
 
@@ -265,7 +282,7 @@ export default class Simulation {
   }
 
   public toggleSelected(selected) {
-    console.log('toggleSelected', selected)
+    // console.log('toggleSelected', selected)
 
     this.onSelectedState = selected.active
 
@@ -285,5 +302,6 @@ export default class Simulation {
       .call(() => isSwitchingLayout.set(false))
     }
   }
+
 
 }

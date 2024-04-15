@@ -1,39 +1,43 @@
 <script>
+  // Stores
   import { app, hoveredFilter } from '$lib/stores/canvas.js';
-  import * as PIXI from "pixi.js";
 
+  // DOM Components
   import ClearFilterButton from "$lib/components/dom/molecules/ClearFilterButton.svelte";
   import BarTween from "$lib/components/dom/atoms/BarTween.svelte";
 	import CheckIcon from '$lib/components/dom/atoms/CheckIcon.svelte';
   import NumberTween from '$lib/components/dom/atoms/NumberTween.svelte';
   import Icon from '$lib/components/dom/atoms/Icon.svelte';
   
+  // WEBGL Components
   import Bubble from '$lib/components/webgl/atoms/Bubble.svelte';
   import Graphics from '$lib/components/webgl/atoms/Graphics.svelte';
 
+  // Actions
   import castContainer from "$lib/actions/castContainer"
 
-
+  // Functions
   import templates from "$lib/templates"
+
 
   export let categories
   export let selected = []
-  export let unselectBtn = true
+  export let multiselect = true
+  export let unselectBtn = multiselect
   export let disabled = false
 
   export let gridlayout = 'simple'
 
   export let direction = 'row'
 
-  export let parent = undefined
 
 </script>
 
 <div class="container {gridlayout} {direction}">
 
   <ul class="input-group">
-    {#each categories as { id, name, alias, nNodes, pctNodes }, i}
-    {@const active = selected.includes(id)}
+    {#each categories as { id, alias, pctNodes }, i}
+    {@const active = multiselect ? selected.includes(id) : selected === id}
 
       <li class="input-group__item" class:active={active}>
 
@@ -50,21 +54,12 @@
           </div>
 
 
-          {#if gridlayout === 'product'}
-          <!-- {@const context = new PIXI.Container()}
-            <div class="item__icon" 
-              use:castContainer={{ parent, context }}
-            >
-              <Graphics context={context} blendmode="MULTIPLY" alpha=.9>
-                <Bubble {id} {i} r={nNodes/3} />
-              </Graphics>
-
-              <Graphics context={context} drawFunc={templates[id]} />
-            </div> -->
-          {/if}
-
           <div class="item__label">
+          {#if multiselect}
             <input type="checkbox" value={id} {disabled} bind:group={selected}/>
+          {:else}
+            <input type="radio" value={id} {disabled} bind:group={selected}/>
+          {/if}
             <span>{alias}</span>
           </div>
 

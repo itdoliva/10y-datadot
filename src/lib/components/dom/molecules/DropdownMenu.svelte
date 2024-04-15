@@ -4,8 +4,6 @@
 
   let active = false
 
-
-
   function handlePointerEnter(e) {
     active = true
     e.stopPropagation()
@@ -23,24 +21,23 @@
 
 </script>
 
-<div 
-  class="dropdown" 
-  class:active
+<div class="dropdown" class:active
   on:pointerenter={handlePointerEnter}
   on:pointerleave={handlePointerLeave}
 >
-  <button 
-    class="link"
-    on:pointerup={handlePointerUp}
-  >
-    <div class="icon-wrapper">
+  <button class="button" on:pointerup={handlePointerUp}>
+
+    <div class="button__icon">
       <Icon icon='caret' />
     </div>
-    <span>{title}</span>
+
+    <span class="button__label">{title}</span>
   </button>
-  <div class="dropdown-menu">
+
+  <div class="content">
     <slot />
   </div>
+
 </div>
 
 <style lang="scss">
@@ -49,26 +46,12 @@
     width: 100%;
     height: 100%;
 
-    &.active {
-      .dropdown-menu {
-        transform: translateY(0);
-        opacity: 1;
-        pointer-events: auto;
-      }
-
-      .link {
-        .icon-wrapper {
-          transform: rotate(0);
-        }
-      }
-    }
-
-    .link {
+    .button {
       padding: 0 1rem;
 
       display: grid;
       grid-template-columns: min-content 1fr;
-      align-content: center;
+      align-items: center;
 
       width: 100%;
       height: 100%;
@@ -76,20 +59,23 @@
       background: none;
 
       font-family: inherit;
-      font-size: inherit;
       cursor: pointer;
       
       text-align: left;
 
-      .icon-wrapper {
+      &__icon {
         align-self: center;
         width: 1rem;
         transform: translateY(-.085rem) rotate(-90deg);
         transition: transform 150ms ease-in-out;
       }
+
+      &__label {
+        font-size: var(--fs-label);
+      }
     }
 
-    .dropdown-menu {
+    .content {
       position: absolute;
 
       padding: 1rem;
@@ -106,6 +92,21 @@
       transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
       z-index: 10;
     }
+
+    &.active {
+      .content {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .button {
+        &__icon {
+          transform: rotate(0);
+        }
+      }
+    }
+
   }
 
 

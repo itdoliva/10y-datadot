@@ -76,20 +76,21 @@ export const categoriesEnriched = derived([ nodes, categories ], ([ $nodes, $cat
 
 
 
-export const lineWidth = readable(1.5)
 export const nodeSize = derived(([ width ]), ([ $width ]) => {
   // Mobile
-  if ($width <= 768) {
-    return 25
+  if ($width < 768) {
+    return 30
   }
-  // Desktops
-  if ($width <= 1800) {
+  else if ($width <= 1800) {
     return 20
   }
-  // Large Desktops
-  return 25
+  return 15 + Math.ceil($width * .01)
+})
+
+export const lineWidth = derived(([ nodeSize ]), ([ $nodeSize ]) => {
+  return $nodeSize / 20
 })
 
 export const gap = derived(nodeSize, ($nodeSize) => {
-  return .9*$nodeSize
+  return $nodeSize * .9
 });

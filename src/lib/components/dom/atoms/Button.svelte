@@ -32,10 +32,10 @@
     cursor: pointer;
 
     &:not(:disabled) {
-      &:active,
-      &:hover {
-        font-weight: 600;
-      }
+      // &:active,
+      // &:hover {
+      //   font-weight: 600;
+      // }
 
       &:active {
         color: #DCDEFE;

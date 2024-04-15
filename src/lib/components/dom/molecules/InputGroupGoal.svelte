@@ -12,13 +12,16 @@
   export let disabled = false
   export let nColumns = 1
 
+  // +1 for unselect btn
+  $: itemsByColumn = Math.ceil((categories.length + 1)/nColumns)
+
 </script>
 
 <div class="container">
 
   <ul class="input-group" 
     style:--n-columns={nColumns}
-    style:--items-by-column={Math.ceil(categories.length/nColumns)}
+    style:--items-by-column={itemsByColumn} 
   >
     {#each categories as { id, alias, color }}
     {@const active = selected.includes(id)}

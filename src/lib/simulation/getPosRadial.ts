@@ -1,38 +1,19 @@
+// Libraries
 import * as d3 from "d3";
+
+// Files
 import layoutConfig from "../config/layout"
+
+// Types
 import { Node, Nodes } from "../types/node"
+import { SectorDataPoint, SectorMetadata, SectorData, Dimensions, LayoutConfig } from "./interfaces";
 
 const { 
   maxDelayRadial, 
 } = layoutConfig
 
 
-
-interface SectorDataPoint {
-  id: string,
-  sectorIndex: number,
-  pileIndex: number,
-  inPileIndex: number
-}
-
-interface SectorMetadata {
-  nGaps: number;
-  nPiles: number;
-  innerRadius?: number;
-}
-
-interface SectorData extends Array<SectorDataPoint> {
-  metadata: SectorMetadata;
-}
-
-interface Dimensions {
-  fw: number;
-  fh: number;
-  nodeSize: number;
-  gap: number;
-}
-
-export default function getPosRadial(nodes: Nodes, groupBy: string, dimensions: Dimensions) {
+export default function getPosRadial(nodes: Nodes, groupBy: string, dimensions: Dimensions): [ SectorData, LayoutConfig ] {
   const { nodeSize, fw, fh } = dimensions
 
   const [ posDataset, innerRadius ] = getOptimalPositionDataset(nodes, groupBy, dimensions)
@@ -51,8 +32,8 @@ export default function getPosRadial(nodes: Nodes, groupBy: string, dimensions: 
   const extentY = exceedY > 0 ? [-(exceedY/2 + nodeSize*3), fh + (exceedY/2 + nodeSize*3)] : [ 0, fh ]
   const extent = extentX.map((_, i) => [ extentX[i], extentY[i] ])
 
-  const config = {
-    innerRadius,
+  const config: LayoutConfig = {
+    data: { innerRadius },
     padding,
     extent
   }

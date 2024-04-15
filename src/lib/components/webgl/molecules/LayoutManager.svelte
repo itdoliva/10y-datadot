@@ -1,5 +1,5 @@
 <script>
-  import { getContext } from "svelte";
+  import { getContext, onMount } from "svelte";
   import * as d3 from "d3"
 
   import Simulation from '$lib/simulation/Simulation';
@@ -15,12 +15,13 @@
 
   // Exports
   export let layout
+  export let zoomController
+
 
   let prevActiveIds = $nodes.activeIds
-
-
+  
   // ----- SIMULATION -----
-  const simulation = new Simulation(layout, "entrance")
+  const simulation = new Simulation(layout, "entrance", zoomController)
 
   // ------------ Reactivity ------------  
 
@@ -29,10 +30,10 @@
 
   // Update simulation Force Properties
   $: if ($figureWidth || $figureHeight) {
-    simulation.updateCollideRadius()
+    simulation.updateForceCollideRadius()
   } 
 
-  $: simulation.updateCoordPos($cameraOffsetX, $cameraOffsetY)
+  $: simulation.updateForceXY($cameraOffsetX, $cameraOffsetY)
 
   // If layout is changed
   $: simulation.switchLayout(layout)
@@ -52,12 +53,6 @@
 
   // When toggle complexity
   $: simulation.toggleComplexity($complexityOn)
-
-
-
-  // $: zoomController.translateExtent(simulation.config.extent)
-
-
 
 
   // function updateExtents(layout, ww, wh, fw, fh) {
@@ -101,7 +96,6 @@
     <Node 
       id={node.id}
       simulationNode={simulation.getNodeById(node.id)}
-      state={simulation.command.state}
     />
   {/if}
 {/each}

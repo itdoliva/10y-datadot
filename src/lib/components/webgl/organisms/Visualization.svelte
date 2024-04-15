@@ -4,7 +4,7 @@
   import * as d3 from "d3";
   
 	import castContainer from '$lib/actions/castContainer';
-  import { app, figureWidth, figureHeight }  from '$lib/stores/canvas';
+  import { width, figureWidth, figureHeight }  from '$lib/stores/canvas';
   import { cameraOffsetX, cameraOffsetY, zoom } from "$lib/stores/zoom";
   import { nodeSize } from "$lib/stores/nodes";
   
@@ -14,36 +14,59 @@
   export let layout
 
   let zoomController
+  let container
 
   const root = new PIXI.Container()
+  const camera = new PIXI.Container()
   const scene = new PIXI.Container()
+
+  // const mask = new PIXI.Graphics()
+  // mask.beginFill(0xFFFFFF)
+  // mask.drawCircle(0, 0, 360)
+  // mask.endFill()
+
+  // mask.beginFill(0x000000 )
+  // mask.drawCircle(0, 0, 120)
+  // mask.endFill()
+
+
   root.name = "viz"
+  camera.name = "outer-scene"
   scene.name = "scene"
 
   scene.node = {
     hitArea: new PIXI.Rectangle()
   }
   
-  root.addChild(scene)
+  root.addChild(camera) //, mask
+  camera.addChild(scene)
+  // scene.mask = mask
 
-  $: scene.x = $figureWidth/2 + $cameraOffsetX
-  $: scene.y = $figureHeight/2 + $cameraOffsetY
-  $: scene.scale.set($zoom)
+  $: camera.x = $cameraOffsetX
+  $: camera.y = $cameraOffsetY
+  $: camera.scale.set($zoom)
+
+  $: scene.x = $figureWidth/2
+  $: scene.y = $figureHeight/2
 
   $: updateNodeHitArea($nodeSize)
 
+  $: if ($width < 768 && layout === 'radial') {
+    zoomController?.scaleExtent([.3, 1])
+    zoomController?.scaleTo(.5)
+  } 
+  else {
+    zoomController?.scaleExtent([1, 1])
+  }
+
 
   onMount(() => {
-    zoomController = new ZoomController($app.view)
+    zoomController = new ZoomController(container)
   })
 
   setContext('viz', { 
-    root, 
-    scene,
-    getZoomController: () => zoomController
+    scene
   })
-
-
 
   function updateNodeHitArea(nodeSize) {
     scene.node.hitArea.x = -nodeSize/2
@@ -55,14 +78,18 @@
 </script>
 
 <div 
-  class="container"
+class="container"
+  bind:this={container}
   bind:clientWidth={$figureWidth}
   bind:clientHeight={$figureHeight}
   use:castContainer={{ context: root, hasMask: true, centered: false }}
 />
 
-{#if $figureWidth + $figureHeight > 0}
-  <LayoutManager bind:layout />
+{#if $figureWidth + $figureHeight > 0 && zoomController}
+  <LayoutManager 
+    bind:layout 
+    {zoomController}
+  />
 {/if}
 
 

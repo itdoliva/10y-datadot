@@ -27,6 +27,8 @@
   import InputIndustry from "$lib/components/dom/organisms/InputIndustry.svelte";
   import ClearAllFilterButton from "$lib/components/dom/molecules/ClearAllFilterButton.svelte";
 	import PlayButton from '$lib/components/dom/molecules/PlayButton.svelte';
+  import DropdownSortBy from "$lib/components/dom/organisms/DropdownSortBy.svelte";
+  import DropdownActivate from "$lib/components/dom/organisms/DropdownActivate.svelte";
 
   // WebGL Components
   import Visualization from '$lib/components/webgl/organisms/Visualization.svelte';
@@ -50,7 +52,7 @@
 <div class="root">
 
 
-  {#if $width <= 768} 
+  {#if $width < 768} 
 
   <header class="logo-container">
     <ProjectLogo />
@@ -60,7 +62,7 @@
     class="viz-container"
     class:filter-open={isMobileFilterOpen}
   >
-    <!-- <Visualization bind:layout /> -->
+    <Visualization bind:layout />
 
     <button class="filter-toggle-container" 
       on:click={() => isMobileFilterOpen = true}
@@ -119,60 +121,130 @@
   
 
   {:else}
+  <header class="top-container">
+    <section class="input-product" 
+      class:collapsed={isTopMenuCollapsed} 
+      use:castContainer={{ context: productContainer, hasMask: true }}
+    >
+      <InputProduct parent={productContainer} />
+    </section>
 
-  <InputPeriod /> 
+    <ul class="panel-menu">
+      <li class="panel-menu__item">
+        <DropdownSortBy />
+      </li>
+
+      <li class="panel-menu__item">
+        <DropdownActivate />
+      </li>
+
+      <li class="panel-menu__item clear-all-btn">
+        <ClearAllFilterButton />
+      </li>
+
+      <li class="panel-menu__item">
+        <PlayButton />
+      </li>
+
+      <li class="panel-menu__item project-logo no-border">
+        <div class="project-logo__wrapper">
+          <ProjectLogo />
+        </div>
+      </li>
+
+      <li class="panel-menu__item collapse-btn no-border">
+        <div class="collapse-btn__wrapper">
+          <div class="rotate" class:collapsed={isTopMenuCollapsed}>
+            <Button onClick={toggleTopMenuCollapse}>
+              <Icon icon="collapse"/>
+            </Button>
+          </div>
+        </div>
+      </li>
+
+    </ul>
+  </header>
+
+  <aside class="left-container">
+    <ul class="filter-list">
+      <li class="filter-list__item input-layout">
+        <InputLayout bind:layout={layout} />
+      </li>
+
+      <li class="filter-list__item input-period">
+        <InputPeriod /> 
+      </li>
+
+      <li class="filter-list__item input-design">
+        <InputDesign />
+      </li>
+
+      <li class="filter-list__item input-goal">
+        <InputGoal />
+      </li>
+
+      <li class="filter-list__item input-industry">
+        <InputIndustry />
+      </li>
+    </ul>
+  </aside>
+
+  <main class="viz-container">
+    <Visualization bind:layout />
+  </main>
+
 
   {/if}
-    <!-- <div class="pa-container">
+  <!-- <div class="pa-container">
 
-      <ul class="pitems-wrapper pa-wrapper">
-        <li>
-          <InputLayout bind:layout />
+    <ul class="pitems-wrapper pa-wrapper">
+      <li>
+        <InputLayout bind:layout />
+      </li>
+    
+      <li>
+        <InputPeriod /> 
+      </li>
+    
+      <li>
+        <InputDesign />
+      </li>
+    
+      <li>
+        <InputGoal />
+      </li>
+    
+      <li>
+        <InputIndustry />
+      </li>
+    </ul>
+
+  </div> -->
+  <!-- <div class="pb-container">
+    
+    <div class="pb-wrapper">
+
+      <ul>
+        <li class="pitems-wrapper" class:collapsed={isTopMenuCollapsed} use:castContainer={{ context: productContainer, hasMask: true }} >
+          <InputProduct parent={productContainer} />
         </li>
-      
-        <li>
-          <InputPeriod /> 
+
+        <li class="pmenu-wrapper">
+          <PanelMenu />
         </li>
-      
-        <li>
-          <InputDesign />
-        </li>
-      
-        <li>
-          <InputGoal />
-        </li>
-      
-        <li>
-          <InputIndustry />
-        </li>
+
       </ul>
 
-    </div> -->
-    <!-- <div class="pb-container">
-      
-      <div class="pb-wrapper">
-
-        <ul>
-          <li class="pitems-wrapper" class:collapsed={isTopMenuCollapsed} use:castContainer={{ context: productContainer, hasMask: true }} >
-            <InputProduct parent={productContainer} />
-          </li>
-
-          <li class="pmenu-wrapper">
-            <PanelMenu />
-          </li>
-
-        </ul>
-
-        <div 
-          class="button-wrapper"
-        >
-          <button class:collapsed={isTopMenuCollapsed} on:click={toggleTopMenuCollapse}>
-            <Icon icon="collapse"/>
-          </button>
-        </div>
+      <div 
+        class="button-wrapper"
+      >
+        <button class:collapsed={isTopMenuCollapsed} on:click={toggleTopMenuCollapse}>
+          <Icon icon="collapse"/>
+        </button>
       </div>
-    </div> -->
-    <!-- <div class="viz-container">
+    </div>
+  </div> -->
+  <!-- <div class="viz-container">
       <Visualization bind:layout />
       <File />
     </div> -->
@@ -180,6 +252,8 @@
 
 
 <style lang="scss">
+  @import "$lib/scss/breakpoints.scss";
+
   .root {
     display: grid;
     height: 100%;
@@ -192,152 +266,257 @@
       "viz"
       "layout"
       "play";
-  }
 
-  .logo-container { grid-area: logo; }
-  .viz-container { grid-area: viz; }
-  .layout-container { grid-area: layout; }
-  .play-container { grid-area: play; }
-
-  .logo-container {
-    padding-block: 1rem;
-
-    border-bottom: 1px solid var(--clr-black-fade-out);
-    z-index: 1;
-  }
-
-  .layout-container {
-    border-top: 1px solid var(--clr-black-fade-out);
-
-    padding: 2vw 0 2vw 0;
-  }
-
-  .play-container {
-    border-top: 1px solid var(--clr-black-fade-out);
-    
-    padding: 2vw 0 2vw 0;
-
-    display: grid;
-    grid-template-columns: repeat(2, min-content);
-    justify-content: center;
-
-    gap: var(--fs-label);
-  }
-
-  .viz-container {
-    position: relative;
-
-    .filter-toggle-container,
-    .filter-container {
-      position: absolute;
-
-      top: calc(2*var(--fs-label));
-      right: 0;
+    @include md {
+      grid-template-columns: minmax(280px, 1fr) 5fr;
+      grid-template-rows: min-content 1fr;
+      grid-template-areas:
+        "left top"
+        "left viz";
     }
 
-    .filter-toggle-container {
-      color: white;
-      background: var(--clr-black);
+    .logo-container { grid-area: logo; }
+    .viz-container { grid-area: viz; }
+    .layout-container { grid-area: layout; }
+    .play-container { grid-area: play; }
+    .top-container { grid-area: top; }
+    .left-container { grid-area: left; }
 
-      border: none;
-      border-top-left-radius: 3rem;
-      border-bottom-left-radius: 3rem;
 
-      padding: 2rem 1rem 2rem 1rem;
 
-      // Entrance transition
-      transition: transform 750ms ease-in-out 500ms;
+    .logo-container {
+      padding-block: 1rem;
+  
+      border-bottom: 1px solid var(--clr-black-fade-out);
+      z-index: 1;
+    }
+  
+    .layout-container {
+      border-top: 1px solid var(--clr-black-fade-out);
+  
+      padding: 2vw 0 2vw 0;
+    }
+  
+    .play-container {
+      border-top: 1px solid var(--clr-black-fade-out);
       
-      p {
-        writing-mode: vertical-lr;
-        transform: rotate(-180deg);
-
-        .plus {
-          font-size: 1.1em;
-          font-weight: 700;
-          text-decoration: underline;
+      padding: 2vw 0 2vw 0;
+  
+      display: grid;
+      grid-template-columns: repeat(2, min-content);
+      justify-content: center;
+  
+      gap: var(--fs-label);
+    }
+  
+    .viz-container {
+      position: relative;
+  
+      .filter-toggle-container,
+      .filter-container {
+        position: absolute;
+  
+        top: calc(2*var(--fs-label));
+        right: 0;
+      }
+  
+      .filter-toggle-container {
+        color: white;
+        background: var(--clr-black);
+  
+        border: none;
+        border-top-left-radius: 3rem;
+        border-bottom-left-radius: 3rem;
+  
+        padding: 2rem 1rem 2rem 1rem;
+  
+        // Entrance transition
+        transition: transform 750ms ease-in-out 500ms;
+        
+        p {
+          writing-mode: vertical-lr;
+          transform: rotate(-180deg);
+  
+          .plus {
+            font-size: 1.1em;
+            font-weight: 700;
+            text-decoration: underline;
+          }
+        }
+  
+      }
+  
+      .filter-container {
+        width: 85vw;
+        height: calc(100% - 4*var(--fs-label));
+  
+        border: 1px solid var(--clr-black);
+        border-right: none;
+        border-top-left-radius: 3rem;
+        border-bottom-left-radius: 3rem;
+  
+        overflow: auto;
+  
+        // Entrance transition
+        transition: transform 500ms ease-in-out;
+        transform: translate(100%, 0);
+  
+        &__close-btn {
+          position: sticky;
+          z-index: 3;
+  
+          top: calc(2*var(--fs-label));
+          left: 100%;
+  
+          padding: .4rem;
+  
+          p {
+            margin: 0 var(--fs-label);
+            font-size: calc(var(--fs-label)*2);
+            font-weight: 700;
+            text-decoration: underline;
+  
+          }
+  
+        }
+  
+        .filter-list {
+          position: absolute;
+          top: 0;
+          width: 100%;
+          overflow: hidden;
+          padding: 4vw 0 4vw 8vw;
+  
+          &__item {
+            border-bottom: 1px solid var(--clr-black-fade-out);
+  
+            padding: 2rem 4vw 2rem 0;
+  
+            &:last-child {
+              border-bottom: none;
+            }
+  
+            &.input-period,
+            &.input-design {
+              padding-right: min(16vw, 4rem);
+            }
+          }
+  
         }
       }
-
+  
+      &.filter-open {
+        .filter-toggle-container {
+          transform: translate(100%, 0);
+  
+          // Exit Transition
+          transition: transform 200ms ease-in-out;
+          pointer-events: none;
+        }
+  
+        .filter-container {
+          transform: translate(0, 0);
+        }
+      }
+  
     }
 
-    .filter-container {
-      width: 85vw;
-      height: calc(100% - 4*var(--fs-label));
+    .left-container {
+      border-right: 1px solid var(--clr-black);
 
-      border: 1px solid var(--clr-black);
-      border-right: none;
-      border-top-left-radius: 3rem;
-      border-bottom-left-radius: 3rem;
+      overflow-y: auto;
 
-      overflow: auto;
+      padding: 
+        calc(4*var(--fs-label)) 
+        calc(2*var(--fs-label)) 
+        calc(2*var(--fs-label)) 
+        calc(4*var(--fs-label));
 
-      // Entrance transition
-      transition: transform 500ms ease-in-out;
-      transform: translate(100%, 0);
-
-      &__close-btn {
-        position: sticky;
-        z-index: 3;
-
-        top: calc(2*var(--fs-label));
-        left: 100%;
-
-        padding: .4rem;
-
-        p {
-          margin: 0 var(--fs-label);
-          font-size: calc(var(--fs-label)*2);
-          font-weight: 700;
-          text-decoration: underline;
-
-        }
-
-      }
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
 
       .filter-list {
-        position: absolute;
-        top: 0;
-        width: 100%;
-        overflow: hidden;
-        padding: 4vw 0 4vw 8vw;
-
         &__item {
+          padding: calc(2.4*var(--fs-label)) calc(2*var(--fs-label)) calc(2.4*var(--fs-label)) 0;
           border-bottom: 1px solid var(--clr-black-fade-out);
 
-          padding: 2rem 4vw 2rem 0;
+          &:first-child {
+            padding-top: 0;
+          }
 
           &:last-child {
             border-bottom: none;
           }
+        }
+      }
+    }
 
-          &.input-period,
-          &.input-design {
-            padding-right: min(16vw, 4rem);
+    .top-container {
+      .input-product {
+        padding: 
+          calc(4*var(--fs-label)) 
+          0
+          calc(2*var(--fs-label)) 
+          calc(4*var(--fs-label));
+      }
+
+      .panel-menu {
+        display: grid;
+        grid-template-columns: auto auto auto max-content max-content 1fr;
+        grid-template-rows: calc(4*var(--fs-label));
+        align-items: stretch;
+
+        border-top: 1px solid var(--clr-black);
+        border-bottom: 1px solid var(--clr-black);
+
+        &__item {
+
+          &:not(.no-border) {
+            border-right: 1px solid var(--clr-black);
+          }
+
+          &.clear-all-btn {
+            padding: 0 var(--fs-label);
+          }
+
+          &.project-logo {
+            padding: 0 calc(2.4*var(--fs-label));
+            margin: auto 0;
+
+            .project-logo__wrapper {
+              width: calc(14*var(--fs-label));
+            }
+          }
+
+          &.collapse-btn {
+            position: relative;
+            z-index: 5;
+
+            .collapse-btn__wrapper {
+              position: absolute;
+              top: 100%;
+              transform: translate(0, -50%);
+              
+              width: calc(3.6*var(--fs-label));
+              
+              .rotate {
+                transition: transform .15s ease-in-out;
+
+                &.collapsed {
+                  transform: rotate(180deg);
+                }
+              }
+            }
           }
         }
-
       }
     }
 
-    &.filter-open {
-      .filter-toggle-container {
-        transform: translate(100%, 0);
-
-        // Exit Transition
-        transition: transform 200ms ease-in-out;
-        pointer-events: none;
-      }
-
-      .filter-container {
-        transform: translate(0, 0);
-      }
-    }
 
   }
 
-
-
+  
 
   // .root {
   //   position: relative;

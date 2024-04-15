@@ -1,11 +1,14 @@
 <script>
+  // Libraries
   import { onMount } from "svelte";
   import * as d3 from "d3";
   import textures from "textures";
 
-  import { categories, categoriesEnriched } from "$lib/stores/nodes";
+  // Stores
+  import { categoriesEnriched, nodeSize } from "$lib/stores/nodes";
 
-  import Button from "$lib/components/dom/atoms/Button.svelte";
+  // DOM Components
+  import ClearFilterButton from "$lib/components/dom/molecules/ClearFilterButton.svelte";
   import BSBubble from "$lib/components/dom/atoms/BSBubble.svelte";
 
   export let selected = []
@@ -25,11 +28,11 @@
     .fill("#818afa")
 
 
-  const areaScale = d3.scaleLinear()
+  $: areaScale = d3.scaleLinear()
     .domain([0, 1])
-    .range([0, 20000])
+    .range([0, 20000 * ($nodeSize/10)])
 
-  const rScale = (v) => {
+  $: rScale = (v) => {
     return Math.sqrt(areaScale(v)/(2*Math.PI)) + 5
   }
     
@@ -116,7 +119,7 @@
 <div class="beeswarm-wrapper">
   <div class="svg-wrapper" bind:clientWidth={w} bind:clientHeight={h}>
     <svg bind:this={svg}>
-      {#if w && h}
+      {#if w && h && simulationNodes}
 
         <defs>
           <filter x="0" y="0" width="1" height="1" id="text-bg">
@@ -150,9 +153,10 @@
       </svg>
   </div>
 
-  <Button onClick={() => selected = []} disabled={selected.length === 0}>
-    selecionar tudo
-  </Button>
+  <ClearFilterButton 
+    onClick={() => selected = []} 
+    disabled={selected.length === 0} 
+  />
 </div>
 
 <style lang="scss">

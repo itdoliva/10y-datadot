@@ -3,19 +3,19 @@
  -->
 
 <script>
+  // Library
   import { onMount, getContext } from "svelte";
+  import * as PIXI from "pixi.js"
+
+  // Stores
   import { app, complexityOn, hoveredNode} from "$lib/stores/canvas";
   import { selected, nodeSize  } from "$lib/stores/nodes";
-  import * as PIXI from "pixi.js"
   
+  // WebGL Components
   import Pokemon from '$lib/components/webgl/atoms/Pokemon.svelte';
-  
-
 
   export let id
   export let simulationNode
-
-  export let state
 
 
   const { scene } = getContext("viz")

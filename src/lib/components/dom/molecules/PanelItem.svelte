@@ -7,7 +7,7 @@
 
 </script>
 
-<div class="container {direction}">
+<div class="panel-item-container container {direction}">
   <div class="panel-item">
 
     {#if icon}
@@ -32,7 +32,6 @@
     display: flex;
     
     .panel-item {
-      
       display: grid;
       gap: .8rem;
 
@@ -51,9 +50,10 @@
 
     &.column {
       align-items: stretch;
-      width: 100%;
 
       .panel-item {
+        width: 100%;
+        
         grid-template-columns: 1.2rem 1fr;
         grid-template-rows: max-content min-content;
         grid-template-areas: 

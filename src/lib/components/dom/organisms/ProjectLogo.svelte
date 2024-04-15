@@ -26,7 +26,8 @@
       width: min(24rem, 8rem + 5.5vw);
     }
 
-    &__text {
+    &__text { 
+      text-wrap: nowrap;
       font-size: var(--fs-label);
     }
   }

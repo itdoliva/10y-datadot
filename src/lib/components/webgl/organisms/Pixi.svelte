@@ -1,7 +1,12 @@
 <script>
-	import { width, height } from '$lib/stores/canvas';
+  // Libraries
   import { onMount } from 'svelte'
   import * as PIXI from "pixi.js"
+  
+  // Stores
+	import { width, height } from '$lib/stores/canvas';
+
+  // Raw files
   import BackgroundVertex from "$lib/bg.vert?raw";
   import BackgroundFragment from "$lib/bg.frag?raw";
 
@@ -9,28 +14,26 @@
 
   let canvas
 
-  const bgFilter = new PIXI.Filter(BackgroundVertex, BackgroundFragment, {
-    iTime: 0.0,
-    iRatio: 1.0,
-  })
-
-  const meshGradient = new PIXI.Graphics()
-  meshGradient.filters = [ bgFilter ]
-
-
   onMount(() => {
-    app = new PIXI.Application({ 
+    app = globalThis.__PIXI_APP__ = new PIXI.Application({ 
       roundPixels: true,
       view: canvas, 
       resizeTo: window, 
       backgroundColor: 0xFFFFFF
     })
 
-    app.stage.name = "stage"
+    initMesh()
+    initAssets()
+  })
 
-    globalThis.__PIXI_APP__ = app
+  function initMesh() {
+    const bgFilter = new PIXI.Filter(BackgroundVertex, BackgroundFragment, {
+      iTime: 0.0,
+      iRatio: 1.0,
+    })
 
-    PIXI.Assets.add({ alias: 'petal', src: '/petal.png'})
+    const meshGradient = new PIXI.Graphics()
+    meshGradient.filters = [ bgFilter ]
 
     app.stage.addChild(meshGradient)
 
@@ -43,7 +46,11 @@
       meshGradient.drawRect(0, 0, app.screen.width, app.screen.height)
       meshGradient.endFill()
     });
-  })
+  }
+
+  function initAssets() {
+    PIXI.Assets.add({ alias: 'petal', src: '/petal.png'})
+  }
 
 </script>
 
