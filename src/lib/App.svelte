@@ -34,6 +34,7 @@
   import Visualization from '$lib/components/webgl/organisms/Visualization.svelte';
 
   let layout = 'block'
+  let topInputGroupHeight
   let isTopMenuCollapsed = false
   let isMobileFilterOpen = false
 
@@ -122,12 +123,18 @@
 
   {:else}
 
-  <header class="top-container">
-    <section class="input-product" 
-      class:collapsed={isTopMenuCollapsed} 
-      use:castContainer={{ context: productContainer, hasMask: true }}
-    >
-      <InputProduct parent={productContainer} />
+  <header 
+    class="top-container" 
+    class:collapsed={isTopMenuCollapsed}
+    style="--input-group-height: {topInputGroupHeight ? `${topInputGroupHeight}px` : "none"};"
+  >
+    <section class="collapsible" >
+      <div class="input-product" 
+        use:castContainer={{ context: productContainer, hasMask: true }}
+        bind:clientHeight={topInputGroupHeight}
+      >
+        <InputProduct parent={productContainer} />
+      </div>
     </section>
 
     <ul class="panel-menu">
@@ -406,13 +413,29 @@
     }
 
     .top-container {
-      .input-product {
-        padding: 
-          calc(4*var(--fs-label)) 
-          0
-          calc(2*var(--fs-label)) 
-          calc(4*var(--fs-label));
+
+      .collapsible {
+        overflow: hidden;
+
+        max-height: var(--input-group-height);
+        transition: all .3s ease-in-out;
+
+        .input-product {
+          padding: 
+            calc(4*var(--fs-label)) 
+            0
+            calc(2*var(--fs-label)) 
+            calc(4*var(--fs-label));
+        } 
       }
+
+      &.collapsed {
+        .collapsible {
+          transform: translate(0, calc(-1*var(--input-group-height)));
+          max-height: 0;
+        }
+      }
+
 
       .panel-menu {
         display: grid;
