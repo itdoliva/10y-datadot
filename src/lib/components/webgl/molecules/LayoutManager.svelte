@@ -33,6 +33,11 @@
     simulation.updateForceCollideRadius()
   } 
 
+  $: if ($figureHeight) {
+    simulation.updatePadding()
+    simulation.updateExtent()
+  }
+
   $: simulation.updateForceXY($cameraOffsetX, $cameraOffsetY)
 
   // If layout is changed

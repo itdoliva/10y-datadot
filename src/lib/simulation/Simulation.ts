@@ -118,6 +118,25 @@ export default class Simulation {
     if (updateExtent) this.updateExtent()
   }
 
+  public updateLayoutOffsets() {
+    const s_fw = get(figureWidth)
+    const s_fh = get(figureHeight)
+
+    const { command, layoutPadding } = this
+    const { layout } = command
+
+    let offsetX = 0
+    let offsetY = 0
+
+    if (layout === "block") {
+       offsetX = -s_fw/2 + layoutPadding.left
+       offsetY = -s_fh/2 + layoutPadding.top
+    }
+
+     this.layoutOffsetX = offsetX
+     this.layoutOffsetY = offsetY
+  }
+
   public updatePadding() {
     const s_fw = get(figureWidth)
     const s_fh = get(figureHeight)
@@ -129,23 +148,16 @@ export default class Simulation {
     const padding = { left: 0, top: 0 }
 
     if (layout === "block") {
-      padding.left = (s_fw - layoutWidth)/2 // + s_nodeSize/2
+      padding.left = (s_fw - layoutWidth)/2
+
       padding.top = layoutHeight < s_fh  
         ? (s_fh - layoutHeight)/2 + s_nodeSize/2 
         : s_nodeSize
-
-      this.layoutOffsetX = -s_fw/2 + padding.left
-      this.layoutOffsetY = -s_fh/2 + padding.top
-    }
-    else {
-      padding.left = s_fw / 2
-      padding.top = s_fh / 2
-
-      this.layoutOffsetX = 0
-      this.layoutOffsetY = 0
     }
 
     this.layoutPadding = padding
+
+    this.updateLayoutOffsets()
   }
 
   public updateExtent() {
@@ -164,7 +176,7 @@ export default class Simulation {
 
       extentX = [ 0, s_fw ]
       extentY = exceedY > 0
-        ? [ 0, (layoutHeight + s_nodeSize) ]
+        ? [ 0, (layoutHeight + 2*s_nodeSize) ]
         : [ 0, s_fh ]
     }
     else {
@@ -300,7 +312,6 @@ export default class Simulation {
     const minRadius = curRadius
 
     // console.log([sectorData, sectorMetadata, minRadius].every(d => d !== undefined && d !== null))
-    console.log(sectorMetadata)
 
     // Make Position Dataset from Optimal Sector Dataset
     const thetaScale = d3.scaleLinear()
