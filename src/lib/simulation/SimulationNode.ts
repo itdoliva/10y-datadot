@@ -125,11 +125,14 @@ export class SimulationNode {
     return this.isActive() === this.attr.renderable
   }
 
-  public setIdleProps = (idlePropsNew) => {
+  public setIdleProps = () => {
     // this.log("setIdleProps")
 
+    const idlePropsNew = this.simulation.posData.find(d => d.id === this.id).pos
+    
     // Check if new position is the same from the previous one
     // If so, do nothing
+
     const idlePropsCur = this.idlePropsTracker[0]
 
     idlePropsNew.active = this.isActive()
@@ -563,8 +566,8 @@ export class SimulationNode {
       const { x, y, theta, radius } = this.tweenCoord
 
       if (this.simulation.command.layout === "block") {
-        this.fx = this.attr.x = x
-        this.fy = this.attr.y = y
+        this.fx = this.attr.x = x + this.simulation.layoutOffsetX
+        this.fy = this.attr.y = y + this.simulation.layoutOffsetY
       }
       else {
         this.fx = this.attr.x = Math.cos(theta) * radius + x

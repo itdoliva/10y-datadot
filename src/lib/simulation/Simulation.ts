@@ -12,14 +12,15 @@ import { dataset, nodes, nodeSize, gap, sortBy } from "../stores/nodes";
 import { figureHeight, figureWidth, isSwitchingLayout } from "../stores/canvas";
 
 // Functions
-import getPosBlock from "./getPosBlock";
-import getPosRadial from "./getPosRadial";
+import randomDensity from "../utility/randomDensity"
+import makeSectorData from "./makeSectorData"
 
 // Files
 import c from "../config/layout";
 
 // Types
 import { Node, Nodes } from "../types/node"
+import { Dimensions, BlockConfigData, LayoutConfig, Padding } from "./interfaces";
 
 export type Layout = "radial" | "block";
 export type State = "idle" | "entrance" | "exit" | "filter-in" | "filter-out" | "sort" | "selected" | "selected-out";
@@ -39,7 +40,6 @@ export default class Simulation {
   private zoomController: ZoomController; 
 
   public command: Command;
-  public config;
   
   public inplaceIdleProps: boolean;
 
@@ -47,6 +47,15 @@ export default class Simulation {
   public forceCollide;
   public forceX;
   public forceY;
+
+  public layoutWidth
+  public layoutHeight
+  public layoutExtent
+  public layoutPadding
+  public layoutOffsetX
+  public layoutOffsetY
+
+  public posData;
 
   public onSelectedState: boolean;
 
@@ -86,7 +95,7 @@ export default class Simulation {
       .nodes(this.nodes)
       .on("tick", this.ticked)
 
-    this.updateIdleProps()
+    this.setIdleProps()
     this.playState()
   }
 
@@ -100,47 +109,256 @@ export default class Simulation {
     this.nodes.forEach((node: SimulationNode) => node.tick())
   }
 
-  private getDimensions = () => {
-    // console.log('*getDimensions')
-    return {
-      fw: get(figureWidth),
-      fh: get(figureHeight),
-      nodeSize: get(nodeSize),
-      gap: get(gap)
+
+  private setLayoutDimensions(w, h, { updatePadding=true, updateExtent=true } = {}) {
+    if (w) this.layoutWidth = w
+    if (h) this.layoutHeight = h
+
+    if (updatePadding) this.updatePadding()
+    if (updateExtent) this.updateExtent()
+  }
+
+  public updatePadding() {
+    const s_fw = get(figureWidth)
+    const s_fh = get(figureHeight)
+    const s_nodeSize = get(nodeSize)
+
+    const { layoutWidth, layoutHeight, command } = this
+    const { layout } = command
+
+    const padding = { left: 0, top: 0 }
+
+    if (layout === "block") {
+      padding.left = (s_fw - layoutWidth)/2 // + s_nodeSize/2
+      padding.top = layoutHeight < s_fh  
+        ? (s_fh - layoutHeight)/2 + s_nodeSize/2 
+        : s_nodeSize
+
+      this.layoutOffsetX = -s_fw/2 + padding.left
+      this.layoutOffsetY = -s_fh/2 + padding.top
+    }
+    else {
+      padding.left = s_fw / 2
+      padding.top = s_fh / 2
+
+      this.layoutOffsetX = 0
+      this.layoutOffsetY = 0
+    }
+
+    this.layoutPadding = padding
+  }
+
+  public updateExtent() {
+    const s_fw = get(figureWidth)
+    const s_fh = get(figureHeight)
+    const s_nodeSize = get(nodeSize)
+
+    const { layoutWidth, layoutHeight, command } = this
+    const { layout } = command
+
+    let extentX: number[] = []
+    let extentY: number[] = []
+    
+    if (layout === "block") {
+      const exceedY = (layoutHeight + s_nodeSize) - s_fh
+
+      extentX = [ 0, s_fw ]
+      extentY = exceedY > 0
+        ? [ 0, (layoutHeight + s_nodeSize) ]
+        : [ 0, s_fh ]
+    }
+    else {
+      const margin = s_nodeSize*3
+
+      const exceedX = layoutWidth - s_fw
+      const exceedY = layoutHeight - s_fh
+
+      extentX = exceedX > 0 
+        ? [ -(exceedX/2 + margin), s_fw + (exceedX/2 + margin)] 
+        : [ 0, s_fw ]
+
+      extentY = exceedY > 0 
+      ? [ -(exceedY/2 + margin), s_fh + (exceedY/2 + margin)] 
+      : [ 0, s_fh ]
+    }
+
+    this.layoutExtent = extentX.map((_, i) => [ extentX[i], extentY[i] ])
+
+    this.zoomController.translateExtent(this.layoutExtent)
+  }
+
+  private setBlockPosData() {
+    const s_nodes: Nodes = <Nodes>get(nodes)
+    const s_nodeSize = get(nodeSize)
+    const s_gap = get(gap)
+    const s_fw = get(figureWidth)
+    const s_fh = get(figureHeight)
+
+    // Calculate aspect ratio of the figure
+    const aspectRatio = s_fw / s_fh
+
+    // Calculate initial number of rows and columns based on aspect ratio
+    const initRows = Math.ceil(Math.sqrt(s_nodes.activeCount / aspectRatio))
+    const initColumns = Math.ceil(aspectRatio * initRows)
+
+    // Adjust rows to ensure all nodes fit within the figure width
+    let rows = Math.ceil(s_nodes.activeCount / initColumns)
+    let columns = initColumns
+
+    // Calculate initial block width and height
+    let blockWidth = (columns + 1) * (s_nodeSize + s_gap) - s_gap
+    let blockHeight;
+
+    // Reduce the number of columns until all nodes fit within the figure width
+    while (blockWidth > s_fw) {
+      // Remove one node column and Recalculate block width
+      blockWidth = --columns * (s_nodeSize + s_gap) - s_gap
+
+      // Recalculate rows to fit the reduced number of columns
+      rows = Math.ceil(s_nodes.activeCount / columns)
+    }
+
+    // Once we have a block that fits the figureWidth, 
+    // we remove another column to make margin
+    blockWidth = --columns * (s_nodeSize + s_gap) - s_gap
+    rows = Math.ceil(s_nodes.activeCount / columns)
+
+    // Update block height
+    blockHeight = rows * (s_nodeSize + s_gap) - s_gap
+
+    // Update layout dimensions
+    this.setLayoutDimensions(blockWidth, blockHeight)
+
+    // Time calculation support
+    const columnDensities = randomDensity(columns)
+    const timeStepByRow = +(c.fullColEntranceMaxDuration / rows).toFixed(4)
+
+    // Update posDataset
+    this.posData = s_nodes.map(({ id, i, active }) => {
+      const pos = { x: 0, y: 0, radius: 0, time: 0 }
+      const dataPoint = { id, pos }
+
+      if (!active) return dataPoint
+
+      const colIndex = Math.floor(i % columns)
+      const rowIndex = Math.floor(i / columns)
+
+      pos.x = colIndex * (s_nodeSize + s_gap) + s_nodeSize/2 // - fw/2 + padding.left
+      pos.y = rowIndex * (s_nodeSize + s_gap) + s_nodeSize/2 // - fh/2 + padding.top
+      pos.time = (
+        columnDensities[colIndex] * c.colEntranceUpTo + // column delay
+        timeStepByRow * rowIndex // row delay
+      )
+
+      return dataPoint
+    })
+
+  }
+
+  private setRadialPosData() {
+    const s_nodes: Nodes = <Nodes>get(nodes)
+    const s_nodeSize = get(nodeSize)
+    const s_fw = get(figureWidth)
+    const s_fh = get(figureHeight)
+    const s_groupBy = get(sortBy)
+
+    const data = s_nodes.filter(d => d.active)
+    const radialGap = s_nodeSize * 1.25
+    const maxStack = s_nodes.activeCount**(1/3)
+
+    let curSectorData
+    let curSectorMetadata
+    let curRadius = Math.min(s_fw, s_fh) * .05
+
+    // console.log([s_nodeSize, s_fw, s_fh, s_groupBy, data, radialGap, maxStack].every(d => d !== undefined && d !== null))
+
+    let isFitting = true
+
+    // As long as the circle length for the current radius is less than the needed
+    // length to carry, increases the current radius by each iteration
+    do {
+      const circleLength = 2 * Math.PI * curRadius
+  
+      // For each iteration, test
+      const pileStacks = d3.range(1, maxStack + 1, 1)
+      pileStacks.forEach((pileStack: number) => {
+        const sectorData = makeSectorData(data, s_groupBy, pileStack)
+        curSectorData = sectorData[0]
+        curSectorMetadata = sectorData[1]
+  
+        const layoutCircleLength = (curSectorMetadata.nPiles + curSectorMetadata.nGaps) * radialGap
+  
+        isFitting = circleLength < layoutCircleLength
+      })
+  
+      curRadius += radialGap
+      
+    } while (isFitting)
+
+    const sectorData = curSectorData
+    const sectorMetadata = curSectorMetadata
+    const minRadius = curRadius
+
+    // console.log([sectorData, sectorMetadata, minRadius].every(d => d !== undefined && d !== null))
+    console.log(sectorMetadata)
+
+    // Make Position Dataset from Optimal Sector Dataset
+    const thetaScale = d3.scaleLinear()
+      .domain([ 0, sectorMetadata.nPiles + sectorMetadata.nGaps ])
+      .range([ 0, 2*Math.PI ])
+
+    const timeScale = d3.scaleLinear()
+      .domain([ 0, 2*Math.PI ])
+      .range([ 0, c.maxDelayRadial ])
+
+    // Update posData dataset
+    this.posData = s_nodes.map(({ id }) => {
+      const pos = { x: 0, y: 0, theta: 0, radius: 0, time: 0 }
+      const dataPoint = { id, pos }
+
+      const sectorDataPoint = sectorData.find(d => d.id === id)
+
+      if (sectorDataPoint) {
+        const { sectorIndex, pileIndex, inPileIndex } = sectorDataPoint
+
+        pos.theta = thetaScale(pileIndex + sectorIndex)
+        pos.radius = minRadius + inPileIndex * (radialGap + s_nodeSize)
+        pos.x = Math.cos(pos.theta) * pos.radius
+        pos.y = Math.sin(pos.theta) * pos.radius
+        pos.time = timeScale(pos.theta)
+      }
+
+      return dataPoint
+    })
+
+    const radialWidth = d3.max(this.posData, d => d.pos.x) - d3.min(this.posData, d => d.pos.x)
+    const radialHeight = d3.max(this.posData, d => d.pos.y) - d3.min(this.posData, d => d.pos.y)
+
+    this.setLayoutDimensions(radialWidth, radialHeight)
+  }
+
+  private setPosData() {
+    const s_fw = get(figureWidth)
+    const s_fh = get(figureHeight)
+
+    if (s_fw + s_fh === 0) return
+
+    if (this.command.layout === "block") {
+      this.setBlockPosData()
+    }
+    else {
+      this.setRadialPosData()
     }
   }
 
-  private updateIdleProps = () => { //{ curNodes, sortBy, dimensions }
-    // console.log('*updateIdleProps')
-    const nodes_ = <Nodes>get(nodes)
-    const groupBy = get(sortBy)
-    const dimensions = this.getDimensions()
+  private setIdleProps = () => { //{ curNodes, sortBy, dimensions }
+    // console.log('*setIdleProps')
 
-    const { fw, fh } = dimensions
-  
-    if (fw + fh === 0) {
-      return
-    }
-  
-    const [ posDataset, config ] = this.command.layout === 'block'
-      ? getPosBlock(nodes_, dimensions)
-      : getPosRadial(nodes_, groupBy, dimensions)
+    this.setPosData()
 
-    this.config = config
+    if (!this.posData) return
 
-    this.nodes.forEach(node => {
-      const posDataPoint = posDataset.find(d => d.id === node.id)
-
-      const idleProps = posDataPoint 
-        ? posDataPoint
-        : { x: 0, y: 0, theta: 0, radius: 0, time: 0 }
-
-      delete idleProps.id
-
-      node.setIdleProps(idleProps) // const hasLayoutChanged = false // this.command.layout !== layout
-    })
-
-    this.zoomController.translateExtent(config.extent)
+    this.nodes.forEach(node => node.setIdleProps())
   }
 
 
@@ -220,7 +438,7 @@ export default class Simulation {
 
     const delay = c.shifts
 
-    this.updateIdleProps()
+    this.setIdleProps()
 
     gsap.timeline({ overwrite: true })
     .set(command, { state: "sort", onComplete: playState })
@@ -235,7 +453,7 @@ export default class Simulation {
 
     const state = isExclusion ? "filter-out" : "filter-in"
 
-    this.updateIdleProps()
+    this.setIdleProps()
 
     gsap.timeline({ overwrite: true })
     .set(command, { state, onComplete: playState })
@@ -243,16 +461,16 @@ export default class Simulation {
 
   }
 
-  public playState = (updateIdleProps=false) => {
+  public playState = (setIdleProps=false) => {
     // console.log('playState:', this.command.state)
 
     const { layout, state } = this.command
 
-    if (updateIdleProps) {
-      this.updateIdleProps()
+    if (setIdleProps) {
+      this.setIdleProps()
     }
 
-    if (!layout || !this.config) {
+    if (!layout || !this.posData) {
       return
     }
 

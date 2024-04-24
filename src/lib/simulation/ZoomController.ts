@@ -8,10 +8,10 @@ export default class ZoomController {
   private zoomBehavior
 
   constructor(target) {
-    console.log('zoomController init')
-    console.log('\t', target)
-    console.log('\t', d3.select(this.target))
-    console.log('\t', this.zoomBehavior)
+    // console.log('zoomController init')
+    // console.log('\t', target)
+    // console.log('\t', d3.select(this.target))
+    // console.log('\t', this.zoomBehavior)
 
     const zoomBehavior = d3.zoom()
       .on("start", this.onZoomStart)
@@ -44,7 +44,7 @@ export default class ZoomController {
   private zoomed(e) {
     const { x, y, k } = e.transform
 
-    console.log(get(zoom))
+    // console.log(get(zoom))
     zoom.set(k)
     cameraOffsetX.set(x)
     cameraOffsetY.set(y)
@@ -56,7 +56,7 @@ export default class ZoomController {
 
   // PUBLIC
   public resetZoom = (duration=1000) => {
-    console.log('resetZoom')
+    // console.log('resetZoom')
 
     const { target, zoomBehavior } = this
 
@@ -67,7 +67,7 @@ export default class ZoomController {
   }
 
   public translateExtent = (extent, reset=true, resetDuration=0) => {
-    console.log('translateExtent')
+    // console.log('translateExtent')
     const { zoomBehavior, resetZoom } = this
 
     zoomBehavior.translateExtent(extent)
@@ -75,7 +75,7 @@ export default class ZoomController {
   }
 
   public scaleExtent = (extent: number[]) => {
-    console.log('scaleExtent')
+    // console.log('scaleExtent')
 
     const { zoomBehavior } = this
     zoomBehavior.scaleExtent(extent)
