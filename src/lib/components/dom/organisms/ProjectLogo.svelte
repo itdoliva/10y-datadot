@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+
   // DOM Elements
   import Icon from "$lib/components/dom/atoms/Icon.svelte";
 
@@ -8,7 +10,7 @@
   <div class="project-logo__icon">
     <Icon icon="logo" />
   </div>
-  <p class="project-logo__text">10 anos</p>
+  <p class="project-logo__text">{$_("page.hero")}</p>
 </div>
 
 <style lang="scss">

@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+
   // Store
   import { fyears } from "$lib/stores/nodes";
   import { isSwitchingLayout } from "$lib/stores/canvas"
@@ -8,7 +10,7 @@
   import YearSliderPicker from "$lib/components/dom/organisms/YearSliderPicker.svelte";
 </script>
 
-<PanelItem icon="period" title="período">
+<PanelItem icon="period" title={$_("input.period")}>
   <YearSliderPicker 
     disabled={$isSwitchingLayout}
     min={2014} 

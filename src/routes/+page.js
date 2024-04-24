@@ -1,3 +1,5 @@
+import "$lib/i18n"
+
 import * as d3 from "d3"
 
 function getNCats() {

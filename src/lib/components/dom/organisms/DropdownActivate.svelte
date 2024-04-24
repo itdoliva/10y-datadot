@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+  
   // Stores
   import { sortBy } from "$lib/stores/nodes";
   import { complexityOn, linkProjectOn, linkClientOn } from "$lib/stores/canvas";
@@ -9,11 +11,12 @@
   
   let activeFeatures = []
 
-  const featCategories = [
-    { alias: "complexidade", id: "complexity" },
-    { alias: "ver conexões por cliente", id: "link-client" },
-    { alias: "ver conexões por projeto", id: "link-project" },
-  ]
+  const featIds = [ "complexity", "link-project", "link-client" ]
+
+  $: featCategories = featIds.map(id => ({
+    id,
+    alias: $_(`menu.active.values.${id}`)
+  }))
 
   $: complexityOn.set(activeFeatures.includes('complexity'))
   $: linkProjectOn.set(activeFeatures.includes('link-project'))
@@ -21,7 +24,7 @@
 
 </script>
 
-<DropdownMenu title="ativar">
+<DropdownMenu title={$_("menu.active.title")}>
   <InputGroup
     direction="column"
     categories={featCategories}

@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+
   // Stores
   import { fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/stores/nodes";
 
@@ -30,9 +32,9 @@
   colorDisabled="var(--clr-accent-low)"
 >
   <div class:disabled={disabled}>
-    <p>
+    <p style:text-transform="uppercase">
       X 
-      <span style:text-decoration="underline">LIMPAR FILTROS</span>
+      <span style:text-decoration="underline">{$_("menu.unselect-all")}</span>
     </p>
   </div> 
   

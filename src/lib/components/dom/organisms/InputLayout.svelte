@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+
   // Components
 	import PanelItem from '$lib/components/dom/molecules/PanelItem.svelte';
   import InputGroupLayout from "$lib/components/dom/molecules/InputGroupLayout.svelte";
@@ -10,7 +12,7 @@
   
 </script>
 
-<PanelItem icon="layouts" title="visualizar como" {direction}>
+<PanelItem icon="layouts" title={$_("input.layout")} {direction}>
 
   <InputGroupLayout 
     {direction}

@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+
   // Actions
   import { hoveredFilter } from '$lib/stores/canvas.js';
 
@@ -43,7 +45,7 @@
 
           <div class="item__label">
             <input type="checkbox" value={id} {disabled} bind:group={selected}/>
-            <span>{alias}</span>
+            <span>{$_(alias)}</span>
           </div>
 
         </label>

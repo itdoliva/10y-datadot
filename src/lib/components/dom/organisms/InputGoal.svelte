@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+
   // Store
   import { fgoals, categoriesEnriched } from "$lib/stores/nodes";
   import { isSwitchingLayout } from "$lib/stores/canvas"
@@ -11,7 +13,7 @@
 
 </script>
 
-<PanelItem icon="goals" title="objetivos do projeto">
+<PanelItem icon="goals" title={$_("input.goal")}>
   <InputGroupGoal 
     categories={$categoriesEnriched.goals} 
     disabled={$isSwitchingLayout}

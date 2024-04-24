@@ -1,0 +1,83 @@
+{
+  "page": {
+    "title": "10 years • datadot design studio",
+    "hero": "10 years"
+  },
+
+  "category": {
+    "channel": {
+      "0": "Digital",
+      "1": "Print Media",
+      "2": "Consulting"
+    },
+    "product": {
+      "10": "Video & Animation",
+      "11": "Publishing",
+      "12": "Report",
+      "13": "Presentation",
+      "14": "Institutional Website",
+      "15": "Editorial Website",
+      "16": "Dashboard",
+      "17": "Infographic"
+    },
+    "design": {
+      "20": "Illustration",
+      "21": "Editorial",
+      "22": "Motion Graphics",
+      "23": "Service Design",
+      "24": "User Interface"
+    },
+    "goal": {
+      "30": "Educational",
+      "31": "Informative",
+      "32": "Positive Impact",
+      "33": "Institutional",
+      "34": "Editorial"
+    },
+    "industry": {
+      "40": "Journalism",
+      "41": "Education",
+      "42": "Tourism",
+      "43": "Retail",
+      "44": "NGOs",
+      "46": "Financial",
+      "47": "Real Estate"
+    }
+  },
+
+  "input": {
+    "layout": "layout as",
+    "period": "period",
+    "design": "design category",
+    "goal": "project goals",
+    "industry": "market industry",
+    "product": "product type",
+    "unselect": "select all"
+  },
+
+  "menu": {
+    "filters": "filters",
+
+    "sort": {
+      "title": "sort by",
+      "values": {
+        "year": "date",
+        "industry": "industry"
+      }
+    },
+    "active": {
+      "title": "activate",
+      "values": {
+        "complexity": "complexity",
+        "link-client": "show client links",
+        "link-project": "show project links"
+      }
+    },
+    "unselect-all": "clear filters",
+    "play": "play my vis!"
+  },
+  
+  "file": {}
+  
+
+}

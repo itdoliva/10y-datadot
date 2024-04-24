@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+
   // Stores
   import { sortBy } from "$lib/stores/nodes";
 
@@ -6,13 +8,16 @@
   import DropdownMenu from "$lib/components/dom/molecules/DropdownMenu.svelte";
   import InputGroup from "$lib/components/dom/molecules/InputGroup.svelte";
 
-  const sortCategories = [
-    { alias: "data", id: "year" },
-    { alias: "setor", id: "industry" },
-  ]
+  const sortIds = [ "year", "industry"]
+
+  $: sortCategories = sortIds.map(id => ({
+    id,
+    alias: $_(`menu.sort.values.${id}`)
+  }))
+
 </script>
 
-<DropdownMenu title="organizar por">
+<DropdownMenu title={$_("menu.sort.title")}>
   <InputGroup
     direction="column"
     categories={sortCategories}

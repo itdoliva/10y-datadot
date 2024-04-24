@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+
   // Store
   import { findustries } from "$lib/stores/nodes";
   import { isSwitchingLayout } from "$lib/stores/canvas"
@@ -8,7 +10,7 @@
   import Beeswarm from "$lib/components/dom/organisms/Beeswarm.svelte";
 </script>
 
-<PanelItem icon="industries" title="setores do mercado">
+<PanelItem icon="industries" title={$_("input.industry")}>
   <Beeswarm 
     disabled={$isSwitchingLayout}
     bind:selected={$findustries} 

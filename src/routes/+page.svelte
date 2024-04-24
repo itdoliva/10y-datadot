@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+
   // Libraries
   import { onMount } from "svelte";
 
@@ -32,7 +34,7 @@
 
 
 <svelte:head>
-  <title>10 anos • datadot design studio</title>
+  <title>{$_("page.title")}</title>
 </svelte:head>
 
 <!-- Background Canvas -->

@@ -1,0 +1,83 @@
+{
+  "page": {
+    "title": "10 anos • datadot design studio",
+    "hero": "10 anos"
+  },
+
+  "category": {
+    "channel": {
+      "0": "Digital",
+      "1": "Impresso",
+      "2": "Consultoria"
+    },
+    "product": {
+      "10": "Animação & Vídeo",
+      "11": "Publicação",
+      "12": "Relatório",
+      "13": "Apresentação",
+      "14": "Site Institucional",
+      "15": "Site Editorial",
+      "16": "Dashboard",
+      "17": "Infográfico"
+    },
+    "design": {
+      "20": "Ilustração",
+      "21": "Editorial",
+      "22": "Motion Graphics",
+      "23": "Design de Serviço",
+      "24": "User Interface"
+    },
+    "goal": {
+      "30": "Educacional",
+      "31": "Informacional",
+      "32": "Impacto Positivo",
+      "33": "Institucional",
+      "34": "Editorial"
+    },
+    "industry": {
+      "40": "Jornalismo",
+      "41": "Educação",
+      "42": "Turismo",
+      "43": "Varejo",
+      "44": "ONGs",
+      "46": "Financeiro",
+      "47": "Imobiliário"
+    }
+  },
+
+  "input": {
+    "layout": "visualizar como",
+    "period": "período",
+    "design": "categoria de design",
+    "goal": "objetivos do projeto",
+    "industry": "setores do mercado",
+    "product": "tipos de entrega",
+    "unselect": "selecionar tudo"
+  },
+
+  "menu": {
+    "filters": "filtros",
+
+    "sort": {
+      "title": "organizar por",
+      "values": {
+        "year": "data",
+        "industry": "setor"
+      }
+    },
+    "active": {
+      "title": "ativar",
+      "values": {
+        "complexity": "complexidade",
+        "link-client": "ver conexões por cliente",
+        "link-project": "ver conexões por projeto"
+      }
+    },
+    "unselect-all": "limpar filtros",
+    "play": "play my vis!"
+  },
+  
+  "file": {}
+  
+
+}

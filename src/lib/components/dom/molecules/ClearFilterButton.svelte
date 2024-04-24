@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+
   // DOM Elements
   import Button from "$lib/components/dom/atoms/Button.svelte"
 
@@ -12,7 +14,7 @@
   colorHover="var(--clr-accent)"
   colorDisabled="var(--clr-accent-low)"
 >
-  <p class:disabled={disabled}>selecionar tudo</p>
+  <p class:disabled={disabled}>{$_("input.unselect")}</p>
 </Button>
 
 <style lang="scss">

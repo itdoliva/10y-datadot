@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+
   // Libraries
   import * as PIXI from "pixi.js"
 
@@ -79,7 +81,7 @@
 
           <div class="item__label">
             <input type="checkbox" value={id} {disabled} bind:group={selected}/>
-            <p>{alias}</p>
+            <p>{$_(alias)}</p>
           </div>
 
         </label>

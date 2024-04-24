@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+
   // Libraries
   import { onMount } from "svelte";
   import { tweened } from "svelte/motion";
@@ -36,7 +38,7 @@
     {/if}
 
     <text class="text__alias" text-anchor="middle" dominant-baseline="middle" dy="1.35em" filter="url(#text-bg)">
-      {alias}
+      {$_(alias)}
     </text>
 
 

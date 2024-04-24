@@ -24,6 +24,7 @@
 		"node-sass": "^9.0.0",
 		"pixi.js": "^7.3.3",
 		"sass": "^1.69.5",
+		"svelte-i18n": "^4.0.0",
 		"svelte-preprocess": "^5.1.0",
 		"textures": "^1.2.3"
 	}

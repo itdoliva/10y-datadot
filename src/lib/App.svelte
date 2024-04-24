@@ -1,7 +1,9 @@
 <script>
+  import { _, locale } from 'svelte-i18n'
+
   // Initialize
   import "./pixi.js"
-
+  
   // Libraries
   import * as PIXI from "pixi.js"
 
@@ -14,9 +16,11 @@
   import onClickOutside from "$lib/actions/onClickOutside"
 
   // DOM Components
-  import File from '$lib/components/dom/organisms/File.svelte';
   import Icon from "$lib/components/dom/atoms/Icon.svelte";
   import Button from "$lib/components/dom/atoms/Button.svelte";
+  import ClearAllFilterButton from "$lib/components/dom/molecules/ClearAllFilterButton.svelte";
+	import PlayButton from '$lib/components/dom/molecules/PlayButton.svelte';
+  import File from '$lib/components/dom/organisms/File.svelte';
   import ProjectLogo from "$lib/components/dom/organisms/ProjectLogo.svelte";
   import PanelMenu from '$lib/components/dom/organisms/PanelMenu.svelte';
   import InputProduct from "$lib/components/dom/organisms/InputProduct.svelte";
@@ -25,18 +29,21 @@
   import InputPeriod from "$lib/components/dom/organisms/InputPeriod.svelte";
   import InputGoal from "$lib/components/dom/organisms/InputGoal.svelte";
   import InputIndustry from "$lib/components/dom/organisms/InputIndustry.svelte";
-  import ClearAllFilterButton from "$lib/components/dom/molecules/ClearAllFilterButton.svelte";
-	import PlayButton from '$lib/components/dom/molecules/PlayButton.svelte';
   import DropdownSortBy from "$lib/components/dom/organisms/DropdownSortBy.svelte";
   import DropdownActivate from "$lib/components/dom/organisms/DropdownActivate.svelte";
 
   // WebGL Components
   import Visualization from '$lib/components/webgl/organisms/Visualization.svelte';
 
+
   let layout = 'block'
   let topInputGroupHeight
   let isTopMenuCollapsed = false
   let isMobileFilterOpen = false
+
+  let selectedLanguage = $locale.slice(0, 2)
+
+  $: locale.set(selectedLanguage.slice(0, 2))
 
   const productContainer = new PIXI.Container()
   productContainer.name = "top-panel"
@@ -68,7 +75,7 @@
     <button class="filter-toggle-container" 
       on:click={() => isMobileFilterOpen = true}
     >
-      <p>filtros <span class="plus">+</span></p>
+      <p>{$_("menu.filters")} <span class="plus">+</span></p>
     </button>
 
     <aside 
@@ -122,6 +129,12 @@
   
 
   {:else}
+
+  
+  <select bind:value={selectedLanguage}>
+    <option value="en">EN</option>
+    <option value="pt">PT</option>
+  </select>
 
   <header 
     class="top-container" 
@@ -213,6 +226,13 @@
 
 <style lang="scss">
   @import "$lib/scss/breakpoints.scss";
+
+  select {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    z-index: 10;
+  }
 
   .root {
     display: grid;

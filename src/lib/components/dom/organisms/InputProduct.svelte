@@ -1,4 +1,6 @@
 <script>
+  import { _ } from 'svelte-i18n'
+
   // Store
   import { fproducts, categoriesEnriched } from "$lib/stores/nodes";
   import { isSwitchingLayout } from "$lib/stores/canvas"
@@ -11,7 +13,7 @@
   export let nColumns = 1
 </script>
 
-<PanelItem icon="products" title="tipos de entrega">
+<PanelItem icon="products" title={$_("input.product")}>
   <InputGroupProduct
     parent={parent}
     categories={$categoriesEnriched.products}

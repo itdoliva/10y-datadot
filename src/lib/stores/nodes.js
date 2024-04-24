@@ -1,4 +1,6 @@
 import { writable, derived, readable } from "svelte/store";
+import { _ } from 'svelte-i18n'
+
 import * as d3 from "d3"
 
 import { width } from "./canvas"
@@ -69,6 +71,15 @@ export const categoriesEnriched = derived([ nodes, categories ], ([ $nodes, $cat
       d.pctNodes = +(d.nNodes / activeNodes.length).toFixed(2)
     })
   })
+
+  // Object.keys(enriched).forEach(category => {
+  //   Object.keys(enriched[category]).forEach(categoryValue => {
+  //     const aliasKey = enriched[category][categoryValue].alias
+  //     enriched[category][categoryValue].alias = $_(aliasKey)
+  //   })
+  // })
+
+
 
   return enriched
 })
