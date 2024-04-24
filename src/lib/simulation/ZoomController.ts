@@ -1,4 +1,8 @@
+// Libraries
 import * as d3 from "d3"
+import { gsap } from "gsap";
+
+// Stores
 import { get } from "svelte/store"
 import { zoom, cameraOffsetX, cameraOffsetY, isDragging } from "../stores/zoom";
 
@@ -6,13 +10,13 @@ export default class ZoomController {
   private target
   private targetSelection
   private zoomBehavior
+  
+  private _translateExtentCenter;
+  private _translateExtent;
+  private _scaleExtent = [ 1, 1 ]
+  private _scale = 1
 
   constructor(target) {
-    // console.log('zoomController init')
-    // console.log('\t', target)
-    // console.log('\t', d3.select(this.target))
-    // console.log('\t', this.zoomBehavior)
-
     const zoomBehavior = d3.zoom()
       .on("start", this.onZoomStart)
       .on("end", this.onZoomEnd)
@@ -55,36 +59,59 @@ export default class ZoomController {
   }
 
   // PUBLIC
-  public resetZoom = (duration=1000) => {
-    // console.log('resetZoom')
+  public zoom = () => {
+    return get(zoom)
+  }
 
+  public resetZoom = (duration=1000) => {
     const { target, zoomBehavior } = this
 
     d3.select(target)
       .transition()
       .duration(duration)
       .call(zoomBehavior.transform, d3.zoomIdentity)
+    return this
   }
 
-  public translateExtent = (extent, reset=true, resetDuration=0) => {
-    // console.log('translateExtent')
-    const { zoomBehavior, resetZoom } = this
+  public translateExtent = (extent: number[][] | undefined) => {
+    if (!Array.isArray(extent)) {
+      return this._translateExtent
+    }
 
-    zoomBehavior.translateExtent(extent)
-    if (reset) resetZoom(resetDuration)
+    this._translateExtent = extent
+    this.zoomBehavior.translateExtent(extent)
+    return this
+  }
+
+  public translateTo = (...args) => {
+    this.zoomBehavior.translateTo(this.targetSelection, ...args)
+    return this
   }
 
   public scaleExtent = (extent: number[]) => {
-    // console.log('scaleExtent')
+    if (extent) {
+      this._scaleExtent = extent
+    }
 
-    const { zoomBehavior } = this
-    zoomBehavior.scaleExtent(extent)
+    this.zoomBehavior.scaleExtent(this._scaleExtent)
+    return this
   }
 
-  public scaleTo = (scale) => {
-    const { zoomBehavior } = this
-    zoomBehavior.scaleTo(this.targetSelection, scale)
-    zoom.set(scale)
+  public scale = (k: number) => {
+
+    if (!k) {
+      return this._scale
+    }
+
+    this._scale = k
+
+    this.zoomBehavior.scaleTo(this.targetSelection, this._scale)
+    zoom.set(this._scale)
+
+    return this
+    
   }
+
+
 
 }

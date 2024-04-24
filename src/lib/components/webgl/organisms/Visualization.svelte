@@ -53,7 +53,7 @@
 
   $: if ($width < 768 && layout === 'radial') {
     zoomController?.scaleExtent([.3, 1])
-    zoomController?.scaleTo(.5)
+    zoomController?.scale(.5)
   } 
   else {
     zoomController?.scaleExtent([1, 1])

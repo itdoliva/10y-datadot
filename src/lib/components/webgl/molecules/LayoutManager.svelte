@@ -32,9 +32,7 @@
   $: if ($figureWidth || $figureHeight) {
     simulation.updateForceCollideRadius()
   } 
-
   $: if ($figureHeight) {
-    simulation.updatePadding()
     simulation.updateExtent()
   }
 

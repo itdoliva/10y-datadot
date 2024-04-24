@@ -129,8 +129,6 @@ export class SimulationNode {
     // this.log("setIdleProps")
 
     const idlePropsNew = this.simulation.posData.find(d => d.id === this.id).pos
-    idlePropsNew.x += this.simulation.layoutOffsetX
-    idlePropsNew.y += this.simulation.layoutOffsetY
     
     // Check if new position is the same from the previous one
     // If so, do nothing

@@ -50,10 +50,9 @@ export default class Simulation {
 
   public layoutWidth
   public layoutHeight
-  public layoutExtent
-  public layoutPadding
-  public layoutOffsetX
-  public layoutOffsetY
+  
+  public translateToX
+  public translateToY
 
   public posData;
 
@@ -110,55 +109,13 @@ export default class Simulation {
   }
 
 
-  private setLayoutDimensions(w, h, { updatePadding=true, updateExtent=true } = {}) {
+  private setLayoutDimensions(w, h, { updateExtent=true } = {}) {
     if (w) this.layoutWidth = w
     if (h) this.layoutHeight = h
 
-    if (updatePadding) this.updatePadding()
     if (updateExtent) this.updateExtent()
   }
 
-  public updateLayoutOffsets() {
-    const s_fw = get(figureWidth)
-    const s_fh = get(figureHeight)
-
-    const { command, layoutPadding } = this
-    const { layout } = command
-
-    let offsetX = 0
-    let offsetY = 0
-
-    if (layout === "block") {
-       offsetX = -s_fw/2 + layoutPadding.left
-       offsetY = -s_fh/2 + layoutPadding.top
-    }
-
-     this.layoutOffsetX = offsetX
-     this.layoutOffsetY = offsetY
-  }
-
-  public updatePadding() {
-    const s_fw = get(figureWidth)
-    const s_fh = get(figureHeight)
-    const s_nodeSize = get(nodeSize)
-
-    const { layoutWidth, layoutHeight, command } = this
-    const { layout } = command
-
-    const padding = { left: 0, top: 0 }
-
-    if (layout === "block") {
-      padding.left = (s_fw - layoutWidth)/2
-
-      padding.top = layoutHeight < s_fh  
-        ? (s_fh - layoutHeight)/2 + s_nodeSize/2 
-        : s_nodeSize
-    }
-
-    this.layoutPadding = padding
-
-    this.updateLayoutOffsets()
-  }
 
   public updateExtent() {
     const s_fw = get(figureWidth)
@@ -168,16 +125,21 @@ export default class Simulation {
     const { layoutWidth, layoutHeight, command } = this
     const { layout } = command
 
-    let extentX: number[] = []
-    let extentY: number[] = []
+    let extentX: number[] = [ 0, s_fw ]
+    let extentY: number[] = [ 0, s_fh ]
+
+    let translateToX = 0
+    let translateToY = 0
     
     if (layout === "block") {
+      const margin = s_nodeSize
       const exceedY = (layoutHeight + s_nodeSize) - s_fh
 
-      extentX = [ 0, s_fw ]
-      extentY = exceedY > 0
-        ? [ 0, (layoutHeight + 2*s_nodeSize) ]
-        : [ 0, s_fh ]
+      if (exceedY > 0) {
+        extentY = [ -(exceedY/2 + margin), s_fh + (exceedY/2 + margin) ]
+      }
+
+      translateToY = extentY[0]
     }
     else {
       const margin = s_nodeSize*3
@@ -194,9 +156,10 @@ export default class Simulation {
       : [ 0, s_fh ]
     }
 
-    this.layoutExtent = extentX.map((_, i) => [ extentX[i], extentY[i] ])
+    const extent = extentX.map((_, i) => [ extentX[i], extentY[i] ])
 
-    this.zoomController.translateExtent(this.layoutExtent)
+    this.zoomController.translateExtent(extent)
+      .translateTo(translateToX, translateToY, [0, 0])
   }
 
   private setBlockPosData() {
@@ -255,8 +218,8 @@ export default class Simulation {
       const colIndex = Math.floor(i % columns)
       const rowIndex = Math.floor(i / columns)
 
-      pos.x = colIndex * (s_nodeSize + s_gap) + s_nodeSize/2 // - fw/2 + padding.left
-      pos.y = rowIndex * (s_nodeSize + s_gap) + s_nodeSize/2 // - fh/2 + padding.top
+      pos.x = colIndex * (s_nodeSize + s_gap) + s_nodeSize/2 - blockWidth/2
+      pos.y = rowIndex * (s_nodeSize + s_gap) + s_nodeSize/2 - blockHeight/2
       pos.time = (
         columnDensities[colIndex] * c.colEntranceUpTo + // column delay
         timeStepByRow * rowIndex // row delay
@@ -488,7 +451,28 @@ export default class Simulation {
     const targetNodes = this.nodes.slice(1)
 
 
+    const { zoomController } = this
     if (state === "entrance") {
+      // const initK = zoomController.zoom() 
+      // const t = { k: initK }
+
+      // const tl = gsap.timeline({
+      //   onUpdate: () => {
+      //     zoomController.scale(t.k)
+      //   }
+      // })
+
+      // tl.to(t, {
+      //   k: .3,
+      //   duration: .750,
+      //   ease: d3.easeQuadInOut
+      // })
+      // .to(t, {
+      //   k: initK,
+      //   duration: .250,
+      //   ease: d3.easeCubicInOut
+      // })
+
       targetNodes.forEach((node) => node.chainEntrance())
     }
     else if (state === "exit") {
