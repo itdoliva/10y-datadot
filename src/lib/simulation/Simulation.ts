@@ -158,8 +158,10 @@ export default class Simulation {
 
     const extent = extentX.map((_, i) => [ extentX[i], extentY[i] ])
 
+    // console.log({ layout: [ layoutWidth, layoutHeight ], extent })
+
     this.zoomController.translateExtent(extent)
-      .translateTo(translateToX, translateToY, [0, 0])
+      .translateTo(translateToX, translateToY)
   }
 
   private setBlockPosData() {
@@ -438,6 +440,7 @@ export default class Simulation {
   public playState = (setIdleProps=false) => {
     // console.log('playState:', this.command.state)
 
+    const { zoomController } = this
     const { layout, state } = this.command
 
     if (setIdleProps) {
@@ -450,32 +453,12 @@ export default class Simulation {
 
     const targetNodes = this.nodes.slice(1)
 
-
-    const { zoomController } = this
     if (state === "entrance") {
-      // const initK = zoomController.zoom() 
-      // const t = { k: initK }
-
-      // const tl = gsap.timeline({
-      //   onUpdate: () => {
-      //     zoomController.scale(t.k)
-      //   }
-      // })
-
-      // tl.to(t, {
-      //   k: .3,
-      //   duration: .750,
-      //   ease: d3.easeQuadInOut
-      // })
-      // .to(t, {
-      //   k: initK,
-      //   duration: .250,
-      //   ease: d3.easeCubicInOut
-      // })
-
+      // zoomController.playEntrance(layout)
       targetNodes.forEach((node) => node.chainEntrance())
     }
     else if (state === "exit") {
+      // zoomController.playExit()
       targetNodes.forEach((node) => node.chainExit())
     }
     else if (state === "filter-in") {

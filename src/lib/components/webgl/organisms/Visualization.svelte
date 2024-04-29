@@ -56,7 +56,7 @@
     zoomController?.scale(.5)
   } 
   else {
-    zoomController?.scaleExtent([1, 1])
+    zoomController?.scaleExtent([.1, 3])
   }
 
 

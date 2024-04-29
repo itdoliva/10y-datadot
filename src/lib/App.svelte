@@ -1,5 +1,5 @@
 <script>
-  import { _, locale } from 'svelte-i18n'
+  import { _ } from 'svelte-i18n'
 
   // Initialize
   import "./pixi.js"
@@ -31,6 +31,7 @@
   import InputIndustry from "$lib/components/dom/organisms/InputIndustry.svelte";
   import DropdownSortBy from "$lib/components/dom/organisms/DropdownSortBy.svelte";
   import DropdownActivate from "$lib/components/dom/organisms/DropdownActivate.svelte";
+  import LanguageChange from "$lib/components/dom/organisms/LanguageChange.svelte";
 
   // WebGL Components
   import Visualization from '$lib/components/webgl/organisms/Visualization.svelte';
@@ -41,9 +42,7 @@
   let isTopMenuCollapsed = false
   let isMobileFilterOpen = false
 
-  let selectedLanguage = $locale.slice(0, 2)
 
-  $: locale.set(selectedLanguage.slice(0, 2))
 
   const productContainer = new PIXI.Container()
   productContainer.name = "top-panel"
@@ -62,8 +61,11 @@
 
   {#if $width < 768} 
 
-  <header class="logo-container">
-    <ProjectLogo />
+  <header class="mobile-header-container">
+    <div class="logo-container">
+      <ProjectLogo />
+    </div>
+    <LanguageChange />
   </header>
 
   <main 
@@ -131,10 +133,6 @@
   {:else}
 
   
-  <select bind:value={selectedLanguage}>
-    <option value="en">EN</option>
-    <option value="pt">PT</option>
-  </select>
 
   <header 
     class="top-container" 
@@ -188,6 +186,12 @@
         </div>
       </li>
 
+      <li class="panel-menu__item no-border language-change">
+        <div class="language-change-container">
+          <LanguageChange />
+        </div>
+      </li>
+
     </ul>
   </header>
 
@@ -227,10 +231,10 @@
 <style lang="scss">
   @import "$lib/scss/breakpoints.scss";
 
-  select {
-    position: absolute;
-    top: 2rem;
-    right: 2rem;
+  .language-change-container {
+    // position: absolute;
+    // top: 2rem;
+    // right: 2rem;
     z-index: 10;
   }
 
@@ -242,7 +246,7 @@
 
     grid-template-rows: min-content 1fr min-content min-content;
     grid-template-areas:
-      "logo"
+      "header"
       "viz"
       "layout"
       "play";
@@ -255,7 +259,7 @@
         "left viz";
     }
 
-    .logo-container { grid-area: logo; }
+    .mobile-header-container { grid-area: header; }
     .viz-container { grid-area: viz; }
     .layout-container { grid-area: layout; }
     .play-container { grid-area: play; }
@@ -264,11 +268,19 @@
 
 
 
-    .logo-container {
-      padding-block: 1rem;
+    .mobile-header-container {
+      padding: 
+        calc(2.4*var(--fs-label)) 
+        calc(2*var(--fs-label))
+        calc(1.2*var(--fs-label))
+        calc(2*var(--fs-label));
   
       border-bottom: 1px solid var(--clr-black-fade-out);
       z-index: 1;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
     }
   
     .layout-container {
@@ -459,7 +471,7 @@
 
       .panel-menu {
         display: grid;
-        grid-template-columns: auto auto auto max-content max-content 1fr;
+        grid-template-columns: auto auto auto max-content max-content 1fr min-content;
         grid-template-rows: calc(4*var(--fs-label));
         align-items: stretch;
 
@@ -506,6 +518,11 @@
                 }
               }
             }
+          }
+
+          &.language-change {
+            align-self: center;
+            padding-right: calc(4*var(--fs-label));
           }
         }
       }
