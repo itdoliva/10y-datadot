@@ -41,6 +41,8 @@
 </Button>
 
 <style lang="scss">
+  @import "$lib/scss/breakpoints.scss";
+
   div {
     width: 100%;
     height: 100%;
@@ -59,6 +61,16 @@
 
       p {
         font-weight: 700;
+      }
+    }
+
+    &.disabled {
+      p {
+        opacity: .4;
+  
+        @include md {
+          opacity: 1;
+        }
       }
     }
   }

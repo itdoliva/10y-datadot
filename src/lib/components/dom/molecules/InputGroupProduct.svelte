@@ -1,4 +1,5 @@
 <script>
+  import { getContext } from 'svelte';
   import { _ } from 'svelte-i18n'
 
   // Libraries
@@ -22,6 +23,8 @@
   // Templates
   import templates from "$lib/templates"
 
+  const { theme } = getContext("item-theme")
+
 
   export let categories
   export let selected = []
@@ -36,7 +39,7 @@
 </script>
 
 <div 
-  class="container"
+  class="container {theme}"
   class:bubble={!!parent}
 >
 
@@ -58,6 +61,7 @@
 
           <div class="item__check">
             <CheckIcon 
+              onDark={theme === "on-dark"}
               active={active} 
               hoveredFilter={$hoveredFilter === id} 
             />
@@ -106,9 +110,25 @@
     // grid-auto-flow: row;
     // gap: 0;
 
+    &.on-dark {
+        .input-group {
+          &__item {
+            .item {
+              &__label {
+                input:checked + p {
+                  font-weight: 700;
+                  color: var(--clr-accent);
+                }
+
+              }
+            }
+          }
+        }
+      }
+
     .input-group {
       display: grid;
-      grid-template-rows: repeat(var(--items-by-column), auto);
+      grid-template-rows: repeat(var(--items-by-column), min-content);
       grid-template-columns: repeat(var(--n-columns), 1fr);
 
       align-items: start;
@@ -119,6 +139,8 @@
       columns: var(--n-columns);
       -webkit-columns: var(--n-columns);
       -moz-columns: var(--n-columns);
+
+      
 
       &__item {
 

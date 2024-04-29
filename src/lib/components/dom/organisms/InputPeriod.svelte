@@ -1,4 +1,5 @@
 <script>
+  import { setContext } from 'svelte';
   import { _ } from 'svelte-i18n'
 
   // Store
@@ -8,6 +9,10 @@
   // Components
 	import PanelItem from '$lib/components/dom/molecules/PanelItem.svelte';
   import YearSliderPicker from "$lib/components/dom/organisms/YearSliderPicker.svelte";
+
+  export let theme = "on-light"
+
+  setContext("item-theme", { theme })
 </script>
 
 <PanelItem icon="period" title={$_("input.period")}>

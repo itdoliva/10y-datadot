@@ -1,4 +1,6 @@
 <script>
+  import { getContext } from 'svelte';
+
   // Stores
   import { hoveredFilter } from '$lib/stores/canvas.js';
 
@@ -19,11 +21,13 @@
 
   export let direction = 'row'
 
+  const { theme } = getContext("item-theme")
+
 
 
 </script>
 
-<div class="container {gridlayout} {direction}">
+<div class="container {gridlayout} {direction} {theme}">
 
   <ul class="input-group">
     {#each categories as { id, alias, pctNodes }, i}
@@ -38,7 +42,7 @@
 
           <div class="item__check">
             <CheckIcon 
-              {onDark}
+              onDark={onDark || theme === "on-dark"}
               active={active} 
               hoveredFilter={$hoveredFilter === id} 
             />
@@ -90,6 +94,22 @@
     gap: 0;
 
     width: 100%;
+
+    &.on-dark {
+      .input-group {
+        &__item {
+          .item {
+            &__label {
+              input:checked + span {
+                font-weight: 700;
+                color: var(--clr-accent);
+              }
+
+            }
+          }
+        }
+      }
+    }
 
     .input-group {
       display: grid;

@@ -1,7 +1,7 @@
 <script>
   // Libraries
   import * as d3 from "d3"
-  import { onMount } from "svelte"
+  import { getContext } from "svelte"
 
   export let min
   export let max
@@ -10,6 +10,7 @@
   export let disabled
 
   const drag = [ min, max ]
+  const { theme } = getContext("item-theme")
 
   let svg
   let w = 100
@@ -72,7 +73,7 @@
 </script>
 
 
-<div class="container" >
+<div class="container {theme}" >
 
   <ul class="labels">
     {#each drag as year}
@@ -93,8 +94,8 @@
       <g transform="translate({pad.left}, {h/2})">
 
         <g class="slider__lines">
-          <line class="back-line" x1=0 x2={innerW} />
-          <line class="front-line" x1={year2pos(drag[0])} x2={year2pos(drag[1])} />
+          <line class="line-back" x1=0 x2={innerW} />
+          <line class="line-front" x1={year2pos(drag[0])} x2={year2pos(drag[1])} />
         </g>
 
         <g class="slider__handlers">
@@ -135,12 +136,36 @@
 
 
 <style lang="scss">
+  @import "$lib/scss/breakpoints.scss";
+
   .container {
     --fs-year-label: calc(var(--fs-label)*.9);
 
     display: grid;
 
     grid-auto-flow: row;
+
+    &.on-light {
+      --clr-line-back: var(--clr-black);
+      --clr-line-front: var(--clr-black);
+
+      --clr-fst-circle-fill: transparent;
+      --clr-fst-circle-inner: var(--clr-black);
+
+      --clr-sec-circle-fill: var(--clr-black);
+      --clr-sec-circle-inner: var(--clr-white);
+    }
+
+    &.on-dark {
+      --clr-line-back: var(--clr-white);
+      --clr-line-front: var(--clr-accent);
+      
+      --clr-fst-circle-fill: var(--clr-accent);
+      --clr-fst-circle-inner: transparent;
+
+      --clr-sec-circle-fill: var(--clr-white);
+      --clr-sec-circle-inner: var(--clr-accent);
+    }
 
     .labels {
       height: var(--fs-year-label);
@@ -168,13 +193,23 @@
         overflow: visible;
 
         &__lines {
-          .back-line {
-            stroke: var(--clr-black);
-            stroke-dasharray: 1 3;
+          stroke-width: 3px;
+
+          @include md {
+            stroke-width: 1px;
           }
 
-          .front-line {
-            stroke: var(--clr-black);
+          .line-back {
+            stroke: var(--clr-line-back);
+            stroke-dasharray: 4;
+
+            @include md {
+              stroke-dasharray: 1 3;
+            }
+          }
+
+          .line-front {
+            stroke: var(--clr-line-front);
           }
         }
 
@@ -183,8 +218,11 @@
           .handler {
 
             .outer-circle {
-              stroke: var(--clr-black);
               stroke-width: 1px;
+              
+              @include md {
+                stroke: var(--clr-black);
+              }
             }
 
             .inner-circle {
@@ -197,21 +235,21 @@
 
             &:first-child {
               .outer-circle {
-                fill: transparent;
+                fill: var(--clr-fst-circle-fill);
               }
 
               .inner-circle {
-                fill: var(--clr-black);
+                fill: var(--clr-fst-circle-inner);
               }
             }
 
             &:last-child {
               .outer-circle {
-                fill: var(--clr-black);
+                fill: var(--clr-sec-circle-fill);
               }
 
               .inner-circle {
-                fill: var(--clr-white);
+                fill: var(--clr-sec-circle-inner);;
               }
             }
 

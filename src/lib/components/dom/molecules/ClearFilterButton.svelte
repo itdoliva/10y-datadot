@@ -6,6 +6,7 @@
 
   export let onClick
   export let disabled
+
 </script>
 
 <Button {onClick} {disabled}
@@ -18,11 +19,23 @@
 </Button>
 
 <style lang="scss">
+  @import "$lib/scss/breakpoints.scss";
+
   p {
     text-decoration: underline;
 
-    &:not(.disabled):hover {
-      font-weight: 700;
+    &:not(.disabled) {
+      &:hover {
+        font-weight: 700;
+      }
+    }
+
+    &.disabled {
+      opacity: .4;
+
+      @include md {
+        opacity: 1;
+      }
     }
   }
 </style>

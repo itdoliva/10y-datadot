@@ -1,4 +1,5 @@
 <script>
+  import { setContext } from 'svelte';
   import { _ } from 'svelte-i18n'
 
   // Store
@@ -10,6 +11,9 @@
   import InputGroupGoal from "$lib/components/dom/molecules/InputGroupGoal.svelte";
 
   export let nColumns = 1
+  export let theme = "on-light"
+
+  setContext("item-theme", { theme })
 
 </script>
 

@@ -1,4 +1,5 @@
 <script>
+  import { setContext } from 'svelte';
   import { _ } from 'svelte-i18n'
 
   // Store
@@ -8,6 +9,10 @@
   // Components
 	import PanelItem from '$lib/components/dom/molecules/PanelItem.svelte';
   import InputGroup from "$lib/components/dom/molecules/InputGroup.svelte";
+
+  export let theme = "on-light"
+
+  setContext("item-theme", { theme })
 
   $: categories = $categoriesEnriched.designs.map(d => ({
     ...d,

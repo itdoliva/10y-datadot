@@ -1,4 +1,5 @@
 <script>
+  import { getContext } from 'svelte';
   import { _ } from 'svelte-i18n'
 
   // Actions
@@ -17,9 +18,11 @@
   // +1 for unselect btn
   $: itemsByColumn = Math.ceil((categories.length + 1)/nColumns)
 
+  const { theme } = getContext("item-theme")
+
 </script>
 
-<div class="container">
+<div class="container {theme}">
 
   <ul class="input-group" 
     style:--n-columns={nColumns}
@@ -69,6 +72,22 @@
     display: grid;
     grid-auto-flow: row;
     gap: 0;
+
+    &.on-dark {
+      .input-group {
+        &__item {
+          .item {
+            &__label {
+              input:checked + span {
+                font-weight: 700;
+                color: var(--clr-accent);
+              }
+
+            }
+          }
+        }
+      }
+    }
 
     .input-group {
       display: grid;

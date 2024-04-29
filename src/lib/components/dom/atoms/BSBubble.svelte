@@ -1,4 +1,5 @@
 <script>
+  import { getContext } from "svelte";
   import { _ } from 'svelte-i18n'
 
   // Libraries
@@ -18,13 +19,15 @@
   export let fill = 'transparent'
   export let active
 
+  const { theme } = getContext("item-theme")
+
   const r_t = tweened(r, { duration: 300, delay: tweenDelay, ease: d3.easeQuadInOut })
 
   $: $r_t = r
 
 </script>
 
-<g class="bs-bubble" class:active transform="translate({x}, {y})">
+<g class="bs-bubble {theme}" class:active transform="translate({x}, {y})">
 
   <circle class="circle outer" r={$r_t} {fill} stroke-width={$lineWidth} />
   <circle class="circle inner" r={2.4*$lineWidth} />
@@ -47,6 +50,8 @@
 </g>
 
 <style lang="scss">
+  @import "$lib/scss/breakpoints.scss";
+
   .bs-bubble {
 
     .circle {
@@ -69,22 +74,32 @@
 
       pointer-events: none;
 
-      opacity: 0;
 
       &__percentage {
         font-weight: 700;
         font-size: calc(2*var(--fs-label));
+        fill: var(--clr-white);
+
+        opacity: 0;
+
+        @include md {
+          fill: var(--clr-black);
+        }
       }
 
       &__alias {
         text-transform: lowercase;
         font-size: var(--fs-label);
         font-weight: 500;
+
+        @include md {
+          opacity: 0;
+        }
       }
 
     }
 
-    &:hover, &.active {
+    &.active {
       .circle {
         &.outer {
           fill: var(--clr-accent);
@@ -92,9 +107,49 @@
       }
 
       .text {
-        opacity: 1;
+        &__percentage {
+          opacity: 1;
+        }
       }
     }
+
+    @include md {
+      &:hover, &.active {
+        .circle {
+          &.outer {
+            fill: var(--clr-accent);
+          }
+        }
+
+        .text {
+          &__percentage {
+            opacity: 1;
+          }
+
+          &__alias {
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+
+    // &.active {
+    //   .text {
+    //     &__percentage {
+    //       opacity: 1
+    //     }
+
+    //     &__label {
+    //       @include md {
+    //         opacity: 1;
+    //       }
+    //     }
+    //   }
+
+    // }
+
+
 
 
   }

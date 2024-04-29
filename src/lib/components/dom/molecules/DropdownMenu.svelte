@@ -1,4 +1,5 @@
 <script>
+  import { setContext } from 'svelte';
 	import Icon from '$lib/components/dom/atoms/Icon.svelte';
   export let title
 
@@ -18,6 +19,8 @@
     active = !active
     e.stopPropagation()
   }
+
+  setContext("item-theme", { theme: "on-dark" })
 
 </script>
 

@@ -74,47 +74,57 @@
   >
     <Visualization bind:layout />
 
-    <button class="filter-toggle-container" 
-      on:click={() => isMobileFilterOpen = true}
-    >
-      <p>{$_("menu.filters")} <span class="plus">+</span></p>
+    <button class="filter-toggle-container" on:click={() => isMobileFilterOpen = true}>
+      <p>> {$_("menu.filters")}</p>
     </button>
 
-    <aside 
-      class="filter-container"
+    <aside class="filter-container"
       use:onClickOutside 
       on:outsideclick={() => isMobileFilterOpen = false}
     >
 
-      <button class="filter-container__close-btn clean-btn"
-        on:click={() => isMobileFilterOpen = false}
-      >
-        <p>X</p>
-      </button>
+      <!-- <div class="filter-container__close-btn">
+        <button class="clean-btn" on:click={() => isMobileFilterOpen = false}>
+          <p>X</p>
+        </button>
+      </div> -->
 
-      <ul class="filter-list">
+      <ul class="filter-container__list">
 
-        <li class="filter-list__item input-period">
-          <InputPeriod /> 
+        <li class="filter-container__list--item input-period">
+          <InputPeriod theme="on-dark"/> 
         </li>
 
-        <li class="filter-list__item input-design">
-          <InputDesign />
+        <li class="filter-container__list--item input-design">
+          <InputDesign theme="on-dark"/>
         </li>
 
-        <li class="filter-list__item input-goal">
-          <InputGoal nColumns=2 />
+        <li class="filter-container__list--item input-goal">
+          <InputGoal nColumns=2 theme="on-dark"/>
         </li>
 
-        <li class="filter-list__item input-product">
-          <InputProduct nColumns=2 />
+        <li class="filter-container__list--item input-product">
+          <InputProduct nColumns=2 theme="on-dark"/>
         </li>
 
-        <li class="filter-list__item input-industry">
-          <InputIndustry />
+        <li class="filter-container__list--item input-industry">
+          <InputIndustry theme="on-dark"/>
         </li>
 
       </ul>
+
+      <div class="filter-container__footer">
+        <div class="clear-all-container">
+          <ClearAllFilterButton />
+        </div>
+
+        <div class="close-btn-container">
+          <button class="clean-btn" on:click={() => isMobileFilterOpen = false}>
+            <p>X</p>
+          </button>
+        </div>
+
+      </div>
 
     </aside>
 
@@ -126,7 +136,7 @@
 
   <section class="play-container">
     <PlayButton />
-    <ClearAllFilterButton />
+    
   </section>
   
 
@@ -307,80 +317,74 @@
       .filter-toggle-container,
       .filter-container {
         position: absolute;
+        z-index: 10;
   
-        top: calc(2*var(--fs-label));
+        top: 0;
         right: 0;
       }
   
       .filter-toggle-container {
-        color: white;
+        top: calc(2*var(--fs-label));
+
+        color: var(--clr-white);
         background: var(--clr-black);
   
         border: none;
-        border-top-left-radius: 3rem;
-        border-bottom-left-radius: 3rem;
+        border-top-left-radius: var(--fs-label);
+        border-bottom-left-radius: var(--fs-label);
   
-        padding: 2rem 1rem 2rem 1rem;
+        padding: var(--fs-label);
   
         // Entrance transition
         transition: transform 750ms ease-in-out 500ms;
-        
-        p {
-          writing-mode: vertical-lr;
-          transform: rotate(-180deg);
-  
-          .plus {
-            font-size: 1.1em;
-            font-weight: 700;
-            text-decoration: underline;
-          }
-        }
-  
       }
   
       .filter-container {
         width: 85vw;
-        height: calc(100% - 4*var(--fs-label));
+        height: 110%;
+
+        display: grid;
+        grid-template-rows: 1fr min-content;
+
+        background: var(--clr-black);
   
-        border: 1px solid var(--clr-black);
+        border: 1px solid var(--clr-white);
         border-right: none;
         border-top-left-radius: 3rem;
         border-bottom-left-radius: 3rem;
   
-        overflow: auto;
+        overflow: hidden;
   
         // Entrance transition
         transition: transform 500ms ease-in-out;
         transform: translate(100%, 0);
   
-        &__close-btn {
-          position: sticky;
-          z-index: 3;
+        // &__close-btn {
+        //   position: sticky;
+        //   z-index: 3;
   
-          top: calc(2*var(--fs-label));
-          left: 100%;
+        //   top: calc(2*var(--fs-label));
+        //   left: 100%;
   
-          padding: .4rem;
+        //   padding: .4rem;
   
-          p {
-            margin: 0 var(--fs-label);
-            font-size: calc(var(--fs-label)*2);
-            font-weight: 700;
-            text-decoration: underline;
+        //   p {
+        //     color: var(--clr-white);
+        //     margin: 0 var(--fs-label);
+        //     font-size: calc(var(--fs-label)*2);
+        //     font-weight: 700;
+        //     text-decoration: underline;
   
-          }
+        //   }
   
-        }
-  
-        .filter-list {
-          position: absolute;
-          top: 0;
-          width: 100%;
-          overflow: hidden;
+        // }
+
+        &__list {
+          overflow: auto;
           padding: 4vw 0 4vw 8vw;
   
-          &__item {
-            border-bottom: 1px solid var(--clr-black-fade-out);
+          &--item {
+            border-bottom: 1px solid var(--clr-white-fade-out);
   
             padding: 2rem 4vw 2rem 0;
   
@@ -393,8 +397,34 @@
               padding-right: min(16vw, 4rem);
             }
           }
-  
         }
+
+        &__footer {
+          display: grid;
+          grid-template-columns: 1fr min-content;
+          height: calc(5.4*var(--fs-label));
+          border-top: 1px solid var(--clr-white-fade-out);
+          
+          padding-left: calc(2*var(--fs-label));
+
+          .close-btn-container {
+            padding: .4rem;
+            border-left: 1px solid var(--clr-white-fade-out);
+
+            display: flex;
+            flex-direction: center;
+            align-items: center;
+  
+            p {
+              color: var(--clr-white);
+              margin: 0 var(--fs-label);
+              font-size: calc(var(--fs-label)*2);
+              font-weight: 700;
+
+            }
+          }
+        }
+        
       }
   
       &.filter-open {

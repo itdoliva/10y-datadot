@@ -1,4 +1,5 @@
 <script>
+  import { setContext } from 'svelte';
   import { _ } from 'svelte-i18n'
 
   // Store
@@ -11,6 +12,11 @@
 
   export let parent
   export let nColumns = 1
+
+  export let theme = "on-light"
+
+  setContext("item-theme", { theme })
+
 </script>
 
 <PanelItem icon="products" title={$_("input.product")}>

@@ -1,4 +1,5 @@
 <script>
+  import { setContext } from 'svelte';
   import { _ } from 'svelte-i18n'
 
   // Components
@@ -9,6 +10,10 @@
 
   export let layout
   export let direction = "column"
+
+  export let theme = "on-light"
+
+  setContext("item-theme", { theme })
   
 </script>
 

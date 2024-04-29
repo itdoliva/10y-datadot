@@ -40,6 +40,8 @@
 </div>
 
 <style lang="scss">
+  @import "$lib/scss/breakpoints.scss";
+
   .container {
     width: var(--fs-label);
     display: flex;
@@ -100,10 +102,12 @@
         }
       }
 
-      &.hovered {
-        .check {
-          &__main {
-            fill: var(--clr-fill-hover);
+      @include md {
+        &.hovered {
+          .check {
+            &__main {
+              fill: var(--clr-fill-hover);
+            }
           }
         }
       }
