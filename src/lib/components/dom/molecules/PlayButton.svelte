@@ -31,6 +31,7 @@
 
     display: grid;
     grid-template-columns: var(--icn-width) min-content var(--icn-width);
+    justify-content: center;
     align-items: center;
     gap: .6rem;
 

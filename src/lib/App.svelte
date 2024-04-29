@@ -136,7 +136,6 @@
 
   <section class="play-container">
     <PlayButton />
-    
   </section>
   
 
@@ -254,7 +253,7 @@
 
     overflow: hidden;
 
-    grid-template-rows: min-content 1fr min-content min-content;
+    grid-template-rows: min-content 1fr min-content calc(4*var(--fs-label));
     grid-template-areas:
       "header"
       "viz"
@@ -301,14 +300,6 @@
   
     .play-container {
       border-top: 1px solid var(--clr-black-fade-out);
-      
-      padding: 2vw 0 2vw 0;
-  
-      display: grid;
-      grid-template-columns: repeat(2, min-content);
-      justify-content: center;
-  
-      gap: var(--fs-label);
     }
   
     .viz-container {
