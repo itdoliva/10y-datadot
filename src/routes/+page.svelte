@@ -1,28 +1,30 @@
-<script>
-  import { _ } from 'svelte-i18n'
 
+<script>
   // Libraries
-  import { onMount } from "svelte";
+  import { _ } from 'svelte-i18n'
+	import { loader } from '$lib/loader';
 
   // Files
   import "$lib/scss/global.scss";
   
   // Stores
+  import { isReady } from "$lib/stores/loading"
   import { dataset, nodes, categories, projects, clients } from "$lib/stores/nodes"
   import { width, height, pixelRatio, app } from "$lib/stores/canvas"
   
   // Components
   import App from "$lib/App.svelte";
   import Pixi from "$lib/components/webgl/organisms/Pixi.svelte";
+  import LoadingScreen from "$lib/components/dom/organisms/LoadingScreen.svelte";
 
   export let data
-
-  // console.log({ projects: data.projects, clients: data.clients })
 
   clients.set(data.clients)
   projects.set(data.projects)
   categories.set(data.categories)
   dataset.set(data.nodes)
+
+  loader.setNodeIds(data.nodes.map(d => d.id))
 
 </script>
 
@@ -43,4 +45,9 @@
 {#if $nodes.length > 0 && $app}
   <App />
 {/if}
+
+{#if !$isReady}
+  <LoadingScreen />
+{/if}
+
 

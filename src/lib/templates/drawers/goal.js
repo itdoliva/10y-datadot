@@ -12,21 +12,18 @@ export function goalTemplateFactory(goalId) {
     const index = goals.map(d => d.id).indexOf(goalId)
     const goal = goals[index]
   
-    PIXI.Assets.load('petal')
-      .then(asset => new PIXI.Sprite(asset))
-      .then(sprite => {
-        sprite.anchor.set(...anchor)
-        sprite.scale.set(get(nodeSize) / 25)
-        sprite.tint = new PIXI.Color(goal.color).toNumber()
-        sprite.blendMode = PIXI.BLEND_MODES.MULTIPLY
+    return PIXI.Assets.load('petal')
+    .then(asset => new PIXI.Sprite(asset))
+    .then(sprite => {
+      sprite.anchor.set(...anchor)
+      sprite.scale.set(get(nodeSize) / 25)
+      sprite.tint = new PIXI.Color(goal.color).toNumber()
+      sprite.blendMode = PIXI.BLEND_MODES.MULTIPLY
 
-        if (rotateSprite) {
-          sprite.rotation = index * 2*Math.PI / goals.length
-        }
-
-        context.addChild(sprite)
-      })
-  
-    return context
+      if (rotateSprite) {
+        sprite.rotation = index * 2*Math.PI / goals.length
+      }
+      context.addChild(sprite)
+    })
   }
 }

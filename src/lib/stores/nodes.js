@@ -17,7 +17,6 @@ export const fgoals = writable([])
 export const findustries = writable([])
 export const fproducts = writable([])
 
-
 export const selected = writable({ active: false })
 export const nodes = derived(
   [ dataset, fyears, findustries, fdesigns, fgoals, fproducts, categories, sortBy ], 
@@ -83,7 +82,6 @@ export const categoriesEnriched = derived([ nodes, categories ], ([ $nodes, $cat
 
   return enriched
 })
-
 
 
 

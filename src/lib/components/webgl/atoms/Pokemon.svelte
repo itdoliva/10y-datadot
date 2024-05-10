@@ -1,4 +1,5 @@
 <script>
+	import { loader } from '$lib/loader';
   import * as d3 from "d3"
 	import { app, pixelRatio, complexityOn } from '$lib/stores/canvas';
   import * as PIXI from "pixi.js"
@@ -35,9 +36,10 @@
   if (node.products.includes(15)) templates[15](graphics) // siteEditorial
   if (node.designs.includes(22)) templates[22](graphics) // motion
 
-  node.goals.forEach(goalId => {
-    templates[goalId](context)
-  })
+  const loadingPromises = node.goals.map(goalId => templates[goalId](context))
+
+  Promise.all(loadingPromises)
+    .then(() => loader.concludeNodeId(id))
 
   function mask(graphic) {
     graphic.mask = new PIXI.Graphics(basisGraphic.geometry)
