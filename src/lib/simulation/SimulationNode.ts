@@ -155,7 +155,7 @@ export class SimulationNode {
       this.idlePropsTracker.splice(0, 0, idlePropsNew, <IdleProperties>this.animation.idleProps)
     }
     else {
-      this.idlePropsTracker.splice(0, 0, idlePropsNew) // Add new pos to the head of the arr // this.simulation.inplaceIdleProps ? 1 : 
+      this.idlePropsTracker.splice(0, 0, idlePropsNew) // Add new pos to the head of the arr 
     }
 
     this.idlePropsTracker = this.idlePropsTracker.slice(0, 2) // Removes the arr tail
@@ -274,7 +274,7 @@ export class SimulationNode {
     const delayFadeOut = Math.max(0, delayFall - Math.random()*.15)
     const duration = c.shifts - delayFall - (Math.random() * .3)
 
-    const y = idleProps.y + get(figureHeight)*(Math.random()*.5 + .3)
+    const y = tweenCoord.y + get(figureHeight)*(Math.random()*.5 + .3)
 
     const tl = gsap.timeline({ overwrite: true })
 

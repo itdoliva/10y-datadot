@@ -14,7 +14,7 @@ import video from "$lib/templates/drawers/product.video"
 import consulting from "$lib/templates/drawers/channel.consulting"
 import digital from "$lib/templates/drawers/channel.digital"
 import print from "$lib/templates/drawers/channel.print"
-import { goalTemplate as goal, goalTemplateFactory } from "$lib/templates/drawers/goal"
+import { goalTemplateFactory } from "$lib/templates/drawers/goal"
 
 
 const templates = {

@@ -32,6 +32,7 @@
   $: if ($figureWidth || $figureHeight) {
     simulation.updateForceCollideRadius()
   } 
+
   $: if ($figureHeight) {
     simulation.updateExtent()
   }
@@ -87,26 +88,3 @@
     />
   {/if}
 {/each}
-
-<!-- <ul
-  style:position="absolute"
-  style:bottom=0
-  style:right=0
-  style:z-index=10
-  style:font-weight=700
-  style:background="white"
->
-  <li>Layout: {simulation.command.layout.toUpperCase()}</li>
-  <li>State: 
-    <span 
-      style:color={(() => {
-        if (simulation.command.state === 'idle') return "black"
-        else if (simulation.command.state === "selected") return "purple"
-        else if (simulation.command.state === "filter") return "orange"
-        else if (simulation.command.state === "move") return "cornflowerblue"
-        else if (simulation.command.state === "entrance") return "green"
-        else if (simulation.command.state === "exit") return "crimson"
-      })()}
-    style:font-weight=700
-    >{simulation.command.state.toUpperCase()}</span></li>
-</ul> -->

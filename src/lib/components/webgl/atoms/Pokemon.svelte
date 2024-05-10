@@ -5,7 +5,7 @@
   import { dataset, categories } from '$lib/stores/nodes';
   import templates from "$lib/templates"
 
-  export let parent
+  export let context
   export let id
 
   const node = $dataset.find(d => d.id === id)
@@ -13,16 +13,7 @@
   const graphics = new PIXI.Graphics()
   graphics.cacheAsBitmap = true
 
-//   const text = new PIXI.Text(`${id}`, {
-//      fontFamily: 'Arial',
-//      fontSize: 12,
-//      fontWeight: 700,
-//      fill: 0x0110FF,
-//      align: 'center',
-//  })
-  
-  // parent.addChild(graphics, text)
-  parent.addChild(graphics)
+  context.addChild(graphics)
   
   // Behind Basis
   if (node.designs.includes(20)) templates[20](graphics) // illustration
@@ -45,24 +36,13 @@
   if (node.designs.includes(22)) templates[22](graphics) // motion
 
   node.goals.forEach(goalId => {
-    templates[goalId](parent)
+    templates[goalId](context)
   })
-
-
-  // const colorScale = d3.scaleSequential([2014, 2024], d3.interpolateViridis)
-
-  // graphics.beginFill(new PIXI.Color(colorScale(node.year)))
-  // graphics.drawCircle(0, 0, 16)
-  // graphics.endFill()
-
 
   function mask(graphic) {
     graphic.mask = new PIXI.Graphics(basisGraphic.geometry)
     graphic.addChild(graphic.mask)
     return graphic
   }
-
-
-
 
 </script>

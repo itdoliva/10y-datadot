@@ -2,6 +2,9 @@ import { get } from "svelte/store";
 import { app } from "$lib/stores/canvas";
 import * as PIXI from "pixi.js"
 
+// Casts a DOM elements to the WebGL Canvas
+// It's useful to position and mask canvas elements by using other DOM element
+
 export default function castContainer(node, { 
   context, 
   parent=get(app).stage, 
@@ -17,17 +20,18 @@ export default function castContainer(node, {
   // Add container to parent
   parent.addChild(context)
 
+
   // Add mask if requested
   let mask
   if (hasMask) {
     mask = new PIXI.Graphics()
-    mask.name = 'mask'
-
+    mask.name = 'cast-container-mask'
     context.mask = mask
     parent.addChild(mask)
   }
 
   const ticker = get(app).ticker.add(ticked)
+
 
   function ticked() {
     const bbox = node.getBoundingClientRect()

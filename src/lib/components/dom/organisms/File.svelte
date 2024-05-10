@@ -8,47 +8,55 @@
 
 </script>
 
-{#if $selected.active}
-  <div class="file" in:fly={{ y: "1rem" }}>
+<div class="container">
+  {#if $selected.active}
+    <div class="file" in:fly={{ y: "1rem" }}>
+      <div class="file__traces">
+        <FileTraces />
+      </div>
 
-    <div class="file__traces">
-      <FileTraces />
+      <div class="file__description">
+        <FileDescription />
+      </div>
     </div>
-
-    <div class="file__description">
-      <FileDescription />
-    </div>
-
-  </div>
-{/if}
+  {/if}
+</div>
 
 <style lang="scss">
-  .file {
+  .container {
     position: absolute;
+
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    
+
     z-index: 1;
 
-    gap: 2rem;
-
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    justify-content: center;
     align-items: center;
-    
-    padding: 0 20%;
 
-    &__traces {
-      align-self: stretch;
 
-    }
-
-    &__description {
+    .file {
+      gap: calc(var(--fs-label)*3.6);
+  
       display: grid;
-      grid-auto-rows: min-content;
-      row-gap: 1.25rem;
+      grid-template-columns: repeat(2, 1fr);
+      align-items: center;
+
+      &__traces {
+        align-self: stretch;
+        justify-self: end;
+      }
+  
+      &__description {
+        display: grid;
+        justify-self: start;
+        grid-auto-rows: min-content;
+        row-gap: calc(var(--fs-label)*1.2);
+      }
+  
     }
 
   }

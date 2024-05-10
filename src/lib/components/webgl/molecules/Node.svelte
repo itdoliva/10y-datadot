@@ -9,7 +9,7 @@
 
   // Stores
   import { app, complexityOn, hoveredNode} from "$lib/stores/canvas";
-  import { selected, nodeSize  } from "$lib/stores/nodes";
+  import { selected  } from "$lib/stores/nodes";
   
   // WebGL Components
   import Pokemon from '$lib/components/webgl/atoms/Pokemon.svelte';
@@ -24,8 +24,8 @@
   const context = new PIXI.Container()
   context.name = id
 
-  context.hitArea = scene.node.hitArea
-  context.accessibleChildren = false
+  // context.hitArea = scene.node.hitArea
+  context.accessibleChildren = true
 
   scene.addChild(context)
 
@@ -41,6 +41,7 @@
   }
 
   context.onpointerup = () => {
+    console.log('clicked!')
     selected.set($selected.active
       ? { active: false }
       : {
@@ -51,12 +52,22 @@
       })
   }
 
+
+  onMount(() => {
+    // simulationNode.playState(state)
+  })
+
+
   $: context.eventMode = $selected.active ? 'none' : 'static'
 
+  // On turn complexity on or off
+  $: simulationNode.playComplexity($complexityOn)
 
   // Variables
   $app.ticker.add(() => {
     const { attr } = simulationNode
+
+    if (!attr) return
 
     context.x = attr.x
     context.y = attr.y
@@ -67,21 +78,11 @@
     context.scale.set(attr.scale)
   })
 
-  onMount(() => {
-    // simulationNode.playState(state)
-  })
 
-  // On turn complexity on or off
-  $: simulationNode.playComplexity($complexityOn)
-
-  // On state change
-  // $: simulationNode.playState(state)
-
-  // On NodeSize Change
 
 
 
 </script>
 
 
-<Pokemon parent={context} id={id} />
+<Pokemon {context} {id} />

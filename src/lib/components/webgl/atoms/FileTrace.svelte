@@ -3,22 +3,19 @@
   import * as PIXI from "pixi.js"
   import gsap from "gsap";
   
-  import castContainer from '$lib/actions/castContainer';
   import templates from "$lib/templates";
 	import { app } from '$lib/stores/canvas';
-  import { categories } from '$lib/stores/nodes';
   
   export let id
+  export let context
 
-  let size
+  const translationRadius = 2 + Math.random() * 5
 
-  const category = Object.values($categories).flat().find(d => d.id === id)
-
+  const ticker = $app.ticker.add(tick)
 
   // RENDER FUNCTIONS
-  const container = new PIXI.Container()
   const graphics = new PIXI.Graphics()
-  container.addChild(graphics)
+  context.addChild(graphics)
 
   templates[id](graphics, id >= 30 && id < 40 
     ? { anchor: [ .5, .5],  rotateSprite: false }
@@ -26,92 +23,41 @@
 
 
   // ANIMATION
-  const tweens = {}
-
-  const t = {
-    rotation: 0,
-    translation: 0,
-    scale: 1
-  }
+  const attr = { rotation: 0, translation: 0, scale: 1 }
+  const tweens = []
 
   // Rotation
-  const thetaMin = -Math.PI/12;
-  const thetaMax = Math.PI/12; 
-
-  tweens.rotation = gsap.fromTo(t,
-    { rotation: thetaMin },
-    { rotation: thetaMax, repeat: -1, duration: 1.75 + Math.random() * .5, yoyo: true, ease: "none" }
-  )
+  const clockwiseRotation = Math.random() > .5 ? 1 : -1
+  tweens.push(gsap.fromTo(attr,
+    { rotation: clockwiseRotation * -Math.PI/12 },
+    { rotation: clockwiseRotation * Math.PI/12, repeat: -1, duration: 1.75 + Math.random() * 1.5, yoyo: true, ease: "none" }
+  ))
 
   // Translation
-  const radius = 5 + Math.random() * 2
-
-  tweens.translation = gsap.fromTo(t,
+  const clockwiseTranslation = Math.random() > .5 ? 1 : -1
+  tweens.push(gsap.fromTo(attr,
     { translation: 0 },
-    { translation: 2*Math.PI, repeat: -1, duration: 10 + Math.random(), ease: "none" }
-  )
+    { translation: clockwiseTranslation * 2*Math.PI, repeat: -1, duration: 6 + Math.random() * 4, ease: "none" }
+  ))
 
   // Scale
-  tweens.scale = gsap.fromTo(t,
-    { scale:1.2 + Math.random()*.1 },
-    { scale: 1.35 + Math.random()*.05, repeat: -1, duration: 3 + Math.random(), yoyo: true, ease: "none" },
-  )
+  tweens.push(gsap.fromTo(attr,
+    { scale:.9 + Math.random()*.1 },
+    { scale: 1.15 + Math.random()*.05, repeat: -1, duration: 3 + Math.random(), yoyo: true, ease: "none" },
+  ))
 
 
-  function animate() {
-    graphics.rotation = t.rotation
-    graphics.x = Math.sin(t.translation) * radius
-    graphics.y = Math.cos(t.translation) * radius
-    graphics.scale.set(t.scale)
+  function tick() {
+    graphics.rotation = attr.rotation
+    graphics.x = Math.cos(attr.translation) * translationRadius
+    graphics.y = Math.sin(attr.translation) * translationRadius
+    graphics.scale.set(attr.scale)
   }
-
-  const ticker = $app.ticker.add(animate)
-
 
   // LIFECYCLE FUNCTIONS
   onDestroy(() => {
-    ticker.remove(animate)
-
-    Object.values(tweens)
-      .forEach(tween => tween.kill())
+    ticker.remove(tick)
+    tweens.forEach(tween => tween.kill())
   })
 
 </script>
-
-<li class="file-traces__item">
-
-  <div 
-    class="primitive-holder"
-    use:castContainer={{ context: container }}
-    bind:clientWidth={size}
-  />
-
-  <p class="label">{category.alias}</p>
-
-</li>
-
-<style lang="scss">
-  .file-traces__item {
-    height: 3rem;
-
-    display: grid;
-    grid-template-columns: 4rem 1fr;
-    
-    padding-left: 2rem;
-
-    gap: 2rem;
-
-    justify-content: end;
-  }
-
-  .primitve-holder {
-    aspect-ratio: 1/1;
-  }
-
-  .label {
-    align-self: center;
-    font-size: .8rem;
-    text-transform: lowercase;
-    text-decoration: underline;
-  }
-</style>

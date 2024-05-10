@@ -65,7 +65,7 @@
             </div>
 
             <div class="item__number">
-              <NumberTween {i} number={pctNodes} isPct={true} />
+              <NumberTween number={pctNodes} isPct={true} />
             </div>
           {/if}
 

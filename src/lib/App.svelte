@@ -1,5 +1,6 @@
 <script>
   import { _ } from 'svelte-i18n'
+  import { onMount } from 'svelte';
 
   // Initialize
   import "./pixi.js"
@@ -8,8 +9,7 @@
   import * as PIXI from "pixi.js"
 
   // Stores
-	import { width, app, hoveredFilter } from '$lib/stores/canvas.js';
-	import { selected } from '$lib/stores/nodes';
+	import { width } from '$lib/stores/canvas.js';
 
   // Actions
   import castContainer from "$lib/actions/castContainer"
@@ -20,9 +20,7 @@
   import Button from "$lib/components/dom/atoms/Button.svelte";
   import ClearAllFilterButton from "$lib/components/dom/molecules/ClearAllFilterButton.svelte";
 	import PlayButton from '$lib/components/dom/molecules/PlayButton.svelte';
-  import File from '$lib/components/dom/organisms/File.svelte';
   import ProjectLogo from "$lib/components/dom/organisms/ProjectLogo.svelte";
-  import PanelMenu from '$lib/components/dom/organisms/PanelMenu.svelte';
   import InputProduct from "$lib/components/dom/organisms/InputProduct.svelte";
   import InputLayout from "$lib/components/dom/organisms/InputLayout.svelte";
   import InputDesign from "$lib/components/dom/organisms/InputDesign.svelte";
@@ -32,6 +30,8 @@
   import DropdownSortBy from "$lib/components/dom/organisms/DropdownSortBy.svelte";
   import DropdownActivate from "$lib/components/dom/organisms/DropdownActivate.svelte";
   import LanguageChange from "$lib/components/dom/organisms/LanguageChange.svelte";
+  import File from "$lib/components/dom/organisms/File.svelte";
+
 
   // WebGL Components
   import Visualization from '$lib/components/webgl/organisms/Visualization.svelte';
@@ -42,15 +42,29 @@
   let isTopMenuCollapsed = false
   let isMobileFilterOpen = false
 
-
+  let mobileVizContainer
+  let mobileFilterContainer
 
   const productContainer = new PIXI.Container()
   productContainer.name = "top-panel"
 
-
   function toggleTopMenuCollapse() {
     isTopMenuCollapsed = !isTopMenuCollapsed
     return 
+  }
+
+  onMount(() => {
+    positionMobileFilter()
+  })
+
+  function positionMobileFilter() {
+    if (!mobileVizContainer) return
+
+    const bbox = mobileVizContainer.getBoundingClientRect()
+
+    mobileFilterContainer.style.top = bbox.y + "px"
+    mobileFilterContainer.style.width = bbox.width + "px"
+    mobileFilterContainer.style.height = (bbox.height*1.1) + "px"
   }
 
 
@@ -68,52 +82,53 @@
     <LanguageChange />
   </header>
 
-  <main 
-    class="viz-container"
-    class:filter-open={isMobileFilterOpen}
+  <main class="viz-container" 
+    bind:this={mobileVizContainer}
+    on:resize={positionMobileFilter} 
   >
     <Visualization bind:layout />
+  </main>
 
-    <button class="filter-toggle-container" on:click={() => isMobileFilterOpen = true}>
+  <div class="filter-container" class:filter-open={isMobileFilterOpen}
+    bind:this={mobileFilterContainer}
+  >
+
+    <button class="filter-toggle" on:click={() => isMobileFilterOpen = true}>
       <p>> {$_("menu.filters")}</p>
     </button>
 
-    <aside class="filter-container"
+    <aside class="filter-panel"
       use:onClickOutside 
       on:outsideclick={() => isMobileFilterOpen = false}
     >
 
-      <!-- <div class="filter-container__close-btn">
-        <button class="clean-btn" on:click={() => isMobileFilterOpen = false}>
-          <p>X</p>
-        </button>
-      </div> -->
+      <ul class="filter-panel__list">
 
-      <ul class="filter-container__list">
-
-        <li class="filter-container__list--item input-period">
+        <li class="filter-panel__list--item input-period">
           <InputPeriod theme="on-dark"/> 
         </li>
 
-        <li class="filter-container__list--item input-design">
+        <li class="filter-panel__list--item input-design">
           <InputDesign theme="on-dark"/>
         </li>
 
-        <li class="filter-container__list--item input-goal">
+        <li class="filter-panel__list--item input-goal">
           <InputGoal nColumns=2 theme="on-dark"/>
         </li>
 
-        <li class="filter-container__list--item input-product">
+        <li class="filter-panel__list--item input-product">
           <InputProduct nColumns=2 theme="on-dark"/>
         </li>
 
-        <li class="filter-container__list--item input-industry">
+        <li class="filter-panel__list--item input-industry">
           <InputIndustry theme="on-dark"/>
         </li>
 
       </ul>
 
-      <div class="filter-container__footer">
+
+      <div class="filter-panel__footer">
+
         <div class="clear-all-container">
           <ClearAllFilterButton />
         </div>
@@ -128,7 +143,12 @@
 
     </aside>
 
-  </main>
+  </div>
+
+
+
+
+
 
   <section class="layout-container">
     <InputLayout bind:layout={layout} direction="row"/>
@@ -230,6 +250,7 @@
 
   <main class="viz-container">
     <Visualization bind:layout />
+    <File />
   </main>
 
 
@@ -270,6 +291,7 @@
 
     .mobile-header-container { grid-area: header; }
     .viz-container { grid-area: viz; }
+    .filter-container { grid-area: viz; }
     .layout-container { grid-area: layout; }
     .play-container { grid-area: play; }
     .top-container { grid-area: top; }
@@ -278,6 +300,8 @@
 
 
     .mobile-header-container {
+      z-index: 1;
+
       padding: 
         calc(2.4*var(--fs-label)) 
         calc(2*var(--fs-label))
@@ -285,7 +309,6 @@
         calc(2*var(--fs-label));
   
       border-bottom: 1px solid var(--clr-black-fade-out);
-      z-index: 1;
 
       display: flex;
       justify-content: space-between;
@@ -293,28 +316,47 @@
     }
   
     .layout-container {
+      z-index: 1;
       border-top: 1px solid var(--clr-black-fade-out);
   
       padding: 2vw 0 2vw 0;
     }
   
     .play-container {
+      z-index: 1;
       border-top: 1px solid var(--clr-black-fade-out);
     }
   
     .viz-container {
+      z-index: 0;
+      pointer-events: none;
+
       position: relative;
-  
-      .filter-toggle-container,
-      .filter-container {
+    }
+
+    .filter-container {
+      position: absolute;
+      overflow: hidden;
+
+      left: 0;
+      top: 0;
+      width: 0;
+      height: 0;
+
+      pointer-events: none;
+      z-index: 5;
+
+
+      .filter-toggle,
+      .filter-panel {
+        pointer-events: all;
         position: absolute;
-        z-index: 10;
   
         top: 0;
         right: 0;
       }
   
-      .filter-toggle-container {
+      .filter-toggle {
         top: calc(2*var(--fs-label));
 
         color: var(--clr-white);
@@ -330,9 +372,9 @@
         transition: transform 750ms ease-in-out 500ms;
       }
   
-      .filter-container {
+      .filter-panel {
         width: 85vw;
-        height: 110%;
+        height: 100%;
 
         display: grid;
         grid-template-rows: 1fr min-content;
@@ -419,22 +461,23 @@
       }
   
       &.filter-open {
-        .filter-toggle-container {
+  
+        .filter-panel {
+          transform: translate(0, 0);
+        }
+
+        .filter-toggle {
           transform: translate(100%, 0);
   
           // Exit Transition
           transition: transform 200ms ease-in-out;
           pointer-events: none;
         }
-  
-        .filter-container {
-          transform: translate(0, 0);
-        }
       }
-  
     }
 
     .left-container {
+      z-index: 1;
       border-right: 1px solid var(--clr-black);
 
       overflow-y: auto;
@@ -466,6 +509,7 @@
     }
 
     .top-container {
+      z-index: 1;
 
       .collapsible {
         overflow: hidden;
@@ -525,6 +569,7 @@
             .collapse-btn__wrapper {
               position: absolute;
               top: 100%;
+              left: 30%;
               transform: translate(0, -50%);
               
               width: calc(2.6*var(--fs-label));

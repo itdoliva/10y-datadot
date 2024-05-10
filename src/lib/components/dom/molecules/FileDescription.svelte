@@ -42,13 +42,18 @@
 
 <style lang="scss">
   .file-description {
-    width: 100%;
-    height: 100%;
+    --fs-name: calc(var(--fs-label)*2.4);
+    --fs-client: calc(var(--fs-label)*1.6);
+    --fs-tags: var(--fs-label);
+    --fs-desc: calc(var(--fs-label)*1.4);
+    --fs-date: calc(var(--fs-label)*1.6);
+
+    max-width: calc(var(--fs-label)*28);
 
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    row-gap: 1rem;
+    row-gap: var(--fs-label);
 
     &__header {
       display: flex;
@@ -59,10 +64,12 @@
       .project-name {
         font-weight: 700;
         text-transform: uppercase;
+        font-size: var(--fs-name);
       }
 
       .project-client {
         text-decoration: underline;
+        font-size: var(--fs-client);
       }
     }
 
@@ -70,21 +77,25 @@
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      row-gap: .75rem;
+      row-gap: var(--fs-label);
 
       ul.project-tags {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-        column-gap: .5rem;
+        column-gap: var(--fs-label);
         row-gap: 0;
 
         li {
           display: inline;
-          font-size: .8rem;
+          font-size: var(--fs-tags);
           font-weight: 500;
           letter-spacing: .1em;
         }
+      }
+
+      .project-description {
+        font-size: var(--fs-desc);
       }
 
     }
@@ -96,6 +107,7 @@
 
       .project-date {
         text-decoration: underline;
+        font-size: var(--fs-date);
       }
 
       button {
@@ -103,22 +115,17 @@
         background: none;
         border: none;
         outline: none;
-        width: 2.8rem;
-        height: 2.8rem;
+        width: calc(var(--fs-label)*4.8);
+        height: calc(var(--fs-label)*4.8);
 
         stroke: var(--clr-black);
-        stroke-width: 1.15px;
+        stroke-width: clump(1.15px, calc(var(--fs-label)/12), 4px);
 
         &:hover {
           stroke: var(--clr-accent);
-          stroke-width: 1.5px;
         }
       }
     }
-  }
-
-  p {
-    font-size: .8rem;
   }
 
 

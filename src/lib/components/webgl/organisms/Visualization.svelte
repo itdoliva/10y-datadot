@@ -37,6 +37,7 @@
   scene.node = {
     hitArea: new PIXI.Rectangle()
   }
+
   
   root.addChild(camera) //, mask
   camera.addChild(scene)
@@ -58,7 +59,6 @@
   else {
     zoomController?.scaleExtent([.1, 3])
   }
-
 
   onMount(() => {
     zoomController = new ZoomController(container)
@@ -86,10 +86,7 @@ class="container"
 />
 
 {#if $figureWidth + $figureHeight > 0 && zoomController}
-  <LayoutManager 
-    bind:layout 
-    {zoomController}
-  />
+  <LayoutManager bind:layout {zoomController} />
 {/if}
 
 

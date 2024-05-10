@@ -75,7 +75,7 @@
             >
 
               <Graphics context={context} blendmode="MULTIPLY" alpha=.9>
-                <Bubble {id} {i} {r} />
+                <Bubble {i} {r} />
               </Graphics>
 
               <Graphics context={context} drawFunc={templates[id]} />

@@ -19,8 +19,7 @@ import makeSectorData from "./makeSectorData"
 import c from "../config/layout";
 
 // Types
-import { Node, Nodes } from "../types/node"
-import { Dimensions, BlockConfigData, LayoutConfig, Padding } from "./interfaces";
+import { Nodes } from "../types/node"
 
 export type Layout = "radial" | "block";
 export type State = "idle" | "entrance" | "exit" | "filter-in" | "filter-out" | "sort" | "selected" | "selected-out";
@@ -41,8 +40,6 @@ export default class Simulation {
 
   public command: Command;
   
-  public inplaceIdleProps: boolean;
-
   public simulation;
   public forceCollide;
   public forceX;
@@ -68,8 +65,6 @@ export default class Simulation {
 
     this.zoomController = zoomController;
 
-    this.inplaceIdleProps = false;
-
     this.dummyNode = new DummySimulationNode(this);
 
     this.nodes = [ 
@@ -77,11 +72,14 @@ export default class Simulation {
       ...get(dataset).map(({ id, clientId, projectId }) => new SimulationNode(this, id, clientId, projectId))
     ]
 
-    this.forceCollide = d3.forceCollide()
-      .radius(this.forceCollideRadius)
+    this.initSimulation()
+    this.setIdleProps()
+    this.playState()
+  }
 
+  private initSimulation() {
+    this.forceCollide = d3.forceCollide().radius(this.forceCollideRadius)
     this.forceX = d3.forceX().strength(.005)
-
     this.forceY = d3.forceY().strength(.005)
 
     this.simulation = d3.forceSimulation()
@@ -93,9 +91,6 @@ export default class Simulation {
       .force("collide", this.forceCollide)
       .nodes(this.nodes)
       .on("tick", this.ticked)
-
-    this.setIdleProps()
-    this.playState()
   }
 
   // PRIVATE
@@ -109,11 +104,11 @@ export default class Simulation {
   }
 
 
-  private setLayoutDimensions(w, h, { updateExtent=true } = {}) {
-    if (w) this.layoutWidth = w
-    if (h) this.layoutHeight = h
+  private setLayoutDimensions(layoutWidth, layoutHeight) {
+    this.layoutWidth = layoutWidth
+    this.layoutHeight = layoutHeight
 
-    if (updateExtent) this.updateExtent()
+    this.updateExtent()
   }
 
 
@@ -143,25 +138,26 @@ export default class Simulation {
     }
     else {
       const margin = s_nodeSize*3
-
       const exceedX = layoutWidth - s_fw
       const exceedY = layoutHeight - s_fh
 
       extentX = exceedX > 0 
-        ? [ -(exceedX/2 + margin), s_fw + (exceedX/2 + margin)] 
+        ? [ -(exceedX/2 + margin), s_fw + (exceedX/2 + margin) ] 
         : [ 0, s_fw ]
 
       extentY = exceedY > 0 
-      ? [ -(exceedY/2 + margin), s_fh + (exceedY/2 + margin)] 
-      : [ 0, s_fh ]
+        ? [ -(exceedY/2 + margin), s_fh + (exceedY/2 + margin) ] 
+        : [ 0, s_fh ]
+
     }
 
-    const extent = extentX.map((_, i) => [ extentX[i], extentY[i] ])
+    const extent = extentX.map((_, i) => [ extentX[i], extentY[i] ].map(Math.round))
 
-    // console.log({ layout: [ layoutWidth, layoutHeight ], extent })
+    this.zoomController
+      .translateExtent(extent)
+      .translate(translateToX, translateToY)
 
-    this.zoomController.translateExtent(extent)
-      .translateTo(translateToX, translateToY)
+     
   }
 
   private setBlockPosData() {
@@ -321,22 +317,18 @@ export default class Simulation {
 
     if (this.command.layout === "block") {
       this.setBlockPosData()
-    }
-    else {
+    } else {
       this.setRadialPosData()
     }
   }
 
-  private setIdleProps = () => { //{ curNodes, sortBy, dimensions }
-    // console.log('*setIdleProps')
-
+  private setIdleProps = () => {
     this.setPosData()
 
     if (!this.posData) return
 
     this.nodes.forEach(node => node.setIdleProps())
   }
-
 
 
   // PUBLIC
@@ -454,7 +446,7 @@ export default class Simulation {
     const targetNodes = this.nodes.slice(1)
 
     if (state === "entrance") {
-      // zoomController.playEntrance(layout)
+      zoomController.playEntrance(layout)
       targetNodes.forEach((node) => node.chainEntrance())
     }
     else if (state === "exit") {

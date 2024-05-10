@@ -22,8 +22,10 @@
       backgroundColor: 0xFFFFFF
     })
 
+    PIXI.Assets.add({ alias: 'petal', src: '/petal.png' })
+
     initMesh()
-    initAssets()
+
   })
 
   function initMesh() {
@@ -48,9 +50,7 @@
     });
   }
 
-  function initAssets() {
-    PIXI.Assets.add({ alias: 'petal', src: '/petal.png'})
-  }
+
 
 </script>
 
@@ -66,6 +66,6 @@
     left: 0;
     top: 0;
 
-    z-index: -1;
+    z-index: 0;
   }
 </style>

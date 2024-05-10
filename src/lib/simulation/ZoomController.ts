@@ -8,57 +8,65 @@ import { width } from "../stores/canvas";
 import { zoom, cameraOffsetX, cameraOffsetY, isDragging } from "../stores/zoom";
 
 export default class ZoomController {
-  private target
-  private targetSelection
+  private userActions = true
+  private targetSelected
   private zoomBehavior
-  
-  public translateExtentCenter;
+
+  private transform
   
   private _translateExtent;
-  private _scaleExtent = [ 1, 1 ]
-  private _scale = 1
+  private _translate
+  private translateExtentCenter
 
-  private t;
+  private _scaleExtent = [ 1, 1 ]
+  private _scale
+
+  private tween;
 
   constructor(target) {
     const zoomBehavior = d3.zoom()
-      .on("start", this.onZoomStart)
-      .on("end", this.onZoomEnd)
-      .on("zoom", this.zoomed)
+      // .on("start", this.onZoomStart)
+      // .on("end", this.onZoomEnd)
+      // .on("zoom", this.zoomed)
 
-    d3.select(target)
-      .call(zoomBehavior)
-      .on("wheel", e => {
-        e.preventDefault()
-      })
+    // d3.select(target)
+    //   .call(zoomBehavior)
+    //   .on("wheel", e => {
+    //     e.preventDefault()
+    //   })
 
-
-    this.target = target
-    this.targetSelection = d3.select(target)
+    this.targetSelected = d3.select(target)
     this.zoomBehavior = zoomBehavior
-    this.t = d3.zoomTransform(target)
+
+    this.tween = { x: 0, y: 0, k: 1 }
+
+    this.transform = new d3.ZoomTransform(1, 0, 0)
 
     return this
   }
 
 
   // PRIVATE
-  private onZoomStart() {
-    isDragging.set(true)
+  private onZoomStart = () => {
+    if (this.userActions) {
+      isDragging.set(true)
+    }
   }
 
-  private onZoomEnd() {
+  private onZoomEnd = () => {
     isDragging.set(false)
   }
 
   private zoomed(e) {
     const { x, y, k } = e.transform
 
-    // console.log(get(zoom))
+    // console.log('*zoomed', x, y)
+
     zoom.set(k)
     cameraOffsetX.set(x)
     cameraOffsetY.set(y)
   }
+
 
   public behavior() {
     return this.zoomBehavior
@@ -70,9 +78,9 @@ export default class ZoomController {
   }
 
   public resetZoom = (duration=1000) => {
-    const { target, zoomBehavior } = this
+    const { targetSelected, zoomBehavior } = this
 
-    d3.select(target)
+    targetSelected
       .transition()
       .duration(duration)
       .call(zoomBehavior.transform, d3.zoomIdentity)
@@ -84,83 +92,103 @@ export default class ZoomController {
       return this._translateExtent
     }
 
-    this._translateExtent = extent
-    
-    const x = extent.map(d => d[0])
-    const y = extent.map(d => d[1])
-    
+    const [ x0, x1 ] = extent.map(d => d[0])
+    const [ y0, y1 ] = extent.map(d => d[1])
+
     this.translateExtentCenter = [
-      x[0] + (x[1] - x[0])/2,
-      x[0] + (x[1] - x[0])/2,
+      x0 + (x1-x0)/2,
+      y0 + (y1-y0)/2
     ]
     
+    this._translateExtent = extent
     this.zoomBehavior.translateExtent(extent)
     return this
   }
 
-  public translateTo = (...args) => {
-    this.zoomBehavior.translateTo(this.targetSelection, ...args)
-    return this
-  }
+  public translate = (x, y) => {
+    const { targetSelected, zoomBehavior, transform } = this
+    
+    this._translate = [ x, y ]
 
-  public translateBy = (...args) => {
-    this.zoomBehavior.translateBy(this.targetSelection, ...args)
+    targetSelected.call(zoomBehavior.transform, transform.translate(-this._translate[0], -this._translate[1]))
     return this
   }
 
   public scaleExtent = (extent: number[]) => {
-    if (extent) {
-      this._scaleExtent = extent
-    }
+    if (extent) this._scaleExtent = extent
 
     this.zoomBehavior.scaleExtent(this._scaleExtent)
     return this
   }
 
   public scale = (k: number) => {
-    // Zoom effects are applied by the store $zoom
-    // Still, we change the zoomBehavior transform scale aswell 
-    // in order to keep consistency
-
-    if (!k) {
-      return this._scale
-    }
+    const { targetSelected, zoomBehavior, transform } = this
 
     this._scale = k
 
-    this.zoomBehavior.scaleTo(this.targetSelection, this._scale)
-    zoom.set(this._scale)
-
+    targetSelected.call(zoomBehavior.transform, transform.scale(k))
     return this
-    
+  }
+
+  public setUserActions(allow: boolean) {
+    this.userActions = allow
+
+    if (allow) {
+    }
+    else {
+      
+    }
   }
 
   public playEntrance(layout) {
-    const { t } = this
+    const { tween, _translate, targetSelected, zoomBehavior, transform, translateExtentCenter } = this
 
     const isMobile = get(width) < 768
     const initK = isMobile ? .1 : .4
     const finalK = isMobile ? 1 : 1
 
-    const onUpdate = () => {
-      this.scale(t.k)
-    }
 
-    gsap.fromTo(t, 
-      { k: initK },
-      { k: finalK, duration: 2, ease: d3.easeCubicOut, onUpdate, overwrite: true })
+    gsap.fromTo(tween, 
+      {  x: 0, y: 0, k: initK },
+      { 
+        x: _translate[0], 
+        y: _translate[1],
+        k: finalK, 
+        duration: 2, 
+        ease: d3.easeCubicOut, 
+        overwrite: true,
+
+        onUpdate: () => {
+
+          targetSelected.call(
+            zoomBehavior.transform, 
+            transform.translate(-tween.x, -tween.y)
+          )
+
+        },
+        // onStart: () => this.setUserActions(false),
+        // onComplete: () => this.setUserActions(true),
+      })
   }
 
   public playExit() {
-    const { t } = this
+    const { tween } = this
 
     const onUpdate = () => {
       this.scale(t.k)
     }
 
     gsap.to(t, 
-      { k: 2, duration: 1, ease: d3.easeCubicIn, onUpdate, overwrite: true }) 
+      { k: 2, 
+        duration: 1, 
+        ease: d3.easeCubicIn, 
+        overwrite: true,
+        onUpdate, 
+        // onStart: () => this.setUserActions(false),
+        // onComplete: () => this.setUserActions(true),
+      }) 
   }
+
 
 
 
