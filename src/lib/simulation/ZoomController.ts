@@ -23,7 +23,7 @@ export default class ZoomController {
   private _scaleExtent = [ 1, 1 ]
   private _scale
 
-  private dragStartPoint
+  private dragP0
 
   private tween;
 
@@ -58,23 +58,29 @@ export default class ZoomController {
 
   // PRIVATE
   private onZoomStart = (e) => {
-    this.dragStartPoint = d3.pointer(e)
+    this.dragP0 = d3.pointer(e)
 
     if (this.userActions) {
     }
   }
 
   private onZoomEnd = () => {
-    this.dragStartPoint = undefined
+    this.dragP0 = undefined
     isDragging.set(false)
   }
 
   private triggerZoomed = (e) => {
-    const dragCurPoint = d3.pointer(e)
+    const { dragP0 } = this
+    const dragP1 = d3.pointer(e)
 
     isDragging.set(
-      this.dragStartPoint.map((_, i) => this.dragStartPoint[i] - dragCurPoint[i]).every(d => Math.abs(d) < 3)
+      Math.sqrt(d3.sum(
+        dragP0.map((_, i) => Math.pow(dragP0[i] - dragP1[i], 2))
+      )) > 3
     )
+
+    console.log(this.dragP0, dragP1, get(isDragging))
+
 
     this.zoom.transform(
       d3.select(this.target),
