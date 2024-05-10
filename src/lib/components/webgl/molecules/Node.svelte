@@ -8,7 +8,8 @@
   import * as PIXI from "pixi.js"
 
   // Stores
-  import { app, complexityOn, hoveredNode} from "$lib/stores/canvas";
+  import { app, complexityOn, hoveredNode } from "$lib/stores/canvas";
+  import { isDragging } from "$lib/stores/zoom";
   import { selected  } from "$lib/stores/nodes";
   
   // WebGL Components
@@ -24,8 +25,7 @@
   const context = new PIXI.Container()
   context.name = id
 
-  // context.hitArea = scene.node.hitArea
-  context.accessibleChildren = true
+  context.hitArea = scene.node.hitArea
 
   scene.addChild(context)
 
@@ -40,8 +40,12 @@
     hoveredNode.set()
   }
 
+
   context.onpointerup = () => {
-    console.log('clicked!')
+    if ($isDragging) {
+      return
+    }
+
     selected.set($selected.active
       ? { active: false }
       : {
@@ -58,7 +62,7 @@
   })
 
 
-  $: context.eventMode = $selected.active ? 'none' : 'static'
+  $: context.eventMode = $selected.active ? 'none' : 'dynamic'
 
   // On turn complexity on or off
   $: simulationNode.playComplexity($complexityOn)

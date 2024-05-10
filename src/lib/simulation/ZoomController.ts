@@ -9,8 +9,10 @@ import { zoom, cameraOffsetX, cameraOffsetY, isDragging } from "../stores/zoom";
 
 export default class ZoomController {
   private userActions = true
-  private targetSelected
-  private zoomBehavior
+  private triggerTarget
+  private target
+  private zoom
+  private triggerZoom
 
   private transform
   
@@ -21,25 +23,33 @@ export default class ZoomController {
   private _scaleExtent = [ 1, 1 ]
   private _scale
 
+  private dragStartPoint
+
   private tween;
 
-  constructor(target) {
-    const zoomBehavior = d3.zoom()
-      // .on("start", this.onZoomStart)
-      // .on("end", this.onZoomEnd)
-      // .on("zoom", this.zoomed)
+  constructor(triggerTarget, target) {
+    this.triggerTarget = triggerTarget
+    this.target = target
 
-    // d3.select(target)
-    //   .call(zoomBehavior)
-    //   .on("wheel", e => {
-    //     e.preventDefault()
-    //   })
+    this.zoom = d3.zoom()
+      .on("zoom", this.targetZoomed)
 
-    this.targetSelected = d3.select(target)
-    this.zoomBehavior = zoomBehavior
+    this.triggerZoom = d3.zoom()
+      .on("start", this.onZoomStart)
+      .on("end", this.onZoomEnd)
+      .on("zoom", this.triggerZoomed)
+
+    d3.select(this.target)
+      .call(this.zoom)
+
+    d3.select(this.triggerTarget)
+      .call(this.triggerZoom)
+      .on("wheel", e => {
+        e.preventDefault()
+      })
+
 
     this.tween = { x: 0, y: 0, k: 1 }
-
     this.transform = new d3.ZoomTransform(1, 0, 0)
 
     return this
@@ -47,20 +57,47 @@ export default class ZoomController {
 
 
   // PRIVATE
-  private onZoomStart = () => {
+  private onZoomStart = (e) => {
+    this.dragStartPoint = d3.pointer(e)
+
     if (this.userActions) {
-      isDragging.set(true)
     }
   }
 
   private onZoomEnd = () => {
+    this.dragStartPoint = undefined
     isDragging.set(false)
   }
 
-  private zoomed(e) {
-    const { x, y, k } = e.transform
+  private triggerZoomed = (e) => {
+    const dragCurPoint = d3.pointer(e)
 
-    // console.log('*zoomed', x, y)
+    isDragging.set(
+      this.dragStartPoint.map((_, i) => this.dragStartPoint[i] - dragCurPoint[i]).every(d => Math.abs(d) < 3)
+    )
+
+    this.zoom.transform(
+      d3.select(this.target),
+      e.transform,
+      [0, 0]
+    )
+
+    // this.zoom.scaleTo(
+    //   d3.select(this.target),
+    //   e.transform.k,
+    //   [ px + 840, 0]
+    // )
+
+    // this.zoom.translateTo(
+    //   d3.select(this.target),
+    //   -e.transform.x, 
+    //   -e.transform.y, 
+    //   [0, 0]
+    // )
+  }
+
+  private targetZoomed = (e) => {
+    const { x, y, k } = e.transform
 
     zoom.set(k)
     cameraOffsetX.set(x)
@@ -68,65 +105,59 @@ export default class ZoomController {
   }
 
 
-  public behavior() {
-    return this.zoomBehavior
-  }
-
   // PUBLIC
-  public zoom = () => {
-    return get(zoom)
-  }
-
   public resetZoom = (duration=1000) => {
-    const { targetSelected, zoomBehavior } = this
+    // const { triggerTarget, triggerZoom } = this
 
-    targetSelected
-      .transition()
-      .duration(duration)
-      .call(zoomBehavior.transform, d3.zoomIdentity)
-    return this
+    // d3.select(triggerTarget)
+    //   .transition()
+    //   .duration(duration)
+    //   .call(triggerZoom.transform, d3.zoomIdentity)
+    // return this
   }
 
   public translateExtent = (extent: number[][] | undefined=undefined) => {
-    if (!Array.isArray(extent)) {
-      return this._translateExtent
-    }
+    // if (!Array.isArray(extent)) {
+    //   return this._translateExtent
+    // }
 
-    const [ x0, x1 ] = extent.map(d => d[0])
-    const [ y0, y1 ] = extent.map(d => d[1])
+    // const [ x0, x1 ] = extent.map(d => d[0])
+    // const [ y0, y1 ] = extent.map(d => d[1])
 
-    this.translateExtentCenter = [
-      x0 + (x1-x0)/2,
-      y0 + (y1-y0)/2
-    ]
+    // this.translateExtentCenter = [
+    //   x0 + (x1-x0)/2,
+    //   y0 + (y1-y0)/2
+    // ]
     
-    this._translateExtent = extent
-    this.zoomBehavior.translateExtent(extent)
+    // this._translateExtent = extent
+    // // this.triggerZoom.translateExtent(extent)
     return this
   }
 
   public translate = (x, y) => {
-    const { targetSelected, zoomBehavior, transform } = this
+    // const { triggerTarget, triggerZoom, transform } = this
     
-    this._translate = [ x, y ]
+    // this._translate = [ x, y ]
 
-    targetSelected.call(zoomBehavior.transform, transform.translate(-this._translate[0], -this._translate[1]))
+    // d3.select(triggerTarget)
+    //   .call(triggerZoom.transform, transform.translate(-this._translate[0], -this._translate[1]))
     return this
   }
 
   public scaleExtent = (extent: number[]) => {
-    if (extent) this._scaleExtent = extent
+    // if (extent) this._scaleExtent = extent
 
-    this.zoomBehavior.scaleExtent(this._scaleExtent)
+    // this.triggerZoom.scaleExtent(this._scaleExtent)
     return this
   }
 
   public scale = (k: number) => {
-    const { targetSelected, zoomBehavior, transform } = this
+    // const { triggerTarget, triggerZoom, transform } = this
 
-    this._scale = k
+    // this._scale = k
 
-    targetSelected.call(zoomBehavior.transform, transform.scale(k))
+    // d3.select(triggerTarget)
+    //   .call(triggerZoom.transform, transform.scale(k))
     return this
   }
 
@@ -141,52 +172,52 @@ export default class ZoomController {
   }
 
   public playEntrance(layout) {
-    const { tween, _translate, targetSelected, zoomBehavior, transform, translateExtentCenter } = this
+    // const { tween, _translate, target, zoom, transform, translateExtentCenter } = this
 
-    const isMobile = get(width) < 768
-    const initK = isMobile ? .1 : .4
-    const finalK = isMobile ? 1 : 1
+    // const isMobile = get(width) < 768
+    // const initK = isMobile ? .1 : .4
+    // const finalK = isMobile ? 1 : 1
 
 
-    gsap.fromTo(tween, 
-      {  x: 0, y: 0, k: initK },
-      { 
-        x: _translate[0], 
-        y: _translate[1],
-        k: finalK, 
-        duration: 2, 
-        ease: d3.easeCubicOut, 
-        overwrite: true,
+    // gsap.fromTo(tween, 
+    //   {  x: 0, y: 0, k: initK },
+    //   { 
+    //     x: _translate[0], 
+    //     y: _translate[1],
+    //     k: finalK, 
+    //     duration: 2, 
+    //     ease: d3.easeCubicOut, 
+    //     overwrite: true,
 
-        onUpdate: () => {
+    //     onUpdate: () => {
 
-          targetSelected.call(
-            zoomBehavior.transform, 
-            transform.translate(-tween.x, -tween.y)
-          )
+    //       d3.select(target).call(
+    //         zoom.transform, 
+    //         transform.translate(-tween.x, -tween.y)
+    //       )
 
-        },
-        // onStart: () => this.setUserActions(false),
-        // onComplete: () => this.setUserActions(true),
-      })
+    //     },
+    //     // onStart: () => this.setUserActions(false),
+    //     // onComplete: () => this.setUserActions(true),
+    //   })
   }
 
   public playExit() {
-    const { tween } = this
+    // const { tween } = this
 
-    const onUpdate = () => {
-      this.scale(t.k)
-    }
+    // const onUpdate = () => {
+    //   this.scale(t.k)
+    // }
 
-    gsap.to(t, 
-      { k: 2, 
-        duration: 1, 
-        ease: d3.easeCubicIn, 
-        overwrite: true,
-        onUpdate, 
-        // onStart: () => this.setUserActions(false),
-        // onComplete: () => this.setUserActions(true),
-      }) 
+    // gsap.to(t, 
+    //   { k: 2, 
+    //     duration: 1, 
+    //     ease: d3.easeCubicIn, 
+    //     overwrite: true,
+    //     onUpdate, 
+    //     // onStart: () => this.setUserActions(false),
+    //     // onComplete: () => this.setUserActions(true),
+    //   }) 
   }
 
 

@@ -4,7 +4,7 @@
   import * as d3 from "d3";
   
 	import castContainer from '$lib/actions/castContainer';
-  import { width, figureWidth, figureHeight }  from '$lib/stores/canvas';
+  import { width, figureWidth, figureHeight, app }  from '$lib/stores/canvas';
   import { cameraOffsetX, cameraOffsetY, zoom } from "$lib/stores/zoom";
   import { nodeSize } from "$lib/stores/nodes";
   
@@ -29,8 +29,7 @@
   // mask.drawCircle(0, 0, 120)
   // mask.endFill()
 
-
-  root.name = "viz"
+  root.name = "viz-root"
   camera.name = "outer-scene"
   scene.name = "scene"
 
@@ -61,12 +60,10 @@
   }
 
   onMount(() => {
-    zoomController = new ZoomController(container)
+    zoomController = new ZoomController($app.view, container)
   })
 
-  setContext('viz', { 
-    scene
-  })
+  setContext('viz', { scene })
 
   function updateNodeHitArea(nodeSize) {
     scene.node.hitArea.x = -nodeSize/2
@@ -78,7 +75,7 @@
 </script>
 
 <div 
-class="container"
+class="visualization-container"
   bind:this={container}
   bind:clientWidth={$figureWidth}
   bind:clientHeight={$figureHeight}
@@ -91,7 +88,7 @@ class="container"
 
 
 <style>
-  .container {
+  .visualization-container {
     width: 100%;
     height: 100%;
   }
