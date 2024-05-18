@@ -2,6 +2,7 @@
   // Libraries
   import { onMount } from 'svelte'
   import * as PIXI from "pixi.js"
+  import * as d3 from "d3"
   
   // Stores
 	import { width, height } from '$lib/stores/canvas';
@@ -55,6 +56,7 @@
 </script>
 
 <canvas 
+  id="canvas"
   bind:this={canvas} 
   style:width={$width + 'px'}
   style:height={$height + 'px'}

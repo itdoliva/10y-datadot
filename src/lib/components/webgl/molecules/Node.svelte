@@ -9,7 +9,6 @@
 
   // Stores
   import { app, complexityOn, hoveredNode } from "$lib/stores/canvas";
-  import { isDragging } from "$lib/stores/zoom";
   import { selected  } from "$lib/stores/nodes";
   
   // WebGL Components
@@ -31,6 +30,7 @@
 
   // Events
   context.cursor = 'pointer';
+  $: context.eventMode = $selected.active ? 'none' : 'dynamic'
 
   context.onpointerenter = (e) => {
     hoveredNode.set(simulationNode)
@@ -42,10 +42,6 @@
 
 
   context.onpointerup = () => {
-    if ($isDragging) {
-      return
-    }
-
     selected.set($selected.active
       ? { active: false }
       : {
@@ -62,7 +58,6 @@
   })
 
 
-  $: context.eventMode = $selected.active ? 'none' : 'dynamic'
 
   // On turn complexity on or off
   $: simulationNode.playComplexity($complexityOn)

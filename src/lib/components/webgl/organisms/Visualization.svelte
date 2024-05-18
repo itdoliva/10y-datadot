@@ -60,7 +60,7 @@
   }
 
   onMount(() => {
-    zoomController = new ZoomController($app.view, container)
+    zoomController = new ZoomController(container)
   })
 
   setContext('viz', { scene })

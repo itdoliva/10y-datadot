@@ -1,9 +1,8 @@
-import * as PIXI from "pixi.js";
 import * as d3 from "d3";
 import { gsap } from "gsap";
-import { isEqual, cloneDeep } from "lodash";
+import { isEqual } from "lodash";
 import { get } from "svelte/store";
-import { nodeSize, nodes, selected } from "../stores/nodes"; 
+import { nodeSize, nodes } from "../stores/nodes"; 
 import { complexityOn, figureHeight, figureWidth } from "../stores/canvas";
 import { cameraOffsetX, cameraOffsetY } from "../stores/zoom";
 import c from "../config/layout"

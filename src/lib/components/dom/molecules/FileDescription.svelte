@@ -1,7 +1,7 @@
 <script>
 	import Icon from '$lib/components/dom/atoms/Icon.svelte';
 
-  import { selected, dataset } from "$lib/stores/nodes";
+  import { selected } from "$lib/stores/nodes";
 
   function onClick() {
     selected.set({ active: false })

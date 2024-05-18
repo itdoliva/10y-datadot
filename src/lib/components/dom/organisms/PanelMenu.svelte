@@ -1,5 +1,5 @@
 <script>
-  import { fyears, fdesigns, fgoals, findustries, fproducts, nodes, sortBy } from "$lib/stores/nodes";
+  import { fyears, fdesigns, fgoals, findustries, fproducts, sortBy } from "$lib/stores/nodes";
   import { complexityOn, linkProjectOn, linkClientOn } from "$lib/stores/canvas";
   
   import Button from "$lib/components/dom/atoms/Button.svelte";

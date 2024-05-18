@@ -5,49 +5,39 @@ import { gsap } from "gsap";
 // Stores
 import { get } from "svelte/store"
 import { width } from "../stores/canvas";
-import { zoom, cameraOffsetX, cameraOffsetY, isDragging } from "../stores/zoom";
+import { zoom, cameraOffsetX, cameraOffsetY } from "../stores/zoom";
 
 export default class ZoomController {
   private userActions = true
-  private triggerTarget
-  private target
+  private zoomBase
   private zoom
-  private triggerZoom
-
+  
   private transform
   
-  private _translateExtent;
-  private _translate
-  private translateExtentCenter
-
-  private _scaleExtent = [ 1, 1 ]
-  private _scale
-
+  private trnslt
+  private trnsltExtent
+  private trnsltExtentCenter
+  
+  private sclExtent = [ 1, 1 ]
+  private scl
+  
+  private dragging
   private dragP0
 
   private tween;
 
-  constructor(triggerTarget, target) {
-    this.triggerTarget = triggerTarget
-    this.target = target
+  constructor(zoomBase) {
+    this.zoomBase = zoomBase
 
     this.zoom = d3.zoom()
-      .on("zoom", this.targetZoomed)
-
-    this.triggerZoom = d3.zoom()
+      .on("zoom", this.zoomed)
       .on("start", this.onZoomStart)
       .on("end", this.onZoomEnd)
-      .on("zoom", this.triggerZoomed)
 
-    d3.select(this.target)
+    d3.select(this.zoomBase)
       .call(this.zoom)
-
-    d3.select(this.triggerTarget)
-      .call(this.triggerZoom)
-      .on("wheel", e => {
-        e.preventDefault()
-      })
-
+      .on("wheel", this,this.handleWheel)
+      .on("pointerup", this.handlePointerUp)
 
     this.tween = { x: 0, y: 0, k: 1 }
     this.transform = new d3.ZoomTransform(1, 0, 0)
@@ -58,6 +48,7 @@ export default class ZoomController {
 
   // PRIVATE
   private onZoomStart = (e) => {
+    this.dragging = false
     this.dragP0 = d3.pointer(e)
 
     if (this.userActions) {
@@ -65,102 +56,72 @@ export default class ZoomController {
   }
 
   private onZoomEnd = () => {
+    this.dragging = false
     this.dragP0 = undefined
-    isDragging.set(false)
   }
 
-  private triggerZoomed = (e) => {
+  private zoomed = (e) => {
+    const { x, y, k } = e.transform
+
     const { dragP0 } = this
     const dragP1 = d3.pointer(e)
 
-    isDragging.set(
-      Math.sqrt(d3.sum(
-        dragP0.map((_, i) => Math.pow(dragP0[i] - dragP1[i], 2))
-      )) > 3
-    )
-
-    console.log(this.dragP0, dragP1, get(isDragging))
-
-
-    this.zoom.transform(
-      d3.select(this.target),
-      e.transform,
-      [0, 0]
-    )
-
-    // this.zoom.scaleTo(
-    //   d3.select(this.target),
-    //   e.transform.k,
-    //   [ px + 840, 0]
-    // )
-
-    // this.zoom.translateTo(
-    //   d3.select(this.target),
-    //   -e.transform.x, 
-    //   -e.transform.y, 
-    //   [0, 0]
-    // )
-  }
-
-  private targetZoomed = (e) => {
-    const { x, y, k } = e.transform
+    this.dragging = this.dragging || 
+      Math.sqrt( d3.sum(dragP1.map((_, i) => (dragP0[i] - dragP1[i])**2)) ) >= 3
 
     zoom.set(k)
     cameraOffsetX.set(x)
     cameraOffsetY.set(y)
   }
 
-
-  // PUBLIC
-  public resetZoom = (duration=1000) => {
-    // const { triggerTarget, triggerZoom } = this
-
-    // d3.select(triggerTarget)
-    //   .transition()
-    //   .duration(duration)
-    //   .call(triggerZoom.transform, d3.zoomIdentity)
-    // return this
+  private handleWheel = (e) => {
+    e.preventDefault()
   }
 
-  public translateExtent = (extent: number[][] | undefined=undefined) => {
-    // if (!Array.isArray(extent)) {
-    //   return this._translateExtent
-    // }
+  private handlePointerUp = (e) => {
+    if (this.dragging) return
 
-    // const [ x0, x1 ] = extent.map(d => d[0])
-    // const [ y0, y1 ] = extent.map(d => d[1])
+    const { clientX, clientY } = e
 
-    // this.translateExtentCenter = [
-    //   x0 + (x1-x0)/2,
-    //   y0 + (y1-y0)/2
-    // ]
+    d3.select("#canvas").node()
+      .dispatchEvent(new PointerEvent('pointerup', { clientX, clientY }))
+  }
+  
+
+  // PUBLIC
+  public translateExtent = (extent: number[][]) => {
+    const [ x0, x1 ] = extent.map(d => d[0])
+    const [ y0, y1 ] = extent.map(d => d[1])
+
+    this.trnsltExtentCenter = [
+      x0 + (x1-x0)/2,
+      y0 + (y1-y0)/2
+    ]
     
-    // this._translateExtent = extent
-    // // this.triggerZoom.translateExtent(extent)
+    this.trnsltExtent = extent
+    this.zoom.translateExtent(this.trnsltExtent)
     return this
   }
 
   public translate = (x, y) => {
-    // const { triggerTarget, triggerZoom, transform } = this
-    
-    // this._translate = [ x, y ]
+    this.trnslt = [ x, y ]
 
-    // d3.select(triggerTarget)
-    //   .call(triggerZoom.transform, transform.translate(-this._translate[0], -this._translate[1]))
+    d3.select(this.zoomBase)
+      .call(this.zoom.transform, this.transform.translate(-this.trnslt[0], -this.trnslt[1]))
     return this
   }
 
   public scaleExtent = (extent: number[]) => {
-    // if (extent) this._scaleExtent = extent
+    // if (extent) this.sclExtent = extent
 
-    // this.triggerZoom.scaleExtent(this._scaleExtent)
+    // this.triggerZoom.scaleExtent(this.sclExtent)
     return this
   }
 
   public scale = (k: number) => {
     // const { triggerTarget, triggerZoom, transform } = this
 
-    // this._scale = k
+    // this.scl = k
 
     // d3.select(triggerTarget)
     //   .call(triggerZoom.transform, transform.scale(k))
@@ -178,7 +139,7 @@ export default class ZoomController {
   }
 
   public playEntrance(layout) {
-    // const { tween, _translate, target, zoom, transform, translateExtentCenter } = this
+    // const { tween, trnslt, target, zoom, transform, trnsltExtentCenter } = this
 
     // const isMobile = get(width) < 768
     // const initK = isMobile ? .1 : .4
@@ -188,8 +149,8 @@ export default class ZoomController {
     // gsap.fromTo(tween, 
     //   {  x: 0, y: 0, k: initK },
     //   { 
-    //     x: _translate[0], 
-    //     y: _translate[1],
+    //     x: trnslt[0], 
+    //     y: trnslt[1],
     //     k: finalK, 
     //     duration: 2, 
     //     ease: d3.easeCubicOut, 

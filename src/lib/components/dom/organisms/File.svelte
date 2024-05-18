@@ -8,7 +8,7 @@
 
 </script>
 
-<div class="container">
+<div class="container file">
   {#if $selected.active}
     <div class="file" in:fly={{ y: "1rem" }}>
       <div class="file__traces">
@@ -37,8 +37,13 @@
     justify-content: center;
     align-items: center;
 
+    pointer-events: none;
+
 
     .file {
+
+      pointer-events: all;
+
       gap: calc(var(--fs-label)*3.6);
   
       display: grid;
