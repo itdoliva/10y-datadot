@@ -103,7 +103,7 @@
       .content {
         transform: translateY(0);
         opacity: 1;
-        pointer-events: auto;
+        pointer-events: auto !important;
       }
 
       .button {
