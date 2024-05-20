@@ -1,13 +1,16 @@
 // Libraries
 import * as d3 from "d3";
 
-// Classes & Interfaces
-import Deliverable from "./Deliverable";
-import { SortBy, SectorDataPoint, SectorMetadata, SectorData, Dimensions, LayoutConfig } from "../types/simulation";
+// Files
+import layoutConfig from "../config/layout"
+
+// Types
+import { Node, Nodes } from "../types/node"
+import { SectorDataPoint, SectorMetadata, SectorData, Dimensions, LayoutConfig } from "./interfaces";
 
 
-export default function makeSectorData(data: Deliverable[], groupBy: SortBy, maxStack: number): [ SectorData, SectorMetadata ] {
-  const acc = (d: Deliverable) => d[groupBy]
+export default function makeSectorData(data: Node[], groupBy: string, maxStack: number): [ SectorData, SectorMetadata ] {
+  const acc = (d: Node) => d[groupBy]
 
   // Sorted unique values for the provided groupBy variable
   const unique = Array.from(new Set(data.map(acc))).sort(d3.ascending)

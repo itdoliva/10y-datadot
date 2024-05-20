@@ -1,15 +1,17 @@
 
 <script>
   // Libraries
+  import { onMount } from 'svelte';
   import { _ } from 'svelte-i18n'
 	import { loader } from '$lib/loader';
 
   // Files
   import "$lib/scss/global.scss";
+  import simulation from "$lib/simulation"
   
   // Stores
   import { isReady } from "$lib/stores/loading"
-  import { dataset, nodes, categories, projects, clients } from "$lib/stores/nodes"
+  import { categories, projects, clients } from "$lib/stores/nodes"
   import { width, height, pixelRatio, app } from "$lib/stores/canvas"
   
   // Components
@@ -22,9 +24,10 @@
   clients.set(data.clients)
   projects.set(data.projects)
   categories.set(data.categories)
-  dataset.set(data.nodes)
 
-  loader.setNodeIds(data.nodes.map(d => d.id))
+  onMount(() => {
+    simulation.data(data.nodes)
+  })
 
 </script>
 
@@ -34,17 +37,13 @@
   bind:devicePixelRatio={$pixelRatio} 
 />
 
-
 <svelte:head>
   <title>{$_("page.title")}</title>
 </svelte:head>
 
-<!-- Background Canvas -->
-<Pixi bind:app={$app}/>
 
-{#if $nodes.length > 0 && $app}
-  <App />
-{/if}
+<Pixi bind:app={$app}/>
+<App />
 
 {#if !$isReady}
   <LoadingScreen />

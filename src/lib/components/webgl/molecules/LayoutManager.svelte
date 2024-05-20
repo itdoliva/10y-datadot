@@ -1,8 +1,7 @@
 <script>
   import { getContext, onMount } from "svelte";
   import * as d3 from "d3"
-
-  import Simulation from '$lib/simulation/Simulation';
+  import simulation from "$lib/simulation"
 
   // Components
   import Node from "$lib/components/webgl/molecules/Node.svelte";
@@ -11,56 +10,51 @@
   // Stores
   import { width, height, figureWidth, figureHeight, complexityOn, linkProjectOn, linkClientOn } from "$lib/stores/canvas";
   import { cameraOffsetX, cameraOffsetY } from "$lib/stores/zoom";
-  import { nodes, selected, sortBy, dataset, projects, clients, nodeSize, gap } from "$lib/stores/nodes"; 
+  import { selected, sortBy, projects, clients, nodeSize, gap } from "$lib/stores/nodes"; 
 
   // Exports
   export let layout
   export let zoomController
 
-
-  let prevActiveIds = $nodes.activeIds
+  let prevActiveIds = {}.activeIds
   
   // ----- SIMULATION -----
-  const simulation = new Simulation(layout, "entrance", zoomController)
-
-  // ------------ Reactivity ------------  
-
   // Update zoom
   // $: updateExtents(simulation.layout, $width, $height, $figureWidth, $figureHeight)
 
   // Update simulation Force Properties
-  $: if ($figureWidth || $figureHeight) {
-    simulation.updateForceCollideRadius()
-  } 
+  // $: if ($figureWidth || $figureHeight) {
+  //   simulation.updateForceCollideRadius()
+  // } 
 
-  $: if ($figureHeight) {
-    simulation.updateExtent()
-  }
+  // $: if ($figureHeight) {
+  //   simulation.updateExtent()
+  // }
 
-  $: simulation.updateForceXY($cameraOffsetX, $cameraOffsetY)
+  // $: simulation.updateForceXY($cameraOffsetX, $cameraOffsetY)
 
   // If layout is changed
-  $: simulation.switchLayout(layout)
+  // $: simulation.switchLayout(layout)
 
   // If nodes are resorted
-  $: simulation.resorted($sortBy)
+  // $: simulation.resorted($sortBy)
 
   // If data is filtered
-  $: if (d3.zip(prevActiveIds, $nodes.activeIds).some(([ a, b ]) => a !== b)) {
-    const isExclusion = prevActiveIds.length > $nodes.activeCount
-    simulation.filtered(isExclusion)
-    prevActiveIds = $nodes.activeIds
-  }
+  // $: if (d3.zip(prevActiveIds, {}.activeIds).some(([ a, b ]) => a !== b)) {
+  //   const isExclusion = prevActiveIds.length > {}.activeCount
+  //   simulation.filtered(isExclusion)
+  //   prevActiveIds = {}.activeIds
+  // }
 
   // When selected statement is triggered
-  $: simulation.toggleSelected($selected)
+  // $: simulation.toggleSelected($selected)
 
   // When toggle complexity
-  $: simulation.toggleComplexity($complexityOn)
+  // $: simulation.toggleComplexity($complexityOn)
 
 </script>
 
-{#each $projects as project}
+<!-- {#each $projects as project}
   <Link
     type="project"
     id={project.id}
@@ -78,13 +72,8 @@
     linkNodes={simulation.getNodesByClientId(client.id)}
     isLinkOn={$linkClientOn && (simulation.command.state === "idle" || simulation.command.state === "selected")}
   />
-{/each}
+{/each} -->
 
-{#each $dataset as node (node.id)}
-  {#if node.id !== -1}
-    <Node 
-      id={node.id}
-      simulationNode={simulation.getNodeById(node.id)}
-    />
-  {/if}
+{#each simulation.nodes.filter(node => node.id !== -1) as node (node.id)}
+  <Node {node} />
 {/each}

@@ -10,22 +10,15 @@
   // Stores
   import { app, complexityOn, hoveredNode } from "$lib/stores/canvas";
   import { selected  } from "$lib/stores/nodes";
-  
-  // WebGL Components
-  import Pokemon from '$lib/components/webgl/atoms/Pokemon.svelte';
 
-  export let id
-  export let simulationNode
-
+  export let node
 
   const { scene } = getContext("viz")
 
   // PIXI Hierarchy
-  const context = new PIXI.Container()
-  context.name = id
-
+  const context = node.context.context
   context.hitArea = scene.node.hitArea
-
+  
   scene.addChild(context)
 
   // Events
@@ -33,25 +26,16 @@
   $: context.eventMode = $selected.active ? 'none' : 'dynamic'
 
   context.onpointerenter = (e) => {
-    hoveredNode.set(simulationNode)
+    hoveredNode.set(node)
   }
 
   context.onpointerleave = () => {
     hoveredNode.set()
   }
 
-
   context.onpointerup = () => {
-    selected.set($selected.active
-      ? { active: false }
-      : {
-        active: true, 
-        id, 
-        x: simulationNode.attr.x, 
-        y: simulationNode.attr.y 
-      })
+    selected.set($selected.active ? false : node)
   }
-
 
   onMount(() => {
     // simulationNode.playState(state)
@@ -60,21 +44,21 @@
 
 
   // On turn complexity on or off
-  $: simulationNode.playComplexity($complexityOn)
+  // $: simulationNode.playComplexity($complexityOn)
 
   // Variables
   $app.ticker.add(() => {
-    const { attr } = simulationNode
+    const { render } = node.attr
 
-    if (!attr) return
+    if (!render) return
 
-    context.x = attr.x
-    context.y = attr.y
+    context.x = render.x
+    context.y = render.y
 
-    context.rotation = attr.rotation
-    context.renderable = attr.renderable
-    context.alpha = attr.alpha
-    context.scale.set(attr.scale)
+    // context.rotation = attr.rotation
+    // context.renderable = attr.renderable
+    // context.alpha = attr.alpha
+    // context.scale.set(attr.scale)
   })
 
 
@@ -82,6 +66,3 @@
 
 
 </script>
-
-
-<Pokemon {context} {id} />

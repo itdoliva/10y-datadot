@@ -4,7 +4,7 @@
   import { _ } from "svelte-i18n";
 
   // Stores
-  import { selected, dataset, categories } from "$lib/stores/nodes";
+  import { selected, categories } from "$lib/stores/nodes";
 
   // Actions
   import castContainer from '$lib/actions/castContainer';
@@ -12,7 +12,7 @@
   // WebGL Components
   import FileTrace from "$lib/components/webgl/atoms/FileTrace.svelte";
   
-  const node = $dataset.find(d => d.id === $selected.id)
+  const node = $selected
 
   const traceIds = [
     node.channel,

@@ -26,7 +26,6 @@
     PIXI.Assets.add({ alias: 'petal', src: '/petal.png' })
 
     initMesh()
-
   })
 
   function initMesh() {

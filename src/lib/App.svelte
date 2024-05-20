@@ -2,6 +2,8 @@
   import { _ } from 'svelte-i18n'
   import { onMount } from 'svelte';
 
+  import simulation from "$lib/simulation"
+
   // Initialize
   import "./pixi.js"
   
@@ -10,6 +12,8 @@
 
   // Stores
 	import { width } from '$lib/stores/canvas.js';
+  import { sortBy, fyears, fdesigns, fgoals, findustries, fproducts } from '$lib/stores/nodes.js';
+  import { isReady } from '$lib/stores/loading.js';
 
   // Actions
   import castContainer from "$lib/actions/castContainer"
@@ -32,10 +36,11 @@
   import LanguageChange from "$lib/components/dom/organisms/LanguageChange.svelte";
   import File from "$lib/components/dom/organisms/File.svelte";
 
-
   // WebGL Components
   import Visualization from '$lib/components/webgl/organisms/Visualization.svelte';
 
+  const productContainer = new PIXI.Container()
+  productContainer.name = "top-panel"
 
   let layout = 'block'
   let topInputGroupHeight
@@ -45,17 +50,19 @@
   let mobileVizContainer
   let mobileFilterContainer
 
-  const productContainer = new PIXI.Container()
-  productContainer.name = "top-panel"
+  $: simulation.setLayout(layout)
+  $: simulation.filter($fyears, $findustries, $fdesigns, $fgoals, $fproducts)
+  $: simulation.sort($sortBy)
+
+  
+  onMount(() => {
+    positionMobileFilter()
+  })
 
   function toggleTopMenuCollapse() {
     isTopMenuCollapsed = !isTopMenuCollapsed
     return 
   }
-
-  onMount(() => {
-    positionMobileFilter()
-  })
 
   function positionMobileFilter() {
     if (!mobileVizContainer) return
@@ -71,189 +78,172 @@
 </script>
 
 <div class="root">
-
+  {#if $isReady}
 
   {#if $width < 768} 
 
-  <header class="mobile-header-container">
-    <div class="logo-container">
-      <ProjectLogo />
+    <header class="mobile-header-container">
+      <div class="logo-container">
+        <ProjectLogo />
+      </div>
+      <LanguageChange />
+    </header>
+
+    <main class="viz-container" bind:this={mobileVizContainer} on:resize={positionMobileFilter}>
+      <Visualization bind:layout />
+    </main>
+
+    <div class="filter-container" class:filter-open={isMobileFilterOpen} bind:this={mobileFilterContainer}>
+
+      <button class="filter-toggle" on:click={() => isMobileFilterOpen = true}>
+        <p>> {$_("menu.filters")}</p>
+      </button>
+
+      <aside class="filter-panel" use:onClickOutside on:outsideclick={() => isMobileFilterOpen = false}>
+
+        <ul class="filter-panel__list">
+
+          <li class="filter-panel__list--item input-period">
+            <InputPeriod theme="on-dark"/> 
+          </li>
+
+          <li class="filter-panel__list--item input-design">
+            <InputDesign theme="on-dark"/>
+          </li>
+
+          <li class="filter-panel__list--item input-goal">
+            <InputGoal nColumns=2 theme="on-dark"/>
+          </li>
+
+          <li class="filter-panel__list--item input-product">
+            <InputProduct nColumns=2 theme="on-dark"/>
+          </li>
+
+          <li class="filter-panel__list--item input-industry">
+            <InputIndustry theme="on-dark"/>
+          </li>
+
+        </ul>
+
+        <div class="filter-panel__footer">
+
+          <div class="clear-all-container">
+            <ClearAllFilterButton />
+          </div>
+
+          <div class="close-btn-container">
+            <button class="clean-btn" on:click={() => isMobileFilterOpen = false}>
+              <p>X</p>
+            </button>
+          </div>
+
+        </div>
+
+      </aside>
+
     </div>
-    <LanguageChange />
-  </header>
 
-  <main class="viz-container" 
-    bind:this={mobileVizContainer}
-    on:resize={positionMobileFilter} 
-  >
-    <Visualization bind:layout />
-  </main>
+    <section class="layout-container">
+      <InputLayout bind:layout={layout} direction="row"/>
+    </section>
 
-  <div class="filter-container" class:filter-open={isMobileFilterOpen}
-    bind:this={mobileFilterContainer}
-  >
+    <section class="play-container">
+      <PlayButton />
+    </section>
+  
+  {:else}
 
-    <button class="filter-toggle" on:click={() => isMobileFilterOpen = true}>
-      <p>> {$_("menu.filters")}</p>
-    </button>
-
-    <aside class="filter-panel"
-      use:onClickOutside 
-      on:outsideclick={() => isMobileFilterOpen = false}
+    <header 
+      class="top-container" 
+      class:collapsed={isTopMenuCollapsed}
+      style="--input-group-height: {topInputGroupHeight ? `${topInputGroupHeight}px` : "none"};"
     >
+      <section class="collapsible" >
+        <div class="input-product" 
+          use:castContainer={{ context: productContainer, hasMask: true }}
+          bind:clientHeight={topInputGroupHeight}
+        >
+          <InputProduct parent={productContainer} />
+        </div>
+      </section>
 
-      <ul class="filter-panel__list">
-
-        <li class="filter-panel__list--item input-period">
-          <InputPeriod theme="on-dark"/> 
+      <ul class="panel-menu">
+        <li class="panel-menu__item">
+          <DropdownSortBy />
         </li>
 
-        <li class="filter-panel__list--item input-design">
-          <InputDesign theme="on-dark"/>
+        <li class="panel-menu__item">
+          <DropdownActivate />
         </li>
 
-        <li class="filter-panel__list--item input-goal">
-          <InputGoal nColumns=2 theme="on-dark"/>
+        <li class="panel-menu__item clear-all-btn">
+          <ClearAllFilterButton />
         </li>
 
-        <li class="filter-panel__list--item input-product">
-          <InputProduct nColumns=2 theme="on-dark"/>
+        <li class="panel-menu__item">
+          <PlayButton />
         </li>
 
-        <li class="filter-panel__list--item input-industry">
-          <InputIndustry theme="on-dark"/>
+        <li class="panel-menu__item project-logo no-border">
+          <div class="project-logo__wrapper">
+            <ProjectLogo />
+          </div>
+        </li>
+
+        <li class="panel-menu__item collapse-btn no-border">
+          <div class="collapse-btn__wrapper">
+            <div class="rotate" class:collapsed={isTopMenuCollapsed}>
+              <Button 
+                onClick={toggleTopMenuCollapse}
+                colorDefault="var(--clr-white)"
+                colorHover="var(--clr-accent)"
+                colorActive="var(--clr-accent-low)"
+              >
+                <Icon icon="collapse"/>
+              </Button>
+            </div>
+          </div>
+        </li>
+
+        <li class="panel-menu__item no-border language-change">
+          <div class="language-change-container">
+            <LanguageChange />
+          </div>
         </li>
 
       </ul>
+    </header>
 
+    <aside class="left-container">
+      <ul class="filter-list">
+        <li class="filter-list__item input-layout">
+          <InputLayout bind:layout={layout} />
+        </li>
 
-      <div class="filter-panel__footer">
+        <li class="filter-list__item input-period">
+          <InputPeriod /> 
+        </li>
 
-        <div class="clear-all-container">
-          <ClearAllFilterButton />
-        </div>
+        <li class="filter-list__item input-design">
+          <InputDesign />
+        </li>
 
-        <div class="close-btn-container">
-          <button class="clean-btn" on:click={() => isMobileFilterOpen = false}>
-            <p>X</p>
-          </button>
-        </div>
+        <li class="filter-list__item input-goal">
+          <InputGoal />
+        </li>
 
-      </div>
-
+        <li class="filter-list__item input-industry">
+          <InputIndustry />
+        </li>
+      </ul>
     </aside>
 
-  </div>
+    <main class="viz-container">
+      <Visualization bind:layout />
+      <File />
+    </main>
 
-
-
-
-
-
-  <section class="layout-container">
-    <InputLayout bind:layout={layout} direction="row"/>
-  </section>
-
-  <section class="play-container">
-    <PlayButton />
-  </section>
-  
-
-  {:else}
-
-  
-
-  <header 
-    class="top-container" 
-    class:collapsed={isTopMenuCollapsed}
-    style="--input-group-height: {topInputGroupHeight ? `${topInputGroupHeight}px` : "none"};"
-  >
-    <section class="collapsible" >
-      <div class="input-product" 
-        use:castContainer={{ context: productContainer, hasMask: true }}
-        bind:clientHeight={topInputGroupHeight}
-      >
-        <InputProduct parent={productContainer} />
-      </div>
-    </section>
-
-    <ul class="panel-menu">
-      <li class="panel-menu__item">
-        <DropdownSortBy />
-      </li>
-
-      <li class="panel-menu__item">
-        <DropdownActivate />
-      </li>
-
-      <li class="panel-menu__item clear-all-btn">
-        <ClearAllFilterButton />
-      </li>
-
-      <li class="panel-menu__item">
-        <PlayButton />
-      </li>
-
-      <li class="panel-menu__item project-logo no-border">
-        <div class="project-logo__wrapper">
-          <ProjectLogo />
-        </div>
-      </li>
-
-      <li class="panel-menu__item collapse-btn no-border">
-        <div class="collapse-btn__wrapper">
-          <div class="rotate" class:collapsed={isTopMenuCollapsed}>
-            <Button 
-              onClick={toggleTopMenuCollapse}
-              colorDefault="var(--clr-white)"
-              colorHover="var(--clr-accent)"
-              colorActive="var(--clr-accent-low)"
-            >
-              <Icon icon="collapse"/>
-            </Button>
-          </div>
-        </div>
-      </li>
-
-      <li class="panel-menu__item no-border language-change">
-        <div class="language-change-container">
-          <LanguageChange />
-        </div>
-      </li>
-
-    </ul>
-  </header>
-
-  <aside class="left-container">
-    <ul class="filter-list">
-      <li class="filter-list__item input-layout">
-        <InputLayout bind:layout={layout} />
-      </li>
-
-      <li class="filter-list__item input-period">
-        <InputPeriod /> 
-      </li>
-
-      <li class="filter-list__item input-design">
-        <InputDesign />
-      </li>
-
-      <li class="filter-list__item input-goal">
-        <InputGoal />
-      </li>
-
-      <li class="filter-list__item input-industry">
-        <InputIndustry />
-      </li>
-    </ul>
-  </aside>
-
-  <main class="viz-container">
-    <Visualization bind:layout />
-    <File />
-  </main>
-
-
+  {/if}
   {/if}
 </div>
 
