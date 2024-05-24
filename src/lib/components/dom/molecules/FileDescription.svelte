@@ -1,11 +1,8 @@
 <script>
-	import Icon from '$lib/components/dom/atoms/Icon.svelte';
+  import Icon from '$lib/components/dom/atoms/Icon.svelte';
 
-  import { selected } from "$lib/stores/nodes";
-
-  function onClick() {
-    selected.set({ active: false })
-  }
+  export let onClick
+  export let outerClose
 
 </script>
 
@@ -26,17 +23,17 @@
     <p class="project-description">
       Infográficos animados para auxiliar na narrativa do documentário.
     </p>
-
   </div>
 
   <div class="file-description__footer">
     <p class="project-date">01/2014</p>
 
-    <button on:click={onClick}>
-      <Icon icon="return"/>
-    </button>
+    {#if !outerClose}
+      <button on:click={onClick}>
+        <Icon icon="return"/>
+      </button>
+    {/if}
   </div>
-
   
 </div>
 
@@ -48,6 +45,7 @@
     --fs-desc: calc(var(--fs-label)*1.4);
     --fs-date: calc(var(--fs-label)*1.6);
 
+    width: 100%;
     max-width: calc(var(--fs-label)*28);
 
     display: flex;
@@ -125,6 +123,8 @@
           stroke: var(--clr-accent);
         }
       }
+
+
     }
   }
 

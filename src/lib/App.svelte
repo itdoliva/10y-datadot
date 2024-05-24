@@ -87,6 +87,7 @@
     on:resize={positionMobileFilter} 
   >
     <Visualization bind:layout />
+    <File nColumns=2 outerClose={true} />
   </main>
 
   <div class="filter-container" class:filter-open={isMobileFilterOpen}
