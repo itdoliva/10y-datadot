@@ -1,18 +1,29 @@
 <script>
-  import { Circle2 } from 'svelte-loading-spinners';
-  import { fade } from 'svelte/transition';
+  import { LottiePlayer } from '@lottiefiles/svelte-lottie-player';
+  import { scale } from 'svelte/transition';
+
+  export let width
+  export let height
+
+  $: size =  Math.min(width, height) * ( width < 768 ? 1 : .85 )
 </script>
 
 <section 
   class="loading" 
-  transition:fade={{ delay: 0, duration: 1200 }}
+  out:scale={{ start: 2, opacity: 0, delay: 0, duration: 1200 }}
 >
-  <Circle2
-    colorOuter="#0D0D0D"
-    colorCenter="#7781FA"
-    colorInner="#CFFF6C"
-    size=120
+  
+  <LottiePlayer
+    src="./src/lib/loadingLottie.json"
+    autoplay={true}
+    loop={true}
+    controls={false}
+    renderer="svg"
+    background="transparent"
+    width={size}
+    height={size}
   />
+
 </section>
 
 <style lang="scss">

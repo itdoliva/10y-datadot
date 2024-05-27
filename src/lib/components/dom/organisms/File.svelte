@@ -10,14 +10,14 @@
   export let outerClose = false
 
   function onClick() {
-    selected.set({ active: false })
+    selected.set(null)
   }
 
 
 </script>
 
 <div class="container file">
-  {#if $selected.active}
+  {#if $selected}
     <div class="file" in:fly={{ y: 20 }}>
       <div class="file__traces">
         <FileTraces {nColumns} />
@@ -29,7 +29,7 @@
 
       {#if outerClose}
         <button class="file__close" on:click={onClick} in:fly={{ y: 80, duration: 2000, delay: 1000 }}>
-          <Icon icon="return"/>
+          <Icon icon="returnBackground"/>
         </button>
       {/if}
     </div>
@@ -107,18 +107,20 @@
       }
 
       &__close {
+
         position: absolute;
         bottom: var(--fs-label);
-        right: 0;
+        right: 50%;
+        transform: translate(50%, 0);
 
         pointer-events: all;
         background: none;
         border: none;
         outline: none;
-        width: calc(var(--fs-label)*4.8);
-        height: calc(var(--fs-label)*4.8);
+        width: calc(var(--fs-label)*6.4);
+        height: calc(var(--fs-label)*6.4);
 
-        stroke: var(--clr-black);
+        stroke: var(--clr-white);
         stroke-width: clump(1.15px, calc(var(--fs-label)/12), 4px);
 
         &:hover {

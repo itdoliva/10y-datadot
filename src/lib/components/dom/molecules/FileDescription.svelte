@@ -9,7 +9,9 @@
 <div class="file-description">
 
   <div class="file-description__header">
-    <h3 class="project-name">IJEN</h3>
+    <div class="project-name">
+      <h3>IJEN</h3>
+    </div>
     <h4 class="project-client">Baboom Filmes</h4>
   </div>
 
@@ -38,6 +40,8 @@
 </div>
 
 <style lang="scss">
+  @import "$lib/scss/breakpoints.scss";
+
   .file-description {
     --fs-name: calc(var(--fs-label)*2.4);
     --fs-client: calc(var(--fs-label)*1.6);
@@ -60,9 +64,22 @@
       letter-spacing: .1em;
 
       .project-name {
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: var(--fs-name);
+
+        h3 {
+          display: inline-block;
+          font-weight: 700;
+          text-transform: uppercase;
+          font-size: var(--fs-name);
+          
+          // background: rgba(255, 255, 255, .8);
+          background: var(--clr-black);
+          color: var(--clr-white);
+
+          @include md {
+            background: none;
+            color: var(--clr-black);
+          }
+        }
       }
 
       .project-client {

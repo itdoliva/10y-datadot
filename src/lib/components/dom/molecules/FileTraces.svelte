@@ -4,7 +4,7 @@
   import { _ } from "svelte-i18n";
 
   // Stores
-  import { selected, dataset, categories } from "$lib/stores/nodes";
+  import { selected, categories } from "$lib/stores/nodes";
 
   // Actions
   import castContainer from '$lib/actions/castContainer';
@@ -14,13 +14,12 @@
 
   export let nColumns = 1
   
-  const node = $dataset.find(d => d.id === $selected.id)
 
-  const traceIds = [
-    node.channel,
-    ...node.products,
-    ...node.designs,
-    ...node.goals,
+  $: traceIds = [
+    $selected.channel,
+    ...$selected.products,
+    ...$selected.designs,
+    ...$selected.goals,
   ]
 
   $: itemsByColumn = Math.ceil((traceIds.length + 1)/nColumns)

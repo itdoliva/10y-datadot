@@ -7,16 +7,19 @@
 
   function handlePointerEnter(e) {
     active = true
+    e.preventDefault()
     e.stopPropagation()
   }
   
   function handlePointerLeave(e) {
     active = false
+    e.preventDefault()
     e.stopPropagation()
   }
 
   function handlePointerUp(e) {
     active = !active
+    e.preventDefault()
     e.stopPropagation()
   }
 
