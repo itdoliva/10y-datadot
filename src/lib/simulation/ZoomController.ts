@@ -4,16 +4,26 @@ import { gsap } from "gsap";
 
 // Stores
 import { get } from "svelte/store"
-import { width } from "../stores/canvas";
+import { figureHeight, figureWidth, width } from "../stores/canvas";
 import { zoom, cameraOffsetX, cameraOffsetY } from "../stores/zoom";
+import Simulation from "./Simulation";
+import { ILayoutSize, Layout } from "../types/simulation";
+import { nodeSize, selected } from "../stores/nodes";
 
 export default class ZoomController {
+  private simulation: Simulation
+
+  private initialized: boolean = false
+
   private userActions = true
   private zoomBase
   private zoom
   
-  private transform
+  private transform: d3.ZoomTransform = new d3.ZoomTransform(1, 0, 0)
   
+  private curTranslateExtent
+  private curScaleExtent
+
   private trnslt
   private trnsltExtent
   private trnsltExtentCenter
@@ -22,34 +32,41 @@ export default class ZoomController {
   private scl
   
   private dragging
-  private dragP0
+  private dragT0: number | undefined
 
-  private tween;
+  private state = { 
+    x: 0, 
+    y: 0, 
+    k: 1 
+  }
 
-  constructor(zoomBase) {
-    this.zoomBase = zoomBase
+  constructor(simulation: Simulation) {
+    this.simulation = simulation
 
     this.zoom = d3.zoom()
       .on("zoom", this.zoomed)
       .on("start", this.onZoomStart)
       .on("end", this.onZoomEnd)
 
-    d3.select(this.zoomBase)
-      .call(this.zoom)
-      .on("wheel", this,this.handleWheel)
-      .on("pointerup", this.handlePointerUp)
-
-    this.tween = { x: 0, y: 0, k: 1 }
-    this.transform = new d3.ZoomTransform(1, 0, 0)
+    this.initialized = true
 
     return this
+  }
+
+  public initZoom = (zoomBase) => {
+    this.zoomBase = zoomBase
+
+    d3.select(this.zoomBase)
+      .call(this.zoom)
+      .on("wheel", this.handleWheel)
+      .on("pointerup", this.handlePointerUp)
   }
 
 
   // PRIVATE
   private onZoomStart = (e) => {
     this.dragging = false
-    this.dragP0 = d3.pointer(e)
+    this.dragT0 = Date.now()
 
     if (this.userActions) {
     }
@@ -57,17 +74,16 @@ export default class ZoomController {
 
   private onZoomEnd = () => {
     this.dragging = false
-    this.dragP0 = undefined
+    this.dragT0 = undefined
   }
 
   private zoomed = (e) => {
+    if (!!get(selected)) {
+      return
+    }
     const { x, y, k } = e.transform
 
-    const { dragP0 } = this
-    const dragP1 = d3.pointer(e)
-
-    this.dragging = this.dragging || 
-      Math.sqrt( d3.sum(dragP1.map((_, i) => (dragP0[i] - dragP1[i])**2)) ) >= 3
+    this.dragging = (Date.now() - <number>this.dragT0) >= 150
 
     zoom.set(k)
     cameraOffsetX.set(x)
@@ -81,12 +97,106 @@ export default class ZoomController {
   private handlePointerUp = (e) => {
     if (this.dragging) return
 
+    console.log('handlePointerUp')
+
     const { clientX, clientY } = e
 
     d3.select("#canvas").node()
       .dispatchEvent(new PointerEvent('pointerup', { clientX, clientY }))
   }
+
   
+  public getLayoutTranslateExtent = (layout: Layout, size: ILayoutSize) => {
+    const s_nodeSize = get(nodeSize)
+    const s_fw = get(figureWidth)
+    const s_fh = get(figureHeight)
+
+    let extentX = [ 0, s_fw ]
+    let extentY = [ 0, s_fh ]
+
+    if (layout === "block") {
+      const margin = s_nodeSize
+      const exceedY = (size.height + s_nodeSize) - s_fh
+
+      if (exceedY > 0) {
+        extentY = [
+          -(exceedY/2 + margin),
+          +(exceedY/2 + margin) + s_fh
+        ]
+      }
+    }
+
+    else {
+      const margin = s_nodeSize*3
+      const exceedX = size.width - s_fw
+      const exceedY = size.height - s_fh
+
+      if (exceedX > 0) {
+        extentX = [
+          -(exceedX/2 + margin),
+          +(exceedX/2 + margin) + s_fw
+        ]
+      }
+
+      if (exceedY > 0) {
+        extentY = [
+          -(exceedY/2 + margin),
+          +(exceedY/2 + margin) + s_fh
+        ]
+      }
+    }
+
+    const extent = d3.range(2).map((i: number) => {
+      return [ extentX[i], extentY[i] ]
+    })
+
+    return extent
+  }
+
+  public updateTranslateExtent = (layout: Layout, size: ILayoutSize, moveTo:string|undefined=undefined) => {
+    if (!this.initialized) return
+
+    const translateExtent = this.getLayoutTranslateExtent(layout, size)
+
+    this.curTranslateExtent = translateExtent
+
+    this.zoom.translateExtent(translateExtent)
+
+    if (moveTo) {
+      d3.select(this.zoomBase)
+        .transition()
+        .duration(750)
+        .call(this.zoom.translateTo, 0, moveTo === "top" ? translateExtent[0][1] : 0, [ 0, 0 ])
+    }
+  }
+
+  public updateScaleExtent = (layout: Layout, windowWidth:number|undefined=undefined) => {
+    if (!this.initialized) return
+
+    if (windowWidth === undefined) {
+      windowWidth = get(width)
+    }
+
+    let scaleExtent = [ 1, 1 ]
+    let scaleTo = 1
+
+    if (layout === "radial" && windowWidth < 768) {
+      scaleExtent = [ .3, 1 ]
+      scaleTo = .5
+    }
+
+    this.curScaleExtent = scaleExtent
+
+    this.zoom.scaleExtent(scaleExtent)
+
+    d3.select(this.zoomBase)
+      .call(this.zoom.scaleTo, scaleTo)
+  }
+
+  
+
+
+
 
   // PUBLIC
   public translateExtent = (extent: number[][]) => {
@@ -138,15 +248,15 @@ export default class ZoomController {
     }
   }
 
-  public playEntrance(layout) {
-    // const { tween, trnslt, target, zoom, transform, trnsltExtentCenter } = this
+  public entrance(isBlock: boolean) {
+    // const { state, trnslt, target, zoom, transform, trnsltExtentCenter } = this
 
     // const isMobile = get(width) < 768
     // const initK = isMobile ? .1 : .4
     // const finalK = isMobile ? 1 : 1
 
 
-    // gsap.fromTo(tween, 
+    // gsap.fromTo(state, 
     //   {  x: 0, y: 0, k: initK },
     //   { 
     //     x: trnslt[0], 
@@ -160,7 +270,7 @@ export default class ZoomController {
 
     //       d3.select(target).call(
     //         zoom.transform, 
-    //         transform.translate(-tween.x, -tween.y)
+    //         transform.translate(-state.x, -state.y)
     //       )
 
     //     },
@@ -170,7 +280,7 @@ export default class ZoomController {
   }
 
   public playExit() {
-    // const { tween } = this
+    // const { state } = this
 
     // const onUpdate = () => {
     //   this.scale(t.k)

@@ -136,11 +136,6 @@
       column-gap: .8rem;
       row-gap: .4rem;
 
-      columns: var(--n-columns);
-      -webkit-columns: var(--n-columns);
-      -moz-columns: var(--n-columns);
-
-      
 
       &__item {
 

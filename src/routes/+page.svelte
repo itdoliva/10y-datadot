@@ -3,20 +3,19 @@
   // Libraries
   import { onMount } from 'svelte';
   import { _ } from 'svelte-i18n'
-	import { loader } from '$lib/loader';
+  import initPixi from '$lib/pixi.js';
 
   // Files
   import "$lib/scss/global.scss";
   import simulation from "$lib/simulation"
   
   // Stores
-  import { isReady } from "$lib/stores/loading"
+  import { nodesLoaded } from "$lib/stores/loading"
   import { categories, projects, clients } from "$lib/stores/nodes"
   import { width, height, pixelRatio, app } from "$lib/stores/canvas"
   
   // Components
   import App from "$lib/App.svelte";
-  import Pixi from "$lib/components/webgl/organisms/Pixi.svelte";
   import LoadingScreen from "$lib/components/dom/organisms/LoadingScreen.svelte";
 
   export let data
@@ -25,8 +24,12 @@
   projects.set(data.projects)
   categories.set(data.categories)
 
+  let canvas
+
   onMount(() => {
-    simulation.data(data.nodes)
+    $app = initPixi(canvas)
+
+    simulation.load(data.nodes)
   })
 
 </script>
@@ -42,11 +45,27 @@
 </svelte:head>
 
 
-<Pixi bind:app={$app}/>
+<canvas 
+  id="canvas" 
+  style:width="{$width}px"
+  style:height="{$height}px"
+  bind:this={canvas} 
+/>
+
 <App />
 
-{#if !$isReady}
-  <LoadingScreen />
+{#if !$nodesLoaded}
+  <LoadingScreen width={$width} height={$height} />
 {/if}
 
+
+<style>
+  canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    z-index: 0;
+  }
+</style>
 

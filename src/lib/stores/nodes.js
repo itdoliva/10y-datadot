@@ -15,7 +15,7 @@ export const fgoals = writable([])
 export const findustries = writable([])
 export const fproducts = writable([])
 
-export const selected = writable({ active: false })
+export const selected = writable()
 
 export const categoriesEnriched = writable()
 

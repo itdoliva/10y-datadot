@@ -1,11 +1,19 @@
 import * as PIXI from "pixi.js"
 import { intersection } from "lodash"
+
+import Deliverable from "./Deliverable"
+import Simulation from "./Simulation"
 import templates from "../templates"
+
+import { selected } from "../stores/nodes"
+import { hovered } from "../stores/canvas"
 
 
 export default class DeliverableContext {
-  public context: PIXI.Container
-  private graphics: PIXI.Graphics
+  private deliverable: Deliverable
+
+  public context = new PIXI.Container()
+  private graphics = new PIXI.Graphics()
 
   private baseGraphics: PIXI.Graphics
 
@@ -19,12 +27,17 @@ export default class DeliverableContext {
     sprite: [ 30, 31, 32, 33, 34 ]
   } 
 
-  constructor(categories: number[]) {
-    this.graphics = new PIXI.Graphics()
-    this.graphics.cacheAsBitmap = true
+  constructor(deliverable: Deliverable, categories: number[]) {
+    this.deliverable = deliverable 
 
-    this.context = new PIXI.Container()
     this.context.addChild(this.graphics)
+    this.context.cursor = 'pointer'
+    this.context.eventMode = 'dynamic'
+    this.context.onpointerenter = this.onpointerenter
+    this.context.onpointerleave = this.onpointerleave
+    this.context.onpointerup = this.select
+
+    this.graphics.cacheAsBitmap = true
 
     const baseId = intersection(this.ids.base, categories)[0]
     const bkgrIds = intersection(this.ids.background, categories)
@@ -38,6 +51,11 @@ export default class DeliverableContext {
     this.loading = Promise.all(sprtIds.map(this.addGraphics))
 
     return this
+  }
+
+  public toScene = (scene: PIXI.Container, ticker: PIXI.Ticker) => {
+    scene.addChild(this.context)
+    ticker.add(this.tick)
   }
 
   private addGraphics = (id: number) => {
@@ -58,5 +76,29 @@ export default class DeliverableContext {
     }
 
     return graphics
+  }
+
+  private onpointerenter = () => {
+    hovered.set(this.deliverable)
+  } 
+
+  private onpointerleave = () => {
+    hovered.set(null)
+  }
+
+  private select = () => {
+    selected.set(this.deliverable)
+  }
+
+  private tick = () => {
+    const { fx, fy, rotation, renderable, alpha, scale } = this.deliverable.attr.render
+
+    this.context.renderable = renderable
+    this.context.alpha = alpha
+
+    this.context.x = fx || 0
+    this.context.y = fy || 0
+    this.context.rotation = rotation
+    this.context.scale.set(scale) 
   }
 }

@@ -10,7 +10,7 @@ export const figureWidth = writable(0);
 export const figureHeight = writable(0);
 
 export const hoveredFilter = writable({ active: false })
-export const hoveredNode = writable()
+export const hovered = writable()
 
 export const complexityOn = writable(false)
 export const linkClientOn = writable(false)

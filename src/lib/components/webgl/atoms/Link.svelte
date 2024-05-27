@@ -5,7 +5,7 @@
   import * as d3 from "d3"
   import { gsap } from "gsap"
 
-  import { app, hoveredNode } from "$lib/stores/canvas";
+  import { app, hovered } from "$lib/stores/canvas";
 
   import grahamScan from "$lib/utility/grahamScan"
 
@@ -79,7 +79,7 @@
     context.endFill()
   })
 
-  $: isHovered = $hoveredNode && $hoveredNode[type + "Id"] === id
+  $: isHovered = $hovered && $hovered[type + "Id"] === id
   $: toggleHovered(isHovered)
   $: toggleLink(isLinkOn)
 

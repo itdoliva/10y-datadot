@@ -2,11 +2,11 @@
 import * as d3 from "d3";
 
 // Classes & Interfaces
-import Deliverable from "./Deliverable";
-import { SortBy, SectorDataPoint, SectorMetadata, SectorData, Dimensions, LayoutConfig } from "../types/simulation";
+import Deliverable from "../simulation/Deliverable";
+import { SortBy, ISectorDataPoint, ISectorMetadata, ISectorData, IDimensions, ILayoutConfig } from "../types/simulation";
 
 
-export default function makeSectorData(data: Deliverable[], groupBy: SortBy, maxStack: number): [ SectorData, SectorMetadata ] {
+export default function makeSectorData(data: Deliverable[], groupBy: SortBy, maxStack: number): [ ISectorData, ISectorMetadata ] {
   const acc = (d: Deliverable) => d[groupBy]
 
   // Sorted unique values for the provided groupBy variable
@@ -42,9 +42,9 @@ export default function makeSectorData(data: Deliverable[], groupBy: SortBy, max
     // Compute the sectorDataset's partial metadata
     const nSectors = unique.length
     const nGaps = nSectors === 1 ? 0 : (nSectors + 1)
-    const nPiles = d3.max(sectorData, (d: SectorDataPoint) => d.pileIndex)
+    const nPiles = d3.max(sectorData, (d: ISectorDataPoint) => d.pileIndex)
   
-    const metadata: SectorMetadata = { 
+    const metadata: ISectorMetadata = { 
       nGaps, 
       nPiles 
     }

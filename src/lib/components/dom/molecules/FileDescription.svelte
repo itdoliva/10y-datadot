@@ -1,18 +1,17 @@
 <script>
-	import Icon from '$lib/components/dom/atoms/Icon.svelte';
+  import Icon from '$lib/components/dom/atoms/Icon.svelte';
 
-  import { selected } from "$lib/stores/nodes";
-
-  function onClick() {
-    selected.set({ active: false })
-  }
+  export let onClick
+  export let outerClose
 
 </script>
 
 <div class="file-description">
 
   <div class="file-description__header">
-    <h3 class="project-name">IJEN</h3>
+    <div class="project-name">
+      <h3>IJEN</h3>
+    </div>
     <h4 class="project-client">Baboom Filmes</h4>
   </div>
 
@@ -26,21 +25,23 @@
     <p class="project-description">
       Infográficos animados para auxiliar na narrativa do documentário.
     </p>
-
   </div>
 
   <div class="file-description__footer">
     <p class="project-date">01/2014</p>
 
-    <button on:click={onClick}>
-      <Icon icon="return"/>
-    </button>
+    {#if !outerClose}
+      <button on:click={onClick}>
+        <Icon icon="return"/>
+      </button>
+    {/if}
   </div>
-
   
 </div>
 
 <style lang="scss">
+  @import "$lib/scss/breakpoints.scss";
+
   .file-description {
     --fs-name: calc(var(--fs-label)*2.4);
     --fs-client: calc(var(--fs-label)*1.6);
@@ -48,6 +49,7 @@
     --fs-desc: calc(var(--fs-label)*1.4);
     --fs-date: calc(var(--fs-label)*1.6);
 
+    width: 100%;
     max-width: calc(var(--fs-label)*28);
 
     display: flex;
@@ -62,9 +64,22 @@
       letter-spacing: .1em;
 
       .project-name {
-        font-weight: 700;
-        text-transform: uppercase;
-        font-size: var(--fs-name);
+
+        h3 {
+          display: inline-block;
+          font-weight: 700;
+          text-transform: uppercase;
+          font-size: var(--fs-name);
+          
+          // background: rgba(255, 255, 255, .8);
+          background: var(--clr-black);
+          color: var(--clr-white);
+
+          @include md {
+            background: none;
+            color: var(--clr-black);
+          }
+        }
       }
 
       .project-client {
@@ -125,6 +140,8 @@
           stroke: var(--clr-accent);
         }
       }
+
+
     }
   }
 

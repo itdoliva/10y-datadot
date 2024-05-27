@@ -11,69 +11,90 @@
 
   // WebGL Components
   import FileTrace from "$lib/components/webgl/atoms/FileTrace.svelte";
-  
-  const node = $selected
 
-  const traceIds = [
-    node.channel,
-    ...node.products,
-    ...node.designs,
-    ...node.goals,
+  export let nColumns = 1
+  
+
+  $: traceIds = [
+    $selected.channel,
+    ...$selected.products,
+    ...$selected.designs,
+    ...$selected.goals,
   ]
+
+  $: itemsByColumn = Math.ceil((traceIds.length + 1)/nColumns)
 
 </script>
 
-<ul class="file-traces">
-  {#each traceIds as id}
-  {@const context = new PIXI.Container()}
-  {@const category = Object.values($categories).flat().find(d => d.id === id)}
-    <li class="file-traces__item">
+<div class="file-traces">
+  <ul 
+    style:--n-columns={nColumns}
+    style:--items-by-column={itemsByColumn}
+  >
+    {#each traceIds as id}
+    {@const context = new PIXI.Container()}
+    {@const category = Object.values($categories).flat().find(d => d.id === id)}
+      <li>
 
-      <div class="primitive-holder" use:castContainer={{ context }}>
-        <FileTrace {id} {context}/>
-      </div>
+        <div class="primitive-holder" use:castContainer={{ context }}>
+          <FileTrace {id} {context}/>
+        </div>
 
-      <p class="label">
-        {$_(category.alias)}
-      </p>
+        <p class="label">
+          {$_(category.alias)}
+        </p>
 
-    </li>
-  {/each}
-</ul>
+      </li>
+    {/each}
+  </ul>
+</div>
 
 <style lang="scss">
+  @import "$lib/scss/breakpoints.scss";
+
   .file-traces {
-    width: 100%;
-    height: 100%;
-    
-    display: grid;
-    grid-auto-flow: row;
-    grid-auto-rows: min-content;
-
-    gap: 1rem;
-
-    align-content: center;
-
-    &__item {
+    ul {
+      width: 100%;
+      
       display: grid;
-      grid-template-columns: calc(var(--fs-label)*3.2) 1fr;
-      grid-template-rows: calc(var(--fs-label)*2.2);
-      gap: calc(var(--fs-label)*2);
+      grid-template-rows: repeat(var(--items-by-column), 1fr);
+      grid-template-columns: repeat(var(--n-columns), 1fr);
 
-      justify-content: end;
-      align-items: center;
+      column-gap: calc(1.2*var(--fs-label));
+      row-gap: calc(2*var(--fs-label));
 
-      .primitive-holder {
-        aspect-ratio: 1/1;
+      @include md {
+        row-gap: calc(2*var(--fs-label));
       }
 
-      .label {
-        align-self: center;
-        text-transform: lowercase;
-        text-decoration: underline;
-        font-size: var(--fs-label);
-      }
+      align-content: center;
 
+      li {
+        display: grid;
+        grid-template-columns: calc(var(--fs-label)*2.6) 1fr;
+        grid-template-rows: calc(var(--fs-label)*2.2);
+        column-gap: calc(var(--fs-label)*1.6);
+
+        justify-content: end;
+        align-items: center;
+
+        @include md {
+          grid-template-columns: calc(var(--fs-label)*3.2) 1fr;
+          column-gap: calc(var(--fs-label)*2);
+        }
+
+        .primitive-holder {
+          aspect-ratio: 1/1;
+        }
+
+        .label {
+          align-self: center;
+          text-transform: lowercase;
+          text-decoration: underline;
+          font-size: var(--fs-label);
+        }
+
+      }
     }
   }
 </style>

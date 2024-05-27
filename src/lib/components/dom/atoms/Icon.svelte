@@ -17,6 +17,7 @@
 	import Return from '$lib/icons/Return.svelte';
 	import Collapse from '$lib/icons/Collapse.svelte';
 	import Logo from '$lib/icons/Logo.svelte';
+  import ReturnBackground from '$lib/icons/ReturnBackground.svelte';
 
   export let icon
 
@@ -37,6 +38,7 @@
     infoActive: InfoActive,
     infoHover: InfoHover,
     return: Return,
+    returnBackground: ReturnBackground,
     collapse: Collapse,
     logo: Logo
   }

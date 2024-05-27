@@ -1,34 +1,51 @@
 export type Layout = "block" | "radial"
-export type Transition = "idle" | "entrance" | "exit" | "filter-in" | "filter-out" | "sort"
 export type SortBy = "year" | "industry"
 
-export interface CartesianCoordinates {
+export interface ILayoutAttributes {
   x: number;
   y: number;
-}
-
-export interface PolarCoordinates {
   radius: number;
   theta: number;
-}
 
-export interface Coordinates extends CartesianCoordinates, PolarCoordinates {}
-
-export interface LayoutAttributes extends Coordinates {
   time: number;
+  active: boolean;
 }
 
-export interface RenderAttributes extends CartesianCoordinates {
+export interface IRenderAttributes {
+  // fx and fy define where the node will be rendered
+  fx: number | undefined;
+  fy: number | undefined;
+
+  // px, py, theta, and radius help defining fx and fy
+  px: number;
+  py: number;
+  theta: number;
+  radius: number;
+
   rotation: number;
   alpha: number;
   scale: number;
   renderable: boolean;
 }
 
+// Transition
+export type TransitionType = "idle" | "entrance" | "exit" | "filterIn" | "filterOut" | "sort"
+
+export interface ILayoutSize {
+  width: number;
+  height: number;
+}
+
+export interface ITransition {
+  type: TransitionType;
+  attrId?: number;
+  layout?: Layout;
+  layoutSize?: ILayoutSize;
+}
 
 
 // General
-export interface Dimensions {
+export interface IDimensions {
   fw: number;
   fh: number;
   nodeSize: number;
@@ -36,39 +53,39 @@ export interface Dimensions {
 }
 
 // Layout Position
-export interface SectorDataPoint {
+export interface ISectorDataPoint {
   id: string,
   sectorIndex: number,
   pileIndex: number,
   inPileIndex: number
 }
 
-export interface SectorMetadata {
+export interface ISectorMetadata {
   nGaps: number;
   nPiles: number;
   innerRadius?: number;
 }
 
-export interface Padding {
+export interface IPadding {
   left: number;
   top: number;
 }
 
-export interface RadialConfigData {
+export interface IRadialConfigData {
   innerRadius: number;
 }
 
-export interface BlockConfigData {
+export interface IBlockConfigData {
   rows: number;
   columns: number;
 }
 
-export interface LayoutConfig {
-  data: RadialConfigData | BlockConfigData;
-  padding: Padding;
+export interface ILayoutConfig {
+  data: IRadialConfigData | IBlockConfigData;
+  padding: IPadding;
   extent: Array<Array<number>>;
 }
 
-export interface SectorData extends Array<SectorDataPoint> {
-  metadata: SectorMetadata;
+export interface ISectorData extends Array<ISectorDataPoint> {
+  metadata: ISectorMetadata;
 }

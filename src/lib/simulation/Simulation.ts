@@ -2,17 +2,24 @@
 import * as d3 from "d3"
 import { gsap } from "gsap";
 import { get } from "svelte/store";
+import _ from "lodash"
+import * as PIXI from "pixi.js"
 
 // Stores
-import { figureHeight, figureWidth, isSwitchingLayout } from "../stores/canvas";
-import { gap, nodeSize, sortBy, categories, categoriesEnriched } from "../stores/nodes";
-import { isReady } from "../stores/loading";
+import { figureHeight, figureWidth, isSwitchingLayout, linkClientOn, linkProjectOn } from "../stores/canvas";
+import { gap, nodeSize, sortBy, categories, categoriesEnriched, selected } from "../stores/nodes";
+import { nodesLoaded } from "../stores/loading";
 
 // Classes, Functions & Interfaces
 import randomDensity from "../utility/randomDensity"
-import makeSectorData from "./makeSectorData"
+import makeSectorData from "../utility/makeSectorData"
 import Deliverable from "./Deliverable"
-import { SortBy, Layout, Transition } from "../types/simulation"
+import { SortBy, Layout, TransitionType, ITransition } from "../types/simulation"
+import NodeAttributes from "./NodeAttributes";
+import TransitionController from "./TransitionController";
+import DummyDeliverable from "./DummyDeliverable";
+import DeliverableGroup from "./DeliverableGroup";
+import ZoomController from "./ZoomController";
 
 export const c: any = {}
 
@@ -39,7 +46,19 @@ export default class Simulation {
   public layout: Layout
   public onSelectedState: boolean
 
-  private loaded: boolean
+  private initialized = false
+
+  private activeIds: number[] = []
+  private activeCount = 0
+
+  private loadCallbacks: any[] = []
+
+  // Transition
+  private attrId = 0
+  public transition: TransitionController
+
+  // Zoom
+  public zoom: ZoomController
 
   // Layout Dimensions
   private width: number
@@ -50,39 +69,29 @@ export default class Simulation {
   private forceX: any
   private forceY: any
 
-  private nodes: Deliverable[] = []
+  private dummy: DummyDeliverable
+  private nodes: ( Deliverable | DummyDeliverable)[] = []
+
+  private clients: DeliverableGroup[] = []
+  private projects: DeliverableGroup[] = []
 
   constructor() {
-    this.nodes = []
-  }
-  
-  
-  public data = (data: any[]) => {
-    console.log("data")
-    const s_sortBy = get(sortBy)
+    this.transition = new TransitionController(this)
+    this.zoom = new ZoomController(this)
+    this.dummy = new DummyDeliverable(this)
 
-    const loading: Promise<any>[] = []
-    
-    data.forEach(dataPoint => {
-      const node = new Deliverable(this, dataPoint)
-      this.nodes.push(node)
-      loading.push(node.context.loading)
-    })
-
-    this.nodes
-      .sort((a, b) => +b.active - +a.active || a[s_sortBy] - b[s_sortBy] )
-      .forEach((node, i) => node.i = i)
-
-    Promise.all(loading).then(() => {
-      this.setNodesAttr()
-      this.updateCategories()
-      this.initSimulation()
-      isReady.set(true)
-    })
-
+    this.nodes.push(this.dummy)
   }
 
-  private initSimulation() {
+  // ------------------------ //
+  // ------- INTERNAL ------- //
+  // ------------------------ //
+
+  private forceCollideRadius = (node:(Deliverable|DummyDeliverable)) => node.radius()
+
+  private ticked = () => this.nodes.forEach(node => node.tick())
+
+  private initSimulation = () => {
     this.forceCollide = d3.forceCollide().radius(this.forceCollideRadius)
     this.forceX = d3.forceX().strength(.005)
     this.forceY = d3.forceY().strength(.005)
@@ -98,16 +107,12 @@ export default class Simulation {
       .on("tick", this.ticked)
   }
 
-  private forceCollideRadius = (node: Deliverable) => node.radius()
-
-  private ticked = () => this.nodes.forEach(node => node.tick())
-
-  private updateCategories() {
+  private updateCategories = () => {
     const categoriesOfInterest = [ 'products', 'designs', 'industries' ]
 
     const enriched = { ...get(categories) }
   
-    const activeNodes = this.nodes.filter(d => d.active)
+    const activeNodes = this.getDeliverableNodes().filter(d => d.active)
   
     categoriesOfInterest.forEach(category => {
       enriched[category].forEach(d => {
@@ -125,90 +130,12 @@ export default class Simulation {
     categoriesEnriched.set(enriched)
   }
 
-  public play(transition: Transition) {
-    if (transition === "exit") {
-      this.nodes.forEach(node => node.attr.playExit())
-    }
-  }
-
-  public setLayout(newLayout: Layout) {
-    console.log("setLayout")
-
-    if (newLayout === this.layout) return
-
-    this.layout = newLayout
-
-    if (!this.onSelectedState) {
-      const onStart = () => isSwitchingLayout.set(true)
-      const onComplete = () => isSwitchingLayout.set(false)
-      
-      const tl = gsap.timeline({ 
-        overwrite: true, 
-        onStart, 
-        onComplete, 
-        onInterrupt: onComplete 
-      })
-
-      tl.call(this.play, ["exit"])
-        .call(this.play, ["entrance"], "+=1")
-    }
-  }
-
-  public setSelected() {
-
-  }
-
-  public sort(sortBy: SortBy) {
-    console.log("sort")
-    this.nodes
-      .sort((a, b) => +b.active - +a.active || a[sortBy] - b[sortBy] ) // Descending because we want active (1) before unactive (0)
-      .forEach((node, i) => node.i = i)
-
-    this.setNodesAttr()
-    this.play("sort")
-  }
-
-  public filter(fyears: number[], findustries: number[], fdesigns: number[], fgoals: number[], fproducts: number[]) {
-    console.log("filter")
-    const beforeCount = this.nodes.filter(node => node.active).length
-    
-    this.nodes.forEach((node) => {
-      const isDeactive = (
-        (fyears && (node.year < fyears[0] || node.year > fyears[1])) ||
-        (fdesigns && fdesigns.length > 0 && !node.designs.some(design => fdesigns.includes(design))) ||
-        (fgoals && fgoals.length > 0 && !node.goals.some(goal => fgoals.includes(goal))) || 
-        (fproducts && fproducts.length > 0 && !node.products.some(product => fproducts.includes(product))) ||
-        (findustries && findustries.length > 0 && !findustries.includes(node.industry))
-      )
-
-      node.active = !isDeactive
-    })
-
-    const afterCount = this.nodes.filter(node => node.active).length
-
-    this.updateCategories()
-
-    const s_sortBy = get(sortBy)
-    this.nodes
-      .sort((a, b) => +b.active - +a.active || a[s_sortBy] - b[s_sortBy] ) // Descending because we want active (1) before unactive (0)
-      .forEach((node, i) => node.i = i)
-
-    const transition = afterCount < beforeCount ? "filter-out" : "filter-in"
-
-    this.setNodesAttr()
-    this.play(transition)
-  }
-
-  public toggleComplexity() {
-
-  }
-
-  private setLayoutDimensions(layoutWidth: number, layoutHeight: number) {
+  private setLayoutDimensions = (layoutWidth: number, layoutHeight: number) => {
     this.width = layoutWidth
     this.height = layoutHeight
   }
 
-  private setNodesBlockAttr(activeCount: number) {
+  private chainNodesBlockAttr = (attrId: number) => {
     const s_nodeSize = get(nodeSize)
     const s_gap = get(gap)
     const s_fw = get(figureWidth)
@@ -218,11 +145,11 @@ export default class Simulation {
     const aspectRatio = s_fw / s_fh
 
     // Calculate initial number of rows and columns based on aspect ratio
-    const initRows = Math.ceil(Math.sqrt(activeCount / aspectRatio))
+    const initRows = Math.ceil(Math.sqrt(this.activeCount / aspectRatio))
     const initColumns = Math.ceil(aspectRatio * initRows)
 
     // Adjust rows to ensure all nodes fit within the figure width
-    let rows = Math.ceil(activeCount / initColumns)
+    let rows = Math.ceil(this.activeCount / initColumns)
     let columns = initColumns
 
     // Calculate initial block width and height
@@ -235,31 +162,29 @@ export default class Simulation {
       blockWidth = --columns * (s_nodeSize + s_gap) - s_gap
 
       // Recalculate rows to fit the reduced number of columns
-      rows = Math.ceil(activeCount / columns)
+      rows = Math.ceil(this.activeCount / columns)
     }
 
     // Once we have a block that fits the figureWidth, 
     // we remove another column to make margin
     blockWidth = --columns * (s_nodeSize + s_gap) - s_gap
-    rows = Math.ceil(activeCount / columns)
+    rows = Math.ceil(this.activeCount / columns)
 
     // Update block height
     blockHeight = rows * (s_nodeSize + s_gap) - s_gap
-
-    // Update layout dimensions
-    this.setLayoutDimensions(blockWidth, blockHeight)
 
     // Time calculation support
     const columnDensities = randomDensity(columns)
     const timeStepByRow = +(c.fullColEntranceMaxDuration / rows).toFixed(4)
 
-    this.nodes.forEach(node => {
-      const attr = { x: 0, y: 0, radius: 0, theta: 0, time: 0 }
+
+    this.getDeliverableNodes().forEach(node => {
+      const attr = { x: 0, y: 0, radius: 0, theta: 0, time: 0, active: node.active }
 
       if (node.active) {
         const colIndex = Math.floor(node.i % columns)
         const rowIndex = Math.floor(node.i / columns)
-
+ 
         attr.x = colIndex * (s_nodeSize + s_gap) + s_nodeSize/2 - blockWidth/2
         attr.y = rowIndex * (s_nodeSize + s_gap) + s_nodeSize/2 - blockHeight/2
         attr.time = 
@@ -267,19 +192,21 @@ export default class Simulation {
           timeStepByRow * rowIndex // row delay
       }
 
-      node.attr.set(attr)
+      node.attr.set(new NodeAttributes(attrId, attr))
     })
+
+    return { width: blockWidth, height: blockHeight }
   }
 
-  private setNodesRadialAttr(activeCount: number) {
+  private chainNodesRadialAttr = (attrId: number) => {
     const s_nodeSize = get(nodeSize)
     const s_fw = get(figureWidth)
     const s_fh = get(figureHeight)
     const s_groupBy = get(sortBy)
 
-    const data = this.nodes.filter(node => node.active)
+    const data = this.getDeliverableNodes().filter(node => node.active)
     const radialGap = s_nodeSize * 1.25
-    const maxStack = activeCount**(1/3)
+    const maxStack = this.activeCount**(1/3)
 
     let curSectorData
     let curSectorMetadata
@@ -323,8 +250,13 @@ export default class Simulation {
       .range([ 0, c.maxDelayRadial ])
 
     // Update posData dataset
-    this.nodes.forEach(node => {
-      const attr = { x: 0, y: 0, theta: 0, radius: 0, time: 0 }
+    let minX = 0
+    let maxX = 0
+    let minY = 0
+    let maxY = 0
+    
+    this.getDeliverableNodes().forEach(node => {
+      const attr = { x: 0, y: 0, theta: 0, radius: 0, time: 0, active: node.active }
 
       const sectorDataPoint = sectorData.find(d => d.id === node.id)
 
@@ -338,30 +270,245 @@ export default class Simulation {
         attr.time = timeScale(attr.theta)
       }
 
-      node.attr.set(attr)
+      if (attr.x < minX) { minX = attr.x } else
+      if (attr.x > maxX) { maxX = attr.x }
+      if (attr.y < minY) { minY = attr.y } else
+      if (attr.y > maxY) { maxY = attr.y }
+
+      node.attr.set(new NodeAttributes(attrId, attr))
     })
 
-    this.setLayoutDimensions(
-      d3.max(this.nodes, (node: Deliverable) => node.attr.cur.x) - d3.min(this.nodes, (node: Deliverable) => node.attr.cur.x), 
-      d3.max(this.nodes, (node: Deliverable) => node.attr.cur.y) - d3.min(this.nodes, (node: Deliverable) => node.attr.cur.y)
-    )
+    const width = maxX - minX
+    const height = maxY - minY
+
+    return { width, height }
   }
 
-  private setNodesAttr() {
-    const s_fw = get(figureWidth)
-    const s_fh = get(figureHeight)
+  private chainNodesAttr = (transitionType: TransitionType) => {
+    console.groupCollapsed("chainNodesAttr()")
 
-    if (s_fw + s_fh === 0) return
+    if (!this.initialized) return console.groupEnd()
 
-    const activeCount = this.nodes.filter(d => d.active).length
+    console.log(`chainNodes${_.capitalize(this.layout)}Attr()`)
+    console.groupEnd()
 
-    if (this.layout === "block") {
-      this.setNodesBlockAttr(activeCount)
-    } 
-    else {
-      this.setNodesRadialAttr(activeCount)
+    const attrId = ++this.attrId
+
+    const layoutSize = this.layout === "block"
+      ? this.chainNodesBlockAttr(attrId)
+      : this.chainNodesRadialAttr(attrId)
+
+    this.transition.add(transitionType, attrId, this.layout, layoutSize)
+  }
+
+
+
+  // ----------------------- //
+  // CALLED ON THIRD-PARTIES //
+  // ----------------------- //
+
+  private debounceInitialize = _.debounce(() => {
+    this.initialized = true
+    this.chainNodesAttr("entrance")
+  }, 300)
+
+  public handleFigureResize = (figureWidth: number) => {
+    if (!figureWidth) return
+
+    if (!this.initialized) {
+      this.debounceInitialize()
     }
   }
+
+  public handleWindowResize = (width: number) => {
+    if (!width) return
+
+    this.zoom.updateScaleExtent(this.layout, width)
+  }
+
+  public load = (dataArr: any[], app: PIXI.Application) => {
+    const loading: Promise<any>[] = []
+    
+    dataArr.forEach(dataPoint => {
+      const node = new Deliverable(this, dataPoint)
+      this.nodes.push(node)
+      loading.push(node.context.loading)
+    })
+
+    const deliverableNodes = this.getDeliverableNodes()
+    this.activeIds = deliverableNodes.filter(d => d.active).map(d => d.id)
+    this.activeCount = this.activeIds.length
+
+    d3.groups(deliverableNodes, (d: Deliverable) => d.clientId).forEach(([ id, deliverables]) => {
+      const client = new DeliverableGroup(this, id, deliverables, 0x83BF00)
+      this.clients.push(client)
+    })
+
+    d3.groups(deliverableNodes, (d: Deliverable) => d.projectId).forEach(([ id, deliverables]) => {
+      const project = new DeliverableGroup(this, id, deliverables, 0X818AFC)
+      this.projects.push(project)
+    })
+
+    this.sort(<SortBy>get(sortBy), true)
+
+    Promise.all(loading).then(() => {
+      console.log("-> LOAD COMPLETED")    
+
+      this.updateCategories()
+      this.initSimulation()
+
+      this.loadCallbacks.forEach(([ callback, params ]) => callback(...params))
+
+      nodesLoaded.set(true)
+    })
+
+  }
+
+  public toScene = (context: PIXI.Container, ticker: PIXI.Ticker) => {
+    this.clients.forEach(node => node.toScene(context, ticker))
+    this.projects.forEach(node => node.toScene(context, ticker))
+
+    this.getDeliverableNodes().forEach(node => {
+      node.context.toScene(context, ticker)
+    })
+  }
+
+  public getDeliverableNodes = (): Deliverable[] => {
+    return <Deliverable[]>this.nodes.filter(d => d.id >= 0)
+  }
+
+  public updateForceCollideRadius = () => {
+    if (!this.forceSimulation) {
+      return
+    }
+
+    this.forceCollide.radius(this.forceCollideRadius)
+  }
+
+  public handleTransition = (isRunning: boolean) => {
+    this.handleLinks("clients", !isRunning && get(linkClientOn))
+    this.handleLinks("projects", !isRunning && get(linkProjectOn))
+  }
+
+  public registerLoadCallback = (callback, params:any[]|undefined=undefined) => {
+    if (params === undefined) {
+      params = []
+    }
+
+    this.loadCallbacks.push([ callback, params ])
+  }
+ 
+  // ---------------------------- //
+  // CALLED FROM USER INTERACTION //
+  // ---------------------------- //
+
+  public setLayout = (newLayout: Layout) => {
+    console.groupCollapsed("setLayout()")
+    console.log(`${this.layout} --> ${newLayout}`)
+    console.groupEnd()
+
+    if (newLayout === this.layout) return
+
+    this.layout = newLayout
+
+    if (!this.initialized) return
+
+    this.transition.add("exit")
+    this.chainNodesAttr("entrance")
+
+  }
+
+  public sort = (sortBy: SortBy, suppressEvents: boolean = false) => {
+    console.groupCollapsed("sort()")
+    console.groupEnd()
+
+    this.getDeliverableNodes()
+      .sort((a, b) => +b.active - +a.active || a[sortBy] - b[sortBy] ) // Descending because we want active (1) before unactive (0)
+      .forEach((node, i) => {
+        node.i = i
+      })
+    
+    if (suppressEvents) {
+      return
+    }
+
+    this.chainNodesAttr("sort")
+
+  }
+
+  public filter = (fyears: number[], findustries: number[], fdesigns: number[], fgoals: number[], fproducts: number[]) => {
+    if (!this.initialized) return
+    
+    console.groupCollapsed("filter()")
+
+    this.getDeliverableNodes().forEach(node => node.setActive(fyears, findustries, fdesigns, fgoals, fproducts))
+
+    const activeIds = this.getDeliverableNodes().filter(d => d.active).map(d => d.id)
+    const equalIds = (
+      this.activeIds.length === activeIds.length && 
+      activeIds.every(d => this.activeIds.includes(d)))
+
+    if (!equalIds) {
+      const transitionType = this.activeCount > activeIds.length 
+        ? "filterOut" 
+        : "filterIn"
+
+      console.log(transitionType)
+      console.groupEnd()
+
+      this.activeIds = activeIds
+      this.activeCount = activeIds.length
+
+      this.sort(<SortBy>get(sortBy), true)
+      this.updateCategories()
+
+      this.chainNodesAttr(transitionType)
+
+    }
+    else {
+      console.log("no real filtering")
+      console.groupEnd()
+    }
+
+  }
+
+  public handleSelected = (selected: any) => {
+    console.groupCollapsed("handleSelected()")
+    console.log(selected)
+    console.groupEnd()
+
+    this.nodes.forEach(node => node.handleSelected(selected))
+    this.onSelectedState = !!selected
+
+    this.handleLinks("clients", !selected && get(linkClientOn))
+    this.handleLinks("projects", !selected && get(linkProjectOn))
+  }
+
+  public handleHovered = (hovered: any) => {
+    this.clients.forEach((node: DeliverableGroup) => node.setHovered(hovered && node.id === hovered.clientId))
+    this.projects.forEach((node: DeliverableGroup) => node.setHovered(hovered && node.id === hovered.projectId))
+  }
+
+  public handleComplexity = (complexityOn: boolean) => {
+    console.groupCollapsed("handleComplexity()")
+    console.log(complexityOn)
+    console.groupEnd()
+
+    this.getDeliverableNodes().forEach(node => node.attr.complexity())
+  }
+
+  public handleLinks = (target: "clients"|"projects", isActive: boolean) => {
+    this[target].forEach((node: DeliverableGroup) => node.setActive(isActive))
+  }
+
+
+
+
+
+
+
+
+
 
 
 }

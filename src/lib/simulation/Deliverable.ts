@@ -1,6 +1,5 @@
 import { get } from 'svelte/store';
 
-import { loader } from '../loader';
 import Simulation from "./Simulation"
 import AttributeController from "./AttributeController"
 import DeliverableContext from "./DeliverableContext"
@@ -11,10 +10,11 @@ export default class Deliverable {
   public simulation: Simulation
   
   public id: number
-  private clientId: number
-  private projectId: number
-  private categories: number[]
-  private complexity: number
+  public clientId: number
+  public projectId: number
+  public categories: number[]
+
+  public complexity: number
 
   public year: number
   public channel: number
@@ -24,8 +24,8 @@ export default class Deliverable {
   public products: number[]
   
   public i: number
-  public active: boolean
-  private selected: boolean
+  public active: boolean = true
+  public selected: boolean = false
 
   public attr: AttributeController
   public context: DeliverableContext
@@ -39,7 +39,7 @@ export default class Deliverable {
   public fx: number | undefined
   public fy: number | undefined
 
-  constructor(simulation, dataPoint) {
+  constructor(simulation: Simulation, dataPoint: any) {
     this.simulation = simulation
 
     this.id = dataPoint.id
@@ -54,9 +54,6 @@ export default class Deliverable {
     this.goals = dataPoint.goals
     this.products = dataPoint.products
 
-    this.active = true
-    this.selected = false
-    
     this.categories = [
       dataPoint.channel,
       dataPoint.industry,
@@ -66,7 +63,7 @@ export default class Deliverable {
     ]
 
     this.attr = new AttributeController(this)
-    this.context = new DeliverableContext(this.categories)
+    this.context = new DeliverableContext(this, this.categories)
   }
 
 
@@ -80,17 +77,33 @@ export default class Deliverable {
     else if (this.simulation.onSelectedState && !this.selected) {
       this.fx = undefined
       this.fy = undefined
-      this.attr.render.x = this.attr.tweened.x = this.x
-      this.attr.render.y = this.attr.tweened.y = this.y
+      this.attr.render.fx = this.x
+      this.attr.render.fy = this.y
     }
 
     // NOT SELECTED STATE
-    else if (this.attr.tweened) {
-      const { tweenX, tweenY } = this.attr.getTweenCoordinates()
-
-      this.fx = this.attr.render.x = tweenX
-      this.fy = this.attr.render.y = tweenY
+    else {
+      const { theta, radius, px, py } = this.attr.render
+      this.fx = this.attr.render.fx = Math.cos(theta) * radius + px
+      this.fy = this.attr.render.fy = Math.sin(theta) * radius + py
     }
+
+  }
+
+  public setActive = (fyears: number[], findustries: number[], fdesigns: number[], fgoals: number[], fproducts: number[]) => {
+    this.active = !(
+      (fyears && (this.year < fyears[0] || this.year > fyears[1])) ||
+      (fdesigns && fdesigns.length > 0 && !this.designs.some(design => fdesigns.includes(design))) ||
+      (fgoals && fgoals.length > 0 && !this.goals.some(goal => fgoals.includes(goal))) || 
+      (fproducts && fproducts.length > 0 && !this.products.some(product => fproducts.includes(product))) ||
+      (findustries && findustries.length > 0 && !findustries.includes(this.industry))
+    )
+  }
+
+  public handleSelected = (selected) => {
+    this.selected = selected && this.id === selected.id
+    this.context.context.eventMode = selected ? "none" : "dynamic"
+    this.attr.selected(this.selected)
   }
 
 
