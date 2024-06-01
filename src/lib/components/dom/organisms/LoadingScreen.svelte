@@ -5,12 +5,13 @@
   export let width
   export let height
 
-  $: size =  Math.min(width, height) * ( width < 768 ? 1 : .85 )
+  // $: size =  Math.min(width, height) * ( width < 768 ? 1 : .85 )
+  $: size =  Math.min(200, Math.min(width, height) * ( width < 768 ? 1 : .85 ))
 </script>
 
 <section 
   class="loading" 
-  out:scale={{ start: 2, opacity: 0, delay: 0, duration: 1200 }}
+  out:scale={{ start: 1, opacity: 0, delay: 0, duration: 1200, delay: 0 }}
 >
   
   <LottiePlayer

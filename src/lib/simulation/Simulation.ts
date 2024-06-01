@@ -7,7 +7,7 @@ import * as PIXI from "pixi.js"
 
 // Stores
 import { figureHeight, figureWidth, isSwitchingLayout, linkClientOn, linkProjectOn } from "../stores/canvas";
-import { gap, nodeSize, sortBy, categories, categoriesEnriched, selected } from "../stores/nodes";
+import { gap, nodeSize, sortBy, categories, categoriesEnriched } from "../stores/nodes";
 import { nodesLoaded } from "../stores/loading";
 
 // Classes, Functions & Interfaces
@@ -25,10 +25,6 @@ export const c: any = {}
 
 c.shifts = 1
 c.maxDelayRadial = .7 * c.shifts
-c.easeDelay = d3.easeCubicInOut
-c.easeEntrance = d3.easeCubicInOut
-c.easeFade = d3.easeCubicInOut
-c.easeExit = d3.easeSinIn
 c.colEntranceUpTo = c.shifts * .2
 c.fullColEntranceMaxDuration = c.shifts - c.colEntranceUpTo
 
@@ -44,7 +40,7 @@ c.maxDurationRadial = (c.shifts - c.maxDelayRadial)
 
 export default class Simulation {
   public layout: Layout
-  public onSelectedState: boolean
+  public onSelectedState: boolean | "leaving" = false
 
   private initialized = false
 
@@ -59,10 +55,6 @@ export default class Simulation {
 
   // Zoom
   public zoom: ZoomController
-
-  // Layout Dimensions
-  private width: number
-  private height: number
 
   private forceSimulation: any
   private forceCollide: any
@@ -128,11 +120,6 @@ export default class Simulation {
     })
 
     categoriesEnriched.set(enriched)
-  }
-
-  private setLayoutDimensions = (layoutWidth: number, layoutHeight: number) => {
-    this.width = layoutWidth
-    this.height = layoutHeight
   }
 
   private chainNodesBlockAttr = (attrId: number) => {
@@ -284,13 +271,13 @@ export default class Simulation {
     return { width, height }
   }
 
-  private chainNodesAttr = (transitionType: TransitionType) => {
-    console.groupCollapsed("chainNodesAttr()")
+  private chainNodeAttributes = (transitionType: TransitionType) => {
+    // console.groupCollapsed("chainNodeAttributes()")
 
-    if (!this.initialized) return console.groupEnd()
+    if (!this.initialized) return // console.groupEnd()
 
-    console.log(`chainNodes${_.capitalize(this.layout)}Attr()`)
-    console.groupEnd()
+    // console.log(`chainNodes${_.capitalize(this.layout)}Attr()`)
+    // console.groupEnd()
 
     const attrId = ++this.attrId
 
@@ -298,7 +285,12 @@ export default class Simulation {
       ? this.chainNodesBlockAttr(attrId)
       : this.chainNodesRadialAttr(attrId)
 
-    this.transition.add(transitionType, attrId, this.layout, layoutSize)
+    this.transition.add({
+      type: transitionType, 
+      attrId, 
+      layout: this.layout, 
+      layoutSize
+    })
   }
 
 
@@ -309,7 +301,7 @@ export default class Simulation {
 
   private debounceInitialize = _.debounce(() => {
     this.initialized = true
-    this.chainNodesAttr("entrance")
+    this.chainNodeAttributes("entrance")
   }, 300)
 
   public handleFigureResize = (figureWidth: number) => {
@@ -403,9 +395,9 @@ export default class Simulation {
   // ---------------------------- //
 
   public setLayout = (newLayout: Layout) => {
-    console.groupCollapsed("setLayout()")
-    console.log(`${this.layout} --> ${newLayout}`)
-    console.groupEnd()
+    // console.groupCollapsed("setLayout()")
+    // console.log(`${this.layout} --> ${newLayout}`)
+    // console.groupEnd()
 
     if (newLayout === this.layout) return
 
@@ -413,14 +405,14 @@ export default class Simulation {
 
     if (!this.initialized) return
 
-    this.transition.add("exit")
-    this.chainNodesAttr("entrance")
+    this.transition.add({ type: "exit" })
+    this.chainNodeAttributes("entrance")
 
   }
 
   public sort = (sortBy: SortBy, suppressEvents: boolean = false) => {
-    console.groupCollapsed("sort()")
-    console.groupEnd()
+    // console.groupCollapsed("sort()")
+    // console.groupEnd()
 
     this.getDeliverableNodes()
       .sort((a, b) => +b.active - +a.active || a[sortBy] - b[sortBy] ) // Descending because we want active (1) before unactive (0)
@@ -432,14 +424,14 @@ export default class Simulation {
       return
     }
 
-    this.chainNodesAttr("sort")
+    this.chainNodeAttributes("sort")
 
   }
 
   public filter = (fyears: number[], findustries: number[], fdesigns: number[], fgoals: number[], fproducts: number[]) => {
     if (!this.initialized) return
     
-    console.groupCollapsed("filter()")
+    // console.groupCollapsed("filter()")
 
     this.getDeliverableNodes().forEach(node => node.setActive(fyears, findustries, fdesigns, fgoals, fproducts))
 
@@ -453,8 +445,8 @@ export default class Simulation {
         ? "filterOut" 
         : "filterIn"
 
-      console.log(transitionType)
-      console.groupEnd()
+      // console.log(transitionType)
+      // console.groupEnd()
 
       this.activeIds = activeIds
       this.activeCount = activeIds.length
@@ -462,26 +454,37 @@ export default class Simulation {
       this.sort(<SortBy>get(sortBy), true)
       this.updateCategories()
 
-      this.chainNodesAttr(transitionType)
+      this.chainNodeAttributes(transitionType)
 
     }
     else {
-      console.log("no real filtering")
-      console.groupEnd()
+      // console.log("no real filtering")
+      // console.groupEnd()
     }
 
   }
 
   public handleSelected = (selected: any) => {
-    console.groupCollapsed("handleSelected()")
-    console.log(selected)
-    console.groupEnd()
+    // console.groupCollapsed("handleSelected()")
+    // console.log(selected)
+    // console.groupEnd()
+
+    // If unselecting, force playNext
+    if (this.onSelectedState && !selected) {
+      this.transition.playNext(true)
+    }
+
+    // If selecting, add unselect transitions
+    else if (!this.onSelectedState && selected) {
+      this.transition.addSelectedLeaving({ layout: this.layout })
+      this.onSelectedState = !!selected
+    }
 
     this.nodes.forEach(node => node.handleSelected(selected))
-    this.onSelectedState = !!selected
-
+    
     this.handleLinks("clients", !selected && get(linkClientOn))
     this.handleLinks("projects", !selected && get(linkProjectOn))
+
   }
 
   public handleHovered = (hovered: any) => {
@@ -490,9 +493,9 @@ export default class Simulation {
   }
 
   public handleComplexity = (complexityOn: boolean) => {
-    console.groupCollapsed("handleComplexity()")
-    console.log(complexityOn)
-    console.groupEnd()
+    // console.groupCollapsed("handleComplexity()")
+    // console.log(complexityOn)
+    // console.groupEnd()
 
     this.getDeliverableNodes().forEach(node => node.attr.complexity())
   }

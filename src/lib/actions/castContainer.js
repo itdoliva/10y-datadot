@@ -1,6 +1,7 @@
 import { get } from "svelte/store";
 import { app } from "$lib/stores/canvas";
 import * as PIXI from "pixi.js"
+import _ from "lodash"
 
 // Casts a DOM elements to the WebGL Canvas
 // It's useful to position and mask canvas elements by using other DOM element
@@ -10,7 +11,8 @@ export default function castContainer(node, {
   parent=get(app).stage, 
   hasMask=false,
   destroy=true,
-  centered=true
+  centered=true,
+  alpha=1
 }) {
 
   if (!context) {
@@ -49,6 +51,7 @@ export default function castContainer(node, {
 
     context.x = x
     context.y = y
+    context.alpha = _.isNumber(alpha) ? alpha : alpha() 
 
     if (hasMask) {
       mask.x = x

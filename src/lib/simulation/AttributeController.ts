@@ -1,27 +1,26 @@
-import { isEqual } from "lodash"
+import _ from "lodash";
 import { get } from "svelte/store";
 import { gsap } from "gsap";
 import * as d3 from "d3";
 
-import { complexityOn, complexityOn, figureHeight, figureWidth } from "../stores/canvas";
+import { complexityOn, figureHeight } from "../stores/canvas";
 
 import Deliverable from "./Deliverable"
 import Simulation, { c } from "./Simulation"
 import NodeAttributes from "./NodeAttributes";
 
-import { ILayoutAttributes, IRenderAttributes, ITransition, Layout } from "../types/simulation"
+import { TransitionType, IRenderAttributes, ITransition } from "../types/simulation"
 
 const rotationOffset = (theta: number) => theta + Math.PI/2
-
 
 export default class AttributeController {
   private simulation: Simulation
   private deliverable: Deliverable
 
-  public cur: ILayoutAttributes
-  public prev: ILayoutAttributes
+  public cur: NodeAttributes
+  public prev: NodeAttributes
 
-  public attrChain: NodeAttributes[] = []
+  public queue: NodeAttributes[] = []
   
   public render: IRenderAttributes = {
     fx: 0,
@@ -38,13 +37,21 @@ export default class AttributeController {
     renderable: false
   }
 
+
   constructor(deliverable: Deliverable) {
     this.deliverable = deliverable
     this.simulation = deliverable.simulation
   }
 
   public set = (attr: NodeAttributes) => {
-    this.attrChain.push(attr)
+    this.queue.push(attr)
+  }
+
+  public pop = (attrId: number) => {
+    const attrIdx = this.queue.findIndex(d => d.id === attrId)
+    const attr = this.queue.splice(attrIdx, 1)[0]
+
+    return attr
   }
 
   public scale = () => {
@@ -53,19 +60,32 @@ export default class AttributeController {
       : 1
   }
 
+
   // Transitions
   public play(transition: ITransition) {
     const { type, attrId, layout } = transition
 
     if (attrId) {
-      const attrIdx = this.attrChain.findIndex(d => d.id === attrId)
-      const attr = this.attrChain.splice(attrIdx, 1)[0]
-  
       this.prev = this.cur
-      this.cur = attr
+      this.cur = this.pop(attrId)
     }
 
     return this[type](layout === "block")
+  }
+
+  public makeTimeline = (forTransitionType:TransitionType|undefined=undefined, overwrite="auto") => {
+
+    const onComplete = () => {
+      tl.kill()
+    }
+
+    const tl = gsap.timeline({ 
+      overwrite,
+      onComplete,
+      onInterrupt: onComplete
+    })
+
+    return tl
   }
   
   public entrance = (isBlock: boolean) => {
@@ -73,7 +93,7 @@ export default class AttributeController {
     const { x, y, theta, radius, time } = this.cur
     const delay = time
 
-    const tl = gsap.timeline({ overwrite: "auto" })
+    const tl = this.makeTimeline("entrance")
 
     if (isBlock) {
       tl
@@ -100,47 +120,33 @@ export default class AttributeController {
 
         delay, 
         duration: c.maxDurationRadial, 
-        ease: c.easeEntrance 
+        ease: "power3.inOut"
       })
     }
-
-    tl.eventCallback("onComplete", () => { tl.kill() })
-    tl.eventCallback("onInterrupt", () => { tl.kill() })
 
     return tl
   }
 
   public exit = () => {
-    const s_fh = get(figureHeight)
 
-    const delayFall = Math.random() * .5
-    const delayFadeOut = Math.max(0, delayFall - Math.random()*.15)
-    const duration = c.shifts - delayFall - (Math.random() * .3)
-
-    const yOffset = s_fh * (Math.random()*.5 + .3)
-    const y = this.render.py + yOffset
-
-    const tl = gsap.timeline({ overwrite: "auto" })
-
-    tl.to(this.render, { py: y, duration, delay: delayFall, ease: c.easeExit })
-    tl.to(this.render, { alpha: 0, duration, delay: delayFadeOut, ease: c.easeFade }, "<")
-
-    tl.eventCallback("onComplete", () => { tl.kill() })
-    tl.eventCallback("onInterrupt", () => { tl.kill() })
+    const yOffset = get(figureHeight) * (Math.random()*.5 + .3)
+    
+    const delay = Math.random() * .5
+    const duration = c.shifts - delay - (Math.random() * .3)
+    
+    const tl = this.makeTimeline("exit")
+    
+    this.simulation.onSelectedState
+      ? tl.fromTo(this.render, { py: 0 }, { py: yOffset, alpha: 0, duration, delay, ease: "power1.in" })
+      : tl.to(this.render, { py: this.render.py + yOffset, alpha: 0, duration, delay, ease: "power1.in" })
 
     return tl
   }
 
   public filterIn = (isBlock: boolean) => {
-    const tl = gsap.timeline({ overwrite: "auto" })
+    const tl = this.makeTimeline("filterIn")
 
-    let isEntering
-    try {
-      isEntering = !this.prev.active && this.cur.active
-    }
-    catch {
-      console.error(this)
-    }
+    const isEntering = !this.prev.active && this.cur.active
 
     if (isBlock) {
       // Waterfall in
@@ -203,7 +209,7 @@ export default class AttributeController {
   }
 
   public filterOut = (isBlock: boolean) => {
-    const tl = gsap.timeline({ overwrite: "auto" })
+    const tl = this.makeTimeline("filterOut")
 
     if (isBlock) {
       const active = this.cur.active
@@ -277,7 +283,7 @@ export default class AttributeController {
   }
 
   public sort = (isBlock: boolean) => {
-    const tl = gsap.timeline({ overwrite: "auto" })
+    const tl = this.makeTimeline("sort")
 
     if (isBlock) {
       tl.to(this.render, { 
@@ -327,18 +333,19 @@ export default class AttributeController {
 
   public selected = (isSelected: boolean) => {
     if (isSelected) {
-      gsap.timeline({ overwrite: "auto" })
+      const tl = this.makeTimeline()
+      
+      tl
       .to(this.render, { alpha: 0, scale: this.scale()*2, duration: .3, ease: d3.easeQuadInOut })
       .set(this.render, { scale: this.scale()})
     }
-    else {
-      this.render.alpha = +this.deliverable.active
-    }
+
   }
 
   public complexity = () => {
-    gsap.timeline({ overwrite: "auto" })
-    .to(this.render, {
+    const tl = this.makeTimeline()
+    
+    tl.to(this.render, {
       scale: this.scale(),
       delay: Math.random() * .7,
       duration: .3,

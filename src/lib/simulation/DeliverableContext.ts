@@ -32,7 +32,7 @@ export default class DeliverableContext {
 
     this.context.addChild(this.graphics)
     this.context.cursor = 'pointer'
-    this.context.eventMode = 'dynamic'
+    this.context.eventMode = 'none'
     this.context.onpointerenter = this.onpointerenter
     this.context.onpointerleave = this.onpointerleave
     this.context.onpointerup = this.select
@@ -88,6 +88,13 @@ export default class DeliverableContext {
 
   private select = () => {
     selected.set(this.deliverable)
+  }
+
+  public toggleEventMode = () => {
+    const onSelectedState = !!this.deliverable.simulation.onSelectedState
+    const onTransition = this.deliverable.simulation.transition.running
+    
+    this.context.eventMode = (onSelectedState || onTransition) ? "none" : "dynamic"
   }
 
   private tick = () => {

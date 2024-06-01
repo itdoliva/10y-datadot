@@ -13,8 +13,8 @@ export interface ILayoutAttributes {
 
 export interface IRenderAttributes {
   // fx and fy define where the node will be rendered
-  fx: number | undefined;
-  fy: number | undefined;
+  fx: number;
+  fy: number;
 
   // px, py, theta, and radius help defining fx and fy
   px: number;
@@ -29,7 +29,7 @@ export interface IRenderAttributes {
 }
 
 // Transition
-export type TransitionType = "idle" | "entrance" | "exit" | "filterIn" | "filterOut" | "sort"
+export type TransitionType = "entrance" | "exit" | "exitSelected" | "filterIn" | "filterOut" | "sort"
 
 export interface ILayoutSize {
   width: number;
@@ -41,6 +41,8 @@ export interface ITransition {
   attrId?: number;
   layout?: Layout;
   layoutSize?: ILayoutSize;
+  onStart?: () => void;
+  onComplete?: () => void;
 }
 
 

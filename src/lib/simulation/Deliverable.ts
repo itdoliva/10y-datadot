@@ -4,6 +4,7 @@ import Simulation from "./Simulation"
 import AttributeController from "./AttributeController"
 import DeliverableContext from "./DeliverableContext"
 import { nodeSize } from "../stores/nodes"; 
+import _ from 'lodash';
 
 
 export default class Deliverable {
@@ -69,19 +70,26 @@ export default class Deliverable {
 
   public radius = () => this.active ? get(nodeSize) : 0
 
+
   public tick = () => {
     // SELECTED STATE
-    if (this.simulation.onSelectedState && this.selected) {
+    if (this.simulation.onSelectedState && this.selected) { 
+
     }
 
-    else if (this.simulation.onSelectedState && !this.selected) {
+    else if (this.simulation.onSelectedState === true && !this.selected) {
       this.fx = undefined
       this.fy = undefined
       this.attr.render.fx = this.x
       this.attr.render.fy = this.y
     }
 
+    else if (this.simulation.onSelectedState === "leaving" && !this.selected) {
+      this.attr.render.fy = this.y + this.attr.render.py
+    }
+
     // NOT SELECTED STATE
+
     else {
       const { theta, radius, px, py } = this.attr.render
       this.fx = this.attr.render.fx = Math.cos(theta) * radius + px
@@ -102,7 +110,7 @@ export default class Deliverable {
 
   public handleSelected = (selected) => {
     this.selected = selected && this.id === selected.id
-    this.context.context.eventMode = selected ? "none" : "dynamic"
+    this.context.toggleEventMode()
     this.attr.selected(this.selected)
   }
 

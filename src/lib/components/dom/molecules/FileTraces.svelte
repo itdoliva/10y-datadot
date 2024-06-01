@@ -2,6 +2,7 @@
   // Libraries
   import * as PIXI from "pixi.js"
   import { _ } from "svelte-i18n";
+  import { fly } from "svelte/transition";
 
   // Stores
   import { selected, categories } from "$lib/stores/nodes";
@@ -14,29 +15,38 @@
 
   export let nColumns = 1
   
+  let traceIds = []
+  let itemsByColumn = 0
 
-  $: traceIds = [
-    $selected.channel,
-    ...$selected.products,
-    ...$selected.designs,
-    ...$selected.goals,
-  ]
+  $: update($selected)
 
-  $: itemsByColumn = Math.ceil((traceIds.length + 1)/nColumns)
+  function update(selected) {
+    if (!selected) return
+
+    traceIds = [
+      selected.channel,
+      ...selected.products,
+      ...selected.designs,
+      ...selected.goals
+    ]
+
+    itemsByColumn = Math.ceil((traceIds.length + 1)/nColumns)
+  }
 
 </script>
 
 <div class="file-traces">
-  <ul 
-    style:--n-columns={nColumns}
-    style:--items-by-column={itemsByColumn}
-  >
-    {#each traceIds as id}
+  
+  <ul style:--n-columns={nColumns} style:--items-by-column={itemsByColumn}>
+    {#each traceIds as id, i (id)}
     {@const context = new PIXI.Container()}
     {@const category = Object.values($categories).flat().find(d => d.id === id)}
-      <li>
+    {@const traceUUID = crypto.randomUUID()}
+    {@const alpha = () => window.getComputedStyle(document.getElementById(traceUUID)).opacity}
 
-        <div class="primitive-holder" use:castContainer={{ context }}>
+      <li id={traceUUID}>
+
+        <div class="primitive-holder" use:castContainer={{ context, alpha }}>
           <FileTrace {id} {context}/>
         </div>
 
@@ -53,9 +63,14 @@
   @import "$lib/scss/breakpoints.scss";
 
   .file-traces {
+    display: flex;
+    align-items: center;
+    height: 100%;
+
     ul {
       width: 100%;
       
+      position: relative;
       display: grid;
       grid-template-rows: repeat(var(--items-by-column), 1fr);
       grid-template-columns: repeat(var(--n-columns), 1fr);
