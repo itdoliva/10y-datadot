@@ -31,6 +31,7 @@ export default class DeliverableContext {
     this.deliverable = deliverable 
 
     this.context.addChild(this.graphics)
+    this.context.alpha = 0
     this.context.cursor = 'pointer'
     this.context.eventMode = 'none'
     this.context.onpointerenter = this.onpointerenter

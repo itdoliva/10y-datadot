@@ -1,4 +1,5 @@
 import "$lib/i18n"
+import "$lib/loader"
 
 import * as d3 from "d3"
 

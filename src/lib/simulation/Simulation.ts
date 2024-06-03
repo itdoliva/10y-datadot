@@ -4,11 +4,11 @@ import { gsap } from "gsap";
 import { get } from "svelte/store";
 import _ from "lodash"
 import * as PIXI from "pixi.js"
+import loader from "../loader"
 
 // Stores
 import { figureHeight, figureWidth, isSwitchingLayout, linkClientOn, linkProjectOn } from "../stores/canvas";
 import { gap, nodeSize, sortBy, categories, categoriesEnriched } from "../stores/nodes";
-import { nodesLoaded } from "../stores/loading";
 
 // Classes, Functions & Interfaces
 import randomDensity from "../utility/randomDensity"
@@ -350,8 +350,7 @@ export default class Simulation {
       this.initSimulation()
 
       this.loadCallbacks.forEach(([ callback, params ]) => callback(...params))
-
-      nodesLoaded.set(true)
+      loader.handleNodesLoaded()
     })
 
   }

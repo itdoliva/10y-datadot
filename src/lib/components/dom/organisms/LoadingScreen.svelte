@@ -11,7 +11,7 @@
 
 <section 
   class="loading" 
-  out:scale={{ start: 1, opacity: 0, delay: 0, duration: 1200, delay: 0 }}
+  out:scale={{ start: 1, opacity: 0, delay: 0, duration: 500, delay: 0 }}
 >
   
   <LottiePlayer
