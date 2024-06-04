@@ -18,12 +18,13 @@
 </div>
 
 <style lang="scss">
+  @import "$lib/scss/breakpoints.scss";
+
   .signals {
     position: absolute;
-    top: var(--fs-label);
-    left: var(--fs-label);
+    bottom: calc(1.6*var(--fs-label));
+    right: calc(1.6*var(--fs-label));
 
-    width: calc(3.6*var(--fs-label));
 
     opacity: 1;
     transition: opacity .5s ease-in-out;
@@ -36,11 +37,19 @@
       opacity: 0;
     }
 
+    @include md {
+      bottom: 5%;
+      right: 50%;
+      transform: translate(-50%, 0);
+    }
+
     .signal {
+      width: calc(3.6*var(--fs-label));
       display: none;
 
       -webkit-animation: ping 1s ease-in-out infinite both;
       animation: ping 1s ease-in-out infinite both;
     }
+
   }
 </style>

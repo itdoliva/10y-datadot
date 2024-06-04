@@ -15,6 +15,10 @@ export default class SignalController {
   private setVisibility = (to: boolean) => {
     const el = document.getElementById(this.id)
 
+    if (!el) {
+      return
+    }
+
     const tl = gsap.timeline({ overwrite: true })
 
     if (to) {
@@ -30,7 +34,7 @@ export default class SignalController {
 
   }
 
-  public wait() {
+  public prepare() {
     if (this.rejected || this.timeoutId) {
       return
     }
@@ -43,10 +47,15 @@ export default class SignalController {
   public stop() {
     if (this.timeoutId) {
       clearTimeout(this.timeoutId)
+      this.timeoutId = undefined
     }
-
-    this.rejected = true
 
     this.setVisibility(false)
   }
+
+  public kill() {
+    this.stop()
+    this.rejected = true
+  }
+
 }

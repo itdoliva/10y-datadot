@@ -25,6 +25,7 @@ export default class ZoomController {
   
   private curTranslateExtent: number[][]
   private curTranslateExtentCenter: number[]
+  private curTranslateExtentExceedsViewport: boolean = false
   private curScaleExtent: number[]
   private curScaleIdeal: number
   
@@ -92,11 +93,11 @@ export default class ZoomController {
       const k0 = this.startEvent.transform.k
 
       if (x0 !== x || y0 !== y) {
-        this.panSignal.stop()
+        this.panSignal.kill()
       }
 
       if (k0 !== k) {
-        this.pinchSignal.stop()
+        this.pinchSignal.kill()
       }
     }
 
@@ -176,6 +177,7 @@ export default class ZoomController {
 
     if (size) {
       this.curTranslateExtent =  this.getLayoutTranslateExtent(layout, size)
+      this.curTranslateExtentExceedsViewport = this.curTranslateExtent[0][0] < 0 || this.curTranslateExtent[0][1] < 0
       this.curTranslateExtentCenter = [
         center(this.curTranslateExtent.map(d => d[0])),
         center(this.curTranslateExtent.map(d => d[1]))
@@ -183,8 +185,11 @@ export default class ZoomController {
 
       this.zoom.translateExtent(this.curTranslateExtent)
 
-      if (this.curTranslateExtent[0][0] < 0 || this.curTranslateExtent[0][1] < 0) {
-        this.panSignal.wait()
+      if (this.curTranslateExtentExceedsViewport) {
+        this.panSignal.prepare()
+      }
+      else {
+        this.panSignal.stop()
       }
     }
 
@@ -206,13 +211,20 @@ export default class ZoomController {
     let scaleExtent = [ 1, 1 ]
     let k = 1
 
+    let preparePinchSignal = false
+
     if (layout === "radial" && windowWidth < 768) {
       scaleExtent = [ .3, 1 ]
       k = .5
 
-      if (this.curTranslateExtent[0][0] < 0 || this.curTranslateExtent[0][1] < 0) {
-        this.pinchSignal.wait()
-      }
+      preparePinchSignal = this.curTranslateExtentExceedsViewport
+    }
+
+    if (preparePinchSignal) {
+      this.pinchSignal.prepare()
+    }
+    else {
+      this.pinchSignal.stop()
     }
 
     this.curScaleIdeal = k
