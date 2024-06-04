@@ -31,7 +31,7 @@ export default class SignalController {
   }
 
   public wait() {
-    if (this.rejected) {
+    if (this.rejected || this.timeoutId) {
       return
     }
 
