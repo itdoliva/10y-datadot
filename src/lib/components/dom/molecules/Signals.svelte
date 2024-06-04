@@ -40,7 +40,7 @@
     @include md {
       bottom: 5%;
       right: 50%;
-      transform: translate(-50%, 0);
+      transform: translate(50%, 0);
     }
 
     .signal {
