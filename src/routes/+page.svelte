@@ -32,12 +32,19 @@
     simulation.load(data.nodes)
   })
 
+  function handleResize() {
+    window.location.reload();
+  }
+
+
+
 </script>
 
 <svelte:window
   bind:innerWidth={$width} 
   bind:innerHeight={$height} 
   bind:devicePixelRatio={$pixelRatio} 
+  on:resize={handleResize}
 />
 
 <svelte:head>

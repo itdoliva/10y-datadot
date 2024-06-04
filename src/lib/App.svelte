@@ -267,6 +267,8 @@
   }
 
   .root {
+    width: 100%;
+    
     display: grid;
     height: 100%;
 
