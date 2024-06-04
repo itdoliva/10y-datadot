@@ -38,6 +38,7 @@
 
   // WebGL Components
   import Visualization from '$lib/components/webgl/organisms/Visualization.svelte';
+  import Signals from './components/dom/molecules/Signals.svelte';
 
   const productContainer = new PIXI.Container()
   productContainer.name = "top-panel"
@@ -97,6 +98,7 @@
     </header>
 
     <main class="viz-container" bind:this={mobileVizContainer} on:resize={positionMobileFilter}>
+      <Signals />
       <Visualization />
       <File nColumns=2 outerClose={true} />
     </main>
@@ -247,6 +249,7 @@
     </aside>
 
     <main class="viz-container">
+      <Signals />
       <Visualization />
       <File />
     </main>

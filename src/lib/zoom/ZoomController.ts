@@ -6,12 +6,13 @@ import { gsap } from "gsap";
 import { get } from "svelte/store"
 import { figureHeight, figureWidth, width } from "../stores/canvas";
 import { zoom, cameraOffsetX, cameraOffsetY } from "../stores/zoom";
-import Simulation from "./Simulation";
+import Simulation from "../simulation/Simulation";
 import { ILayoutSize, Layout } from "../types/simulation";
 import { nodeSize, selected } from "../stores/nodes";
 
 // Functions
 import center from "../utility/center"
+import SignalController from "./SignalController";
 
 export default class ZoomController {
   private simulation: Simulation
@@ -27,12 +28,20 @@ export default class ZoomController {
   private curScaleExtent: number[]
   private curScaleIdeal: number
   
+  private startEvent
+
   private dragging
   private dragT0: number | undefined
+
+  private pinchSignal: SignalController
+  private panSignal: SignalController
 
 
   constructor(simulation: Simulation) {
     this.simulation = simulation
+
+    this.pinchSignal = new SignalController("pinch-signal")
+    this.panSignal = new SignalController("pan-signal")
 
     this.zoom = d3.zoom()
       .on("zoom", this.zoomed)
@@ -59,11 +68,10 @@ export default class ZoomController {
     this.dragging = false
     this.dragT0 = Date.now()
 
-    if (this.userActions) {
-    }
+    this.startEvent = e
   }
 
-  private onZoomEnd = () => {
+  private onZoomEnd = (e) => {
     this.dragging = false
     this.dragT0 = undefined
   }
@@ -72,7 +80,26 @@ export default class ZoomController {
     if (!!get(selected)) {
       return
     }
+
     const { x, y, k } = e.transform
+
+    // If event was triggered by used
+    // Check if there was a pan or zoom interaction
+    // If so, stop the signal
+    if (this.startEvent.sourceEvent) {
+      const x0 = this.startEvent.transform.x
+      const y0 = this.startEvent.transform.y
+      const k0 = this.startEvent.transform.k
+
+      if (x0 !== x || y0 !== y) {
+        this.panSignal.stop()
+      }
+
+      if (k0 !== k) {
+        this.pinchSignal.stop()
+      }
+    }
+
 
     this.dragging = (Date.now() - <number>this.dragT0) >= 150
 
@@ -155,6 +182,10 @@ export default class ZoomController {
       ]
 
       this.zoom.translateExtent(this.curTranslateExtent)
+
+      if (this.curTranslateExtent[0][0] < 0 || this.curTranslateExtent[0][1] < 0) {
+        this.panSignal.wait()
+      }
     }
 
 
@@ -178,6 +209,10 @@ export default class ZoomController {
     if (layout === "radial" && windowWidth < 768) {
       scaleExtent = [ .3, 1 ]
       k = .5
+
+      if (this.curTranslateExtent[0][0] < 0 || this.curTranslateExtent[0][1] < 0) {
+        this.pinchSignal.wait()
+      }
     }
 
     this.curScaleIdeal = k

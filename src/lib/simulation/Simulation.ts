@@ -19,7 +19,7 @@ import NodeAttributes from "./NodeAttributes";
 import TransitionController from "./TransitionController";
 import DummyDeliverable from "./DummyDeliverable";
 import DeliverableGroup from "./DeliverableGroup";
-import ZoomController from "./ZoomController";
+import ZoomController from "../zoom/ZoomController";
 
 export const c: any = {}
 
