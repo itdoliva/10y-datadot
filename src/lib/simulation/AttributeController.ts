@@ -97,8 +97,9 @@ export default class AttributeController {
 
     if (isBlock) {
       tl
-        .set(this.render, { px: x, py: y, radius, theta, alpha: 0, rotation: 0, renderable: active })
-        .set(this.render, { alpha: 1 }, delay.toFixed(2))
+      .set(this.render, { px: x, py: y, radius, theta, alpha: 0, rotation: 0 })
+      .set(this.render, { renderable: active, delay: .05 })
+      .set(this.render, { alpha: 1, delay: delay })
     }
 
     else {
@@ -188,12 +189,15 @@ export default class AttributeController {
 
       // Fade in and rotate towards
       .set(this.render, {
-        renderable: this.cur.active, 
         alpha: 0,
         theta: this.cur.theta - Math.PI/24,
         radius: this.cur.radius,
         rotation: rotationOffset(this.cur.theta - Math.PI/24),
       })
+      .set(this.render, {
+        renderable: this.cur.active,
+        delay: .05,
+      }) // This prevents pokemons blinking at the center of the screen
       .to(this.render, {
         theta: this.cur.theta,
         rotation: rotationOffset(this.cur.theta),

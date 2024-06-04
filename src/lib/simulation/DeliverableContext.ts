@@ -30,14 +30,16 @@ export default class DeliverableContext {
   constructor(deliverable: Deliverable, categories: number[]) {
     this.deliverable = deliverable 
 
-    this.context.addChild(this.graphics)
     this.context.alpha = 0
+    this.context.renderable = false
     this.context.cursor = 'pointer'
     this.context.eventMode = 'none'
     this.context.onpointerenter = this.onpointerenter
     this.context.onpointerleave = this.onpointerleave
     this.context.onpointerup = this.select
 
+    this.context.addChild(this.graphics)
+    
     this.graphics.cacheAsBitmap = true
 
     const baseId = intersection(this.ids.base, categories)[0]
@@ -55,8 +57,8 @@ export default class DeliverableContext {
   }
 
   public toScene = (scene: PIXI.Container, ticker: PIXI.Ticker) => {
-    scene.addChild(this.context)
     ticker.add(this.tick)
+    scene.addChild(this.context)
   }
 
   private addGraphics = (id: number) => {
@@ -101,11 +103,11 @@ export default class DeliverableContext {
   private tick = () => {
     const { fx, fy, rotation, renderable, alpha, scale } = this.deliverable.attr.render
 
-    this.context.renderable = renderable
     this.context.alpha = alpha
+    this.context.renderable = renderable
 
-    this.context.x = fx || 0
-    this.context.y = fy || 0
+    this.context.x = fx
+    this.context.y = fy
     this.context.rotation = rotation
     this.context.scale.set(scale) 
   }

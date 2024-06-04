@@ -47,8 +47,6 @@ export default class Simulation {
   private activeIds: number[] = []
   private activeCount = 0
 
-  private loadCallbacks: any[] = []
-
   // Transition
   private attrId = 0
   public transition: TransitionController
@@ -271,7 +269,7 @@ export default class Simulation {
     return { width, height }
   }
 
-  private chainNodeAttributes = (transitionType: TransitionType) => {
+  private chainNodeAttributes = (transitionType: TransitionType, delay=0) => {
     // console.groupCollapsed("chainNodeAttributes()")
 
     if (!this.initialized) return // console.groupEnd()
@@ -285,12 +283,14 @@ export default class Simulation {
       ? this.chainNodesBlockAttr(attrId)
       : this.chainNodesRadialAttr(attrId)
 
-    this.transition.add({
-      type: transitionType, 
-      attrId, 
-      layout: this.layout, 
-      layoutSize
-    })
+    setTimeout(() => {
+      this.transition.add({
+        type: transitionType, 
+        attrId, 
+        layout: this.layout, 
+        layoutSize
+      })
+    }, delay)
   }
 
 
@@ -301,7 +301,7 @@ export default class Simulation {
 
   private debounceInitialize = _.debounce(() => {
     this.initialized = true
-    this.chainNodeAttributes("entrance")
+    this.chainNodeAttributes("entrance", 250)
   }, 300)
 
   public handleFigureResize = (figureWidth: number) => {
@@ -349,7 +349,6 @@ export default class Simulation {
       this.updateCategories()
       this.initSimulation()
 
-      this.loadCallbacks.forEach(([ callback, params ]) => callback(...params))
       loader.handleNodesLoaded()
     })
 
@@ -381,13 +380,7 @@ export default class Simulation {
     this.handleLinks("projects", !isRunning && get(linkProjectOn))
   }
 
-  public registerLoadCallback = (callback, params:any[]|undefined=undefined) => {
-    if (params === undefined) {
-      params = []
-    }
 
-    this.loadCallbacks.push([ callback, params ])
-  }
  
   // ---------------------------- //
   // CALLED FROM USER INTERACTION //
