@@ -25,7 +25,6 @@
 
   const { theme } = getContext("item-theme")
 
-
   export let categories
   export let selected = []
   export let disabled = false
@@ -47,7 +46,7 @@
     style:--n-columns={nColumns}
     style:--items-by-column={itemsByColumn}
   >
-    {#each categories as { id, alias, nNodes }, i}
+    {#each categories as { id, nNodes }, i}
     {@const active = selected.includes(id)}
 
       <li class="input-group__item" 
@@ -85,7 +84,7 @@
 
           <div class="item__label">
             <input type="checkbox" value={id} {disabled} bind:group={selected}/>
-            <p>{$_(alias)}</p>
+            <p>{$_("category." + id)}</p>
           </div>
 
         </label>
@@ -106,9 +105,6 @@
 
 <style lang="scss">
   .container {
-    // display: grid;
-    // grid-auto-flow: row;
-    // gap: 0;
 
     &.on-dark {
         .input-group {
@@ -159,6 +155,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
+          }
+
+          &__bubble {
+            height: 100%;
+
           }
 
 

@@ -20,14 +20,42 @@ export default class DeliverableContext {
   public loading
 
   private ids = {
-    background: [ 20, 21, 23, 24 ],
-    base: [ 0, 1, 2 ],
-    front: [ 16, 17, 10, 11, 12, 13, 14, 15, 22 ],
-    mask: [ 16, 17 ],
-    sprite: [ 30, 31, 32, 33, 34 ]
+    background: [ 
+      "design.user-interface",
+      "design.datavis",
+      "design.ilustracao",
+      "design.design-de-servicos",
+      "design.editorial",
+      "design.infografia",
+      "design.motion-graphics",
+    ],
+    base: [ 
+      "channel.digital",
+      "channel.impressa",
+      "channel.consultoria"
+    ],
+    front: [ 
+      "product.site-editorial",
+      "product.outras-interfaces",
+      "product.relatorios",
+      "product.apresentacao",
+      "product.publicacao",
+      "product.site-institucional",
+      "product.video",
+    ],
+    mask: [ 
+      "product.infografico",
+    ],
+    sprite: [ 
+      "goal.educacional",
+      "goal.informacional",
+      "goal.impacto-positivo",
+      "goal.jornalistico-editorial",
+      "goal.institucional",
+    ]
   } 
 
-  constructor(deliverable: Deliverable, categories: number[]) {
+  constructor(deliverable: Deliverable, categories: string[]) {
     this.deliverable = deliverable 
 
     this.context.alpha = 0
@@ -47,6 +75,7 @@ export default class DeliverableContext {
     const frntIds = intersection(this.ids.front, categories)
     const sprtIds = intersection(this.ids.sprite, categories)
 
+
     bkgrIds.forEach(this.addGraphics)
     this.baseGraphics = this.addGraphics(baseId)
     frntIds.forEach(this.addGraphics)
@@ -61,7 +90,7 @@ export default class DeliverableContext {
     scene.addChild(this.context)
   }
 
-  private addGraphics = (id: number) => {
+  private addGraphics = (id: string) => {
     let graphics
 
     if (this.ids.sprite.includes(id)) {
@@ -89,7 +118,7 @@ export default class DeliverableContext {
     hovered.set(null)
   }
 
-  private select = () => {
+  public select = () => {
     selected.set(this.deliverable)
   }
 

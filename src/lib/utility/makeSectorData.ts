@@ -6,7 +6,7 @@ import Deliverable from "../simulation/Deliverable";
 import { SortBy, ISectorDataPoint, ISectorMetadata, ISectorData, IDimensions, ILayoutConfig } from "../types/simulation";
 
 
-export default function makeSectorData(data: Deliverable[], groupBy: SortBy, maxStack: number): [ ISectorData, ISectorMetadata ] {
+export default function makeSectorData(data: Deliverable[], groupBy: "year" | "industry", maxStack: number): [ ISectorData, ISectorMetadata ] {
   const acc = (d: Deliverable) => d[groupBy]
 
   // Sorted unique values for the provided groupBy variable

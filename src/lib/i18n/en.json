@@ -4,45 +4,65 @@
     "hero": "10 years"
   },
 
-  "category": {
-    "channel": {
-      "0": "Digital",
-      "1": "Print Media",
-      "2": "Consulting"
+  "onboarding": {
+    "desktop": {
+      "1": "Construímos esta peça para contar a nossa história da forma que mais gostamos: através da visualização de dados",
+      "2": "Cada unidade é uma entrega realizada ao longo da vida da datadot",
+      "3": "Você pode interagir com as unidades",
+      "4": "Explore as nossas entregas de diferentes formas através dos paineis da <span class='left'>esquerda</span> e do <span class='top'>topo</span>. O botão limpar filtros retorna ao estado inicial",
+      "5": "Descubra propriedades ocultas",
+      "6": "Conheça nossa história através de outros sentidos"
     },
-    "product": {
-      "10": "Video & Animation",
-      "11": "Publishing",
-      "12": "Report",
-      "13": "Presentation",
-      "14": "Institutional Website",
-      "15": "Editorial Website",
-      "16": "Dashboard",
-      "17": "Infographic"
-    },
-    "design": {
-      "20": "Illustration",
-      "21": "Editorial",
-      "22": "Motion Graphics",
-      "23": "Service Design",
-      "24": "User Interface"
-    },
-    "goal": {
-      "30": "Educational",
-      "31": "Informative",
-      "32": "Positive Impact",
-      "33": "Institutional",
-      "34": "Editorial"
-    },
-    "industry": {
-      "40": "Journalism",
-      "41": "Education",
-      "42": "Tourism",
-      "43": "Retail",
-      "44": "NGOs",
-      "46": "Financial",
-      "47": "Real Estate"
+    "mobile": {
+      "1": "Construímos esta peça para contar a nossa história da forma que mais gostamos: através da visualização de dados",
+      "2": "Cada unidade é uma entrega realizada ao longo da vida da datadot",
+      "3": "Você pode interagir com as unidades",
+      "4": "Explore as nossas entregas em diferentes layouts...",
+      "5": "...e a partir de diversos filtros.",
+      "6": "Conheça nossa história através de outros sentidos"
     }
+  },
+
+  "category": {
+    "channel.digital": "Digital channel",
+    "channel.impressa": "Print channel",
+    "channel.consultoria": "Consulting",
+
+    "product.site-editorial": "Editorial website",
+    "product.outras-interfaces": "Other digital interfaces",
+    "product.relatorios": "Reports",
+    "product.apresentacao": "Presentation",
+    "product.infografico": "Infographic",
+    "product.publicacao": "Publication",
+    "product.site-institucional": "Institutional website",
+    "product.video": "Video",
+    
+    "design.user-interface": "User interface",
+    "design.datavis": "Datavis",
+    "design.ilustracao": "Illustration",
+    "design.design-de-servicos": "Service design",
+    "design.editorial": "Editorial",
+    "design.infografia": "Infography",
+    "design.motion-graphics": "Motion graphics",
+    
+    "goal.educacional": "Educational",
+    "goal.informacional": "Informational",
+    "goal.impacto-positivo": "Positive impact",
+    "goal.jornalistico-editorial": "Editorial journalism",
+    "goal.institucional": "Institutional",
+
+    "industry.servicos-e-tecnologia": "Services and technology",
+    "industry.automotivo": "Automotive",
+    "industry.varejo": "Retail",
+    "industry.educacao": "Education",
+    "industry.financeiro": "Financial",
+    "industry.ongs-orgs": "NGOs and social and environmental organizations",
+    "industry.consultorias": "Consultancies",
+    "industry.imobiliario": "Real estate",
+    "industry.comunicacao": "Communication",
+    "industry.jornalismo": "Journalism",
+    "industry.pesquisa": "Research"
+
   },
 
   "input": {

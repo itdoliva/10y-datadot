@@ -98,26 +98,24 @@ export default class Simulation {
   }
 
   private updateCategories = () => {
-    const categoriesOfInterest = [ 'products', 'designs', 'industries' ]
-
-    const enriched = { ...get(categories) }
   
     const activeNodes = this.getDeliverableNodes().filter(d => d.active)
-  
-    categoriesOfInterest.forEach(category => {
-      enriched[category].forEach(d => {
-        const { id } = d
-  
-        const f = category !== 'industries'
-          ? node => node[category].includes(id)
-          : node => node.industry === id
-  
-        d.nNodes = activeNodes.filter(f).length
-        d.pctNodes = +(d.nNodes / activeNodes.length).toFixed(2)
-      })
-    })
 
-    categoriesEnriched.set(enriched)
+    categoriesEnriched.set(
+      get(categories).map((category: any) => {
+        const enriched = { ...category }
+
+        // Enrich the types below
+        if ([ 'product', 'design', 'industry' ].includes(category.type)) {
+          const filter_ = (node: Deliverable) => node.categories.includes(category.id)
+
+          enriched.nNodes = activeNodes.filter(filter_).length
+          enriched.pctNodes = +(enriched.nNodes / activeNodes.length).toFixed(2)
+        }
+
+        return enriched
+      })
+    )
   }
 
   private chainNodesBlockAttr = (attrId: number) => {
@@ -187,7 +185,9 @@ export default class Simulation {
     const s_nodeSize = get(nodeSize)
     const s_fw = get(figureWidth)
     const s_fh = get(figureHeight)
-    const s_groupBy = get(sortBy)
+    const s_sortBy = get(sortBy)
+
+    const groupBy = s_sortBy === "dt" ? "year" : "industry"
 
     const data = this.getDeliverableNodes().filter(node => node.active)
     const radialGap = s_nodeSize * 1.25
@@ -208,7 +208,7 @@ export default class Simulation {
       const pileStacks = d3.range(1, maxStack + 1, 1)
 
       pileStacks.forEach((pileStack: number) => {
-        const sectorData = makeSectorData(data, <SortBy>s_groupBy, pileStack)
+        const sectorData = makeSectorData(data, groupBy, pileStack)
         curSectorData = sectorData[0]
         curSectorMetadata = sectorData[1]
   
@@ -318,7 +318,7 @@ export default class Simulation {
     this.zoom.updateScaleExtent(this.layout, width)
   }
 
-  public load = (dataArr: any[], app: PIXI.Application) => {
+  public load = (dataArr: any[]) => {
     const loading: Promise<any>[] = []
     
     dataArr.forEach(dataPoint => {
@@ -331,12 +331,12 @@ export default class Simulation {
     this.activeIds = deliverableNodes.filter(d => d.active).map(d => d.id)
     this.activeCount = this.activeIds.length
 
-    d3.groups(deliverableNodes, (d: Deliverable) => d.clientId).forEach(([ id, deliverables]) => {
+    d3.groups(deliverableNodes, (d: Deliverable) => d.client).forEach(([ id, deliverables]) => {
       const client = new DeliverableGroup(this, id, deliverables, 0x83BF00)
       this.clients.push(client)
     })
 
-    d3.groups(deliverableNodes, (d: Deliverable) => d.projectId).forEach(([ id, deliverables]) => {
+    d3.groups(deliverableNodes, (d: Deliverable) => d.project).forEach(([ id, deliverables]) => {
       const project = new DeliverableGroup(this, id, deliverables, 0X818AFC)
       this.projects.push(project)
     })
@@ -386,6 +386,29 @@ export default class Simulation {
   // CALLED FROM USER INTERACTION //
   // ---------------------------- //
 
+  public getClosestTo = (x, y) => {
+    let curNodeDistance = 9999999
+    let curNode
+
+    const nodes = this.nodes.filter(d => d.id !== -1)
+
+    for (let i = 0; i < nodes.length; i++) {
+      const node = <Deliverable>nodes[i]
+
+      const nodeX = node.context.context.x
+      const nodeY = node.context.context.y
+
+      const distance = Math.sqrt((x - nodeX)**2 + (y - nodeY)**2)
+
+      if (distance < curNodeDistance) {
+        curNode = node
+        curNodeDistance = distance
+      }
+    }
+
+    return curNode
+  }
+
   public setLayout = (newLayout: Layout) => {
     // console.groupCollapsed("setLayout()")
     // console.log(`${this.layout} --> ${newLayout}`)
@@ -406,8 +429,12 @@ export default class Simulation {
     // console.groupCollapsed("sort()")
     // console.groupEnd()
 
+    const sortCb = sortBy === "dt"
+      ? (a: Deliverable, b: Deliverable) => +b.active - +a.active || b[sortBy] - a[sortBy]
+      : (a: Deliverable, b: Deliverable) => +b.active - +a.active || a[sortBy].localeCompare(b[sortBy])
+
     this.getDeliverableNodes()
-      .sort((a, b) => +b.active - +a.active || a[sortBy] - b[sortBy] ) // Descending because we want active (1) before unactive (0)
+      .sort(sortCb) // Descending because we want active (1) before unactive (0)
       .forEach((node, i) => {
         node.i = i
       })
@@ -420,12 +447,14 @@ export default class Simulation {
 
   }
 
-  public filter = (fyears: number[], findustries: number[], fdesigns: number[], fgoals: number[], fproducts: number[]) => {
+  public filter = (fyears: number[], findustries: string[], fdesigns: string[], fgoals: string[], fproducts: string[]) => {
     if (!this.initialized) return
-    
+
     // console.groupCollapsed("filter()")
 
-    this.getDeliverableNodes().forEach(node => node.setActive(fyears, findustries, fdesigns, fgoals, fproducts))
+    this.getDeliverableNodes().forEach(node => {
+      node.setActive(fyears, findustries, fdesigns, fgoals, fproducts)
+    })
 
     const activeIds = this.getDeliverableNodes().filter(d => d.active).map(d => d.id)
     const equalIds = (
@@ -480,8 +509,8 @@ export default class Simulation {
   }
 
   public handleHovered = (hovered: any) => {
-    this.clients.forEach((node: DeliverableGroup) => node.setHovered(hovered && node.id === hovered.clientId))
-    this.projects.forEach((node: DeliverableGroup) => node.setHovered(hovered && node.id === hovered.projectId))
+    this.clients.forEach((node: DeliverableGroup) => node.setHovered(hovered && node.id === hovered.client))
+    this.projects.forEach((node: DeliverableGroup) => node.setHovered(hovered && node.id === hovered.project))
   }
 
   public handleComplexity = (complexityOn: boolean) => {

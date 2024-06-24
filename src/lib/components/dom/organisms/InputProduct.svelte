@@ -22,7 +22,7 @@
 <PanelItem icon="products" title={$_("input.product")}>
   <InputGroupProduct
     parent={parent}
-    categories={$categoriesEnriched.products}
+    categories={$categoriesEnriched.filter(d => d.type === "product")}
     disabled={$isSwitchingLayout}
     {nColumns}
     bind:selected={$fproducts}

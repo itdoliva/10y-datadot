@@ -5,6 +5,7 @@
   import { _ } from 'svelte-i18n'
   import initPixi from '$lib/pixi.js';
 
+
   // Files
   import "$lib/scss/global.scss";
   import simulation from "$lib/simulation"
@@ -13,12 +14,15 @@
   import { nodesLoaded } from "$lib/stores/loading"
   import { categories, projects, clients } from "$lib/stores/nodes"
   import { width, height, pixelRatio, app } from "$lib/stores/canvas"
+  import { page } from '$app/stores';
   
   // Components
   import App from "$lib/App.svelte";
   import LoadingScreen from "$lib/components/dom/organisms/LoadingScreen.svelte";
 
   export let data
+
+  console.log("data", $page.data)
 
   clients.set(data.clients)
   projects.set(data.projects)
@@ -29,7 +33,8 @@
   onMount(() => {
     $app = initPixi(canvas)
 
-    simulation.load(data.nodes)
+    simulation.load(data.deliverables)
+    
   })
 
   function handleResize() {

@@ -14,11 +14,15 @@ export default function initPixi(view) {
     backgroundColor: 0xFFFFFF
   })
 
-  PIXI.Assets.add({ alias: 'petal', src: '/petal.png' })
-
+  addAssets()
   initMesh(app)
 
   return app
+}
+
+function addAssets() {
+  PIXI.Assets.add({ alias: 'petal', src: '/sprites/petal.png' })
+  PIXI.Assets.add({ alias: 'cursor', src: '/sprites/cursor.png' })
 }
 
 

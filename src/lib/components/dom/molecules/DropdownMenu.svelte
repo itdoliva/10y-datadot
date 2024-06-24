@@ -102,7 +102,7 @@
       z-index: 10;
     }
 
-    &.active {
+    &:global(.active) {
       .content {
         transform: translateY(0);
         opacity: 1;

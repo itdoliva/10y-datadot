@@ -53,7 +53,7 @@
     d3.select(svg)
       .call(texture)
 
-    simulationNodes = $categoriesEnriched.industries.map((d, i, arr) => ({
+    simulationNodes = $categoriesEnriched.filter(d => d.type === "industry").map((d, i, arr) => ({
       ...d,
       x: getRandomAxisPosition(i, arr.length, w),
       y: getRandomAxisPosition(i, arr.length, h),
@@ -68,8 +68,8 @@
 
   })
 
-  $: if ($categoriesEnriched.industries && simulationNodes) {
-    $categoriesEnriched.industries.forEach(industry => {
+  $: if (simulationNodes) {
+    $categoriesEnriched.filter(d => d.type === "industry").forEach(industry => {
       const simulationNode = simulationNodes.find(({ id }) => id === industry.id)
       simulationNode.r = rScale(industry.pctNodes)
       simulationNode.x = simulationNode.x
@@ -140,7 +140,7 @@
               on:mouseover={() => bringToFront(id)}
               on:click={() => toggle(id)}
             >
-              <BSBubble {x} {y} {r} {tweenDelay} percentage={pctNodes} {alias} {fill} {active} />
+              <BSBubble {x} {y} {r} {tweenDelay} percentage={pctNodes} alias={"category." + id} {fill} {active} />
             </g>
             {/each}
           </g>

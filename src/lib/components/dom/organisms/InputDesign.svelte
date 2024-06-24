@@ -14,21 +14,15 @@
 
   setContext("item-theme", { theme })
 
-  $: categories = $categoriesEnriched.designs.map(d => ({
-    ...d,
-    alias: $_(d.alias)
-  }))
-
 </script>
 
 <PanelItem icon="designs" title={$_("input.design")}>
-  {#if categories}
   <InputGroup 
     gridlayout="design"
-    categories={categories} 
+    categories={$categoriesEnriched.filter(d => d.type === "design")} 
     direction='column' 
+    i18nPrefix="category."
     disabled={$isSwitchingLayout}
     bind:selected={$fdesigns} 
   />
-  {/if}
 </PanelItem>

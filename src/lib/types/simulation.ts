@@ -1,5 +1,5 @@
 export type Layout = "block" | "radial"
-export type SortBy = "year" | "industry"
+export type SortBy = "dt" | "industry"
 
 export interface ILayoutAttributes {
   x: number;

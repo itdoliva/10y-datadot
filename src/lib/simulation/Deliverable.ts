@@ -11,18 +11,25 @@ export default class Deliverable {
   public simulation: Simulation
   
   public id: number
-  public clientId: number
-  public projectId: number
-  public categories: number[]
 
+  public client: string
+  public project: string
+
+  public description: string
+  
   public complexity: number
+  
+  public dt: number
+  public date: string
 
   public year: number
-  public channel: number
-  public industry: number
-  public designs: number[]
-  public goals: number[]
-  public products: number[]
+  
+  public channel: string
+  public industry: string
+  public designs: string[]
+  public goals: string[]
+  public products: string[]
+  public categories: string[]
   
   public i: number
   public active: boolean = true
@@ -44,24 +51,30 @@ export default class Deliverable {
     this.simulation = simulation
 
     this.id = dataPoint.id
-    this.clientId = dataPoint.clientId
-    this.projectId = dataPoint.projectId
+
+    this.client = dataPoint.client
+    this.project = dataPoint.project
+    this.description = dataPoint.description
+
     this.complexity = dataPoint.complexity
+
+    this.dt = dataPoint.dt
+    this.date = dataPoint.date
 
     this.year = dataPoint.year
     this.channel = dataPoint.channel
     this.industry = dataPoint.industry
-    this.designs = dataPoint.designs
-    this.goals = dataPoint.goals
-    this.products = dataPoint.products
+    this.designs = dataPoint.design
+    this.goals = dataPoint.goal
+    this.products = dataPoint.product
 
     this.categories = [
       dataPoint.channel,
       dataPoint.industry,
-      ...dataPoint.designs,
-      ...dataPoint.goals,
-      ...dataPoint.products
-    ]
+      ...dataPoint.design,
+      ...dataPoint.goal,
+      ...dataPoint.product,
+    ].flat()
 
     this.attr = new AttributeController(this)
     this.context = new DeliverableContext(this, this.categories)
@@ -98,7 +111,7 @@ export default class Deliverable {
 
   }
 
-  public setActive = (fyears: number[], findustries: number[], fdesigns: number[], fgoals: number[], fproducts: number[]) => {
+  public setActive = (fyears: number[], findustries: string[], fdesigns: string[], fgoals: string[], fproducts: string[]) => {
     this.active = !(
       (fyears && (this.year < fyears[0] || this.year > fyears[1])) ||
       (fdesigns && fdesigns.length > 0 && !this.designs.some(design => fdesigns.includes(design))) ||

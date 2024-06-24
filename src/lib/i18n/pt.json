@@ -4,45 +4,65 @@
     "hero": "10 anos"
   },
 
-  "category": {
-    "channel": {
-      "0": "Digital",
-      "1": "Impresso",
-      "2": "Consultoria"
+  "onboarding": {
+    "desktop": {
+      "1": "Construímos esta peça para contar a nossa história da forma que mais gostamos: através da visualização de dados",
+      "2": "Cada unidade é uma entrega realizada ao longo da vida da datadot",
+      "3": "Você pode interagir com as unidades",
+      "4": "Explore as nossas entregas de diferentes formas através dos paineis da <span class='left'>esquerda</span> e do <span class='top'>topo</span>. O botão limpar filtros retorna ao estado inicial",
+      "5": "Descubra propriedades ocultas",
+      "6": "Conheça nossa história através de outros sentidos"
     },
-    "product": {
-      "10": "Animação & Vídeo",
-      "11": "Publicação",
-      "12": "Relatório",
-      "13": "Apresentação",
-      "14": "Site Institucional",
-      "15": "Site Editorial",
-      "16": "Dashboard",
-      "17": "Infográfico"
-    },
-    "design": {
-      "20": "Ilustração",
-      "21": "Editorial",
-      "22": "Motion Graphics",
-      "23": "Design de Serviço",
-      "24": "User Interface"
-    },
-    "goal": {
-      "30": "Educacional",
-      "31": "Informacional",
-      "32": "Impacto Positivo",
-      "33": "Institucional",
-      "34": "Editorial"
-    },
-    "industry": {
-      "40": "Jornalismo",
-      "41": "Educação",
-      "42": "Turismo",
-      "43": "Varejo",
-      "44": "ONGs",
-      "46": "Financeiro",
-      "47": "Imobiliário"
+    "mobile": {
+      "1": "Construímos esta peça para contar a nossa história da forma que mais gostamos: através da visualização de dados",
+      "2": "Cada unidade é uma entrega realizada ao longo da vida da datadot",
+      "3": "Você pode interagir com as unidades",
+      "4": "Explore as nossas entregas em diferentes layouts...",
+      "5": "...e a partir de diversos filtros.",
+      "6": "Conheça nossa história através de outros sentidos"
     }
+  },
+
+  "category": {
+    "channel.digital": "Mídia digital",
+    "channel.impressa": "Mídia impressa",
+    "channel.consultoria": "Consultoria",
+
+    "product.site-editorial": "Site editorial",
+    "product.outras-interfaces": "Outras interfaces digitais",
+    "product.relatorios": "Relatórios",
+    "product.apresentacao": "Apresentação",
+    "product.infografico": "Infográfico",
+    "product.publicacao": "Publicação",
+    "product.site-institucional": "Site institucional",
+    "product.video": "Vídeo",
+    
+    "design.user-interface": "User interface",
+    "design.datavis": "Datavis",
+    "design.ilustracao": "Ilustração",
+    "design.design-de-servicos": "Design de serviços",
+    "design.editorial": "Editorial",
+    "design.infografia": "Infografia",
+    "design.motion-graphics": "Motion graphics",
+    
+    "goal.educacional": "Educacional",
+    "goal.informacional": "Informacional",
+    "goal.impacto-positivo": "Impacto positivo",
+    "goal.jornalistico-editorial": "Jornalístico editorial",
+    "goal.institucional": "Institucional",
+
+    "industry.servicos-e-tecnologia": "Serviços e tecnologia",
+    "industry.automotivo": "Automotivo",
+    "industry.varejo": "Varejo",
+    "industry.educacao": "Educação",
+    "industry.financeiro": "Financeiro",
+    "industry.ongs-orgs": "ONGs e organizações sociais e ambientais",
+    "industry.consultorias": "Consultorias",
+    "industry.imobiliario": "Imobiliário",
+    "industry.comunicacao": "Comunicação",
+    "industry.jornalismo": "Jornalismo",
+    "industry.pesquisa": "Pesquisa"
+
   },
 
   "input": {

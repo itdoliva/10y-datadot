@@ -23,6 +23,12 @@
   let traceIds = []
   let itemsByColumn = 0
 
+  let project = ''
+  let client = ''
+  let description = ''
+  let date = ''
+
+
 
   $: update($selected)
 
@@ -38,6 +44,11 @@
       ...selected.designs,
       ...selected.goals
     ]
+
+    project = selected.project
+    client = selected.client
+    description = selected.description
+    date = selected.date
 
     itemsByColumn = Math.ceil((traceIds.length + 1)/nColumns)
 
@@ -66,6 +77,13 @@
       { opacity: 1, scale: 1, y: 0 }, 
       { opacity: 0, scale: 1.2, y: -20 })
     .set(container, { scale: 1, display: "none" })
+    .add(() => {
+      traceIds = []
+      project = ''
+      client = ''
+      description = ''
+      date = ''
+    })
   }
 
   function onClick() {
@@ -84,18 +102,20 @@
       <ul style:--n-columns={nColumns} style:--items-by-column={itemsByColumn}>
         {#each traceIds as id, i (id)}
         {@const context = new PIXI.Container()}
-        {@const category = Object.values($categories).flat().find(d => d.id === id)}
-        {@const alpha = () => window.getComputedStyle(container).opacity}
+        {@const category = $categories.find(d => d.id === id)}
+
+          {#if category}
     
-          <li>
-            <div class="primitive-holder" use:castContainer={{ context, alpha }}>
-              <FileTrace {id} {context}/>
-            </div>
-    
-            <p class="label">
-              {$_(category.alias)}
-            </p>
-          </li>
+            <li>
+              <div class="primitive-holder" use:castContainer={{ context, propagateOpacity: container }}>
+                <FileTrace {id} {context}/>
+              </div>
+      
+              <p class="label">
+                {$_("category." + category.id)}
+              </p>
+            </li>
+          {/if}
         {/each}
       </ul>
     </div>
@@ -105,25 +125,20 @@
 
       <div class="header">
         <div class="project-name">
-          <h3>IJEN</h3>
+            <h3>{project}</h3>
         </div>
-        <h4 class="project-client">Baboom Filmes</h4>
+          <h4 class="project-client">{client}</h4>
       </div>
     
       <div class="body">
-        <ul class="project-tags">
-          <li>Comunicação;</li>
-          <li>Agência publicidade;</li>
-          <li>Tipografia;</li>
-        </ul>
-      
+
         <p class="project-description">
-          Infográficos animados para auxiliar na narrativa do documentário.
+          {description}
         </p>
       </div>
     
       <div class="footer">
-        <p class="project-date">01/2014</p>
+        <p class="project-date">{date}</p>
     
         {#if !outerClose}
           <button on:click={onClick}>
@@ -258,6 +273,7 @@
             }
 
             .primitive-holder {
+              opacity: inherit;
               aspect-ratio: 1/1;
             }
 

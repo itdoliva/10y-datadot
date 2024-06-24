@@ -19,7 +19,7 @@
 
 <PanelItem icon="goals" title={$_("input.goal")}>
   <InputGroupGoal 
-    categories={$categoriesEnriched.goals} 
+    categories={$categoriesEnriched.filter(d => d.type === "goal")} 
     disabled={$isSwitchingLayout}
     {nColumns}
     bind:selected={$fgoals} 

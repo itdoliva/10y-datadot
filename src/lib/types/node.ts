@@ -12,8 +12,8 @@ export interface Node {
   industry: number[];
   products: number[];
   
-  clientId: number;
-  projectId: number;
+  client: number;
+  project: number;
 }
 
 export interface Nodes extends Array<Node> {

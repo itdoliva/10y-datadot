@@ -28,7 +28,7 @@
     style:--n-columns={nColumns}
     style:--items-by-column={itemsByColumn} 
   >
-    {#each categories as { id, alias, color }}
+    {#each categories as { id, data }}
     {@const active = selected.includes(id)}
 
       <li class="input-group__item" class:active={active}>
@@ -42,13 +42,13 @@
             <CheckIcon 
               active={active} 
               hoveredFilter={$hoveredFilter === id} 
-              backgroundColor={color}
+              backgroundColor={data.color}
             />
           </div>
 
           <div class="item__label">
             <input type="checkbox" value={id} {disabled} bind:group={selected}/>
-            <span>{$_(alias)}</span>
+            <span>{$_("category." + id)}</span>
           </div>
 
         </label>

@@ -8,7 +8,7 @@ export class Loader {
 
   constructor(minLoadingTime: number) {
     this.initAt = Date.now()
-    this.minLoadingTime = 5000 // minLoadingTime
+    this.minLoadingTime = minLoadingTime
   }
 
   public handleNodesLoaded = ()  => {

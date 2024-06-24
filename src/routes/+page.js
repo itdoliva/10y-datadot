@@ -1,116 +1,118 @@
 import "$lib/i18n"
 import "$lib/loader"
 
-import * as d3 from "d3"
 
-function getNCats() {
-  const num = Math.random()
-  if (num < .4) {
-    return 1
-  } 
-  else if (num < .65) {
-    return 2
-  } 
-  else if (num < .8) {
-    return 3
-  }
-  else if (num < .925) {
-    return 4
-  }
-  return 5
-}
+// import * as d3 from "d3"
 
-function getCategories(catList, multi=true) {
-  if (!multi) {
-    return catList[Math.floor(Math.random() * catList.length)].id
-  } 
-  else {
-    const list = [...catList]
-    const values = []
-    for (let i=0; i<getNCats(); i++) {
-      const index = Math.floor(Math.random() * list.length)
-      values.push(list.splice(index, 1)[0].id)
-    }
-    return values
-  }
-}
+// function getNCats() {
+//   const num = Math.random()
+//   if (num < .4) {
+//     return 1
+//   } 
+//   else if (num < .65) {
+//     return 2
+//   } 
+//   else if (num < .8) {
+//     return 3
+//   }
+//   else if (num < .925) {
+//     return 4
+//   }
+//   return 5
+// }
 
-export async function load({ fetch }) {
-  const categories = await fetch("/categories.json")
-    .then(d => d.json())
+// function getCategories(catList, multi=true) {
+//   if (!multi) {
+//     return catList[Math.floor(Math.random() * catList.length)].id
+//   } 
+//   else {
+//     const list = [...catList]
+//     const values = []
+//     for (let i=0; i<getNCats(); i++) {
+//       const index = Math.floor(Math.random() * list.length)
+//       values.push(list.splice(index, 1)[0].id)
+//     }
+//     return values
+//   }
+// }
 
-  const { products, designs, channels, goals, industries } = categories
+// export async function load({ fetch }) {
 
-  const nNodes = 387
-  const nClients = Math.floor(nNodes *.95)
-  const nProjects = Math.floor(nNodes *.975)
+//   const categories = await fetch("/categories.json")
+//     .then(d => d.json())
 
-  const firstDt = new Date(2014, 0, 1)
-  const lastDt = new Date(2023, 11, 1)
+//   const { products, designs, channels, goals, industries } = categories
 
-  const nodes = Array.from({ length: nNodes }, (d, i) => {
-    const year = firstDt.getFullYear() + Math.floor(Math.random()*10)
+//   const nNodes = 387
+//   const nClients = Math.floor(nNodes *.95)
+//   const nProjects = Math.floor(nNodes *.975)
 
-    const prodList = []
-    prodList.push(products.slice(products.length-2)[Math.random() < .5 ? 0 : 1].id)
-    prodList.push(products.slice(0, products.length-2)[Math.floor(Math.random()*(products.length-2))].id)
+//   const firstDt = new Date(2014, 0, 1)
+//   const lastDt = new Date(2023, 11, 1)
 
-    const projectId = Math.floor(Math.random() * nProjects)
+//   const nodes = Array.from({ length: nNodes }, (d, i) => {
+//     const year = firstDt.getFullYear() + Math.floor(Math.random()*10)
 
-    const node = { 
-      id: i, 
-      year,
+//     const prodList = []
+//     prodList.push(products.slice(products.length-2)[Math.random() < .5 ? 0 : 1].id)
+//     prodList.push(products.slice(0, products.length-2)[Math.floor(Math.random()*(products.length-2))].id)
 
-      channel: getCategories(channels, false),
-      designs: getCategories(designs),
-      goals: getCategories(goals),
-      industry: getCategories(industries, false),
-      products: prodList,
+//     const projectId = Math.floor(Math.random() * nProjects)
 
-      active: true,
-      complexity: .4 + Math.random()*.7,
+//     const node = { 
+//       id: i, 
+//       year,
 
-      projectId,
-    }
+//       channel: getCategories(channels, false),
+//       designs: getCategories(designs),
+//       goals: getCategories(goals),
+//       industry: getCategories(industries, false),
+//       products: prodList,
 
-    node.ids = [
-      node.channel, 
-      node.designs, 
-      node.goals, 
-      node.industry, 
-      node.products
-    ].flat()
+//       active: true,
+//       complexity: .4 + Math.random()*.7,
 
-    return node
-  })
+//       projectId,
+//     }
 
-  const projects = d3.groups(nodes, d => d.projectId)
-    .map(([ id, deliveryNodes ], i) => ({
-      id,
-      name: `Project #${i+100}`,
-      clientId: Math.floor(Math.random() * nClients),
-      deliveries: deliveryNodes
-    }))
-    .sort((a, b) => a.id - b.id)
+//     node.ids = [
+//       node.channel, 
+//       node.designs, 
+//       node.goals, 
+//       node.industry, 
+//       node.products
+//     ].flat()
 
-  const clients = d3.groups(projects, d => d.clientId)
-    .map(([ id, projectNodes ], i) => ({
-      id,
-      name: `Client ${i}`,
-      projects: projectNodes
-    }))
-    .sort((a, b) => a.id - b.id)
+//     return node
+//   })
 
-  nodes.forEach(node => {
-    node.clientId = projects.find(project => project.id === node.projectId).clientId
-  })
+//   const projects = d3.groups(nodes, d => d.projectId)
+//     .map(([ id, deliveryNodes ], i) => ({
+//       id,
+//       name: `Project #${i+100}`,
+//       clientId: Math.floor(Math.random() * nClients),
+//       deliveries: deliveryNodes
+//     }))
+//     .sort((a, b) => a.id - b.id)
+
+//   const clients = d3.groups(projects, d => d.clientId)
+//     .map(([ id, projectNodes ], i) => ({
+//       id,
+//       name: `Client ${i}`,
+//       projects: projectNodes
+//     }))
+//     .sort((a, b) => a.id - b.id)
+
+//   nodes.forEach(node => {
+//     node.clientId = projects.find(project => project.id === node.projectId).clientId
+//   })
 
 
-  return {
-    nodes,
-    projects,
-    clients,
-    dates: [ firstDt, lastDt ],
-    categories
-  }
-}
+//   return {
+//     nodes,
+//     projects,
+//     clients,
+//     dates: [ firstDt, lastDt ],
+//     categories
+//   }
+// }

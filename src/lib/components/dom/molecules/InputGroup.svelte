@@ -1,5 +1,6 @@
 <script>
   import { getContext } from 'svelte';
+  import { _ } from 'svelte-i18n'
 
   // Stores
   import { hoveredFilter } from '$lib/stores/canvas.js';
@@ -16,6 +17,7 @@
   export let unselectBtn = multiselect
   export let disabled = false
   export let onDark = false
+  export let i18nPrefix = ""
 
   export let gridlayout = 'simple'
 
@@ -30,7 +32,7 @@
 <div class="container {gridlayout} {direction} {theme}">
 
   <ul class="input-group">
-    {#each categories as { id, alias, pctNodes }, i}
+    {#each categories as { id, pctNodes }, i}
     {@const active = multiselect ? selected.includes(id) : selected === id}
 
       <li class="input-group__item" class:active={active}>
@@ -55,7 +57,7 @@
           {:else}
             <input type="radio" value={id} {disabled} bind:group={selected}/>
           {/if}
-            <span class:on-dark={onDark}>{alias}</span>
+            <span class:on-dark={onDark}>{$_(i18nPrefix + id)}</span>
           </div>
 
 

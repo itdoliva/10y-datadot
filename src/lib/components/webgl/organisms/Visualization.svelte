@@ -15,7 +15,7 @@
   const camera = new PIXI.Container()
   const scene = new PIXI.Container()
 
-  root.name = "viz-root"
+  root.name = "viz-container"
   camera.name = "outer-scene"
   scene.name = "scene"
 
@@ -57,7 +57,12 @@ class="visualization-container"
   bind:this={container}
   bind:clientWidth={$figureWidth}
   bind:clientHeight={$figureHeight}
-  use:castContainer={{ context: root, hasMask: true, centered: false }}
+  use:castContainer={{ 
+    context: root, 
+    hasMask: true, 
+    centered: false,
+    propagateOpacity: ".viz-container"
+  }}
 />
 
 

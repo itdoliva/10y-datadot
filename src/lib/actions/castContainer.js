@@ -12,8 +12,9 @@ export default function castContainer(node, {
   hasMask=false,
   destroy=true,
   centered=true,
-  alpha=1
-}) {
+  propagateOpacity=false
+} = {}) {
+
 
   if (!context) {
     return
@@ -29,11 +30,10 @@ export default function castContainer(node, {
     mask = new PIXI.Graphics()
     mask.name = 'cast-container-mask'
     context.mask = mask
-    parent.addChild(mask)
+    context.addChild(mask)
   }
 
   const ticker = get(app).ticker.add(ticked)
-
 
   function ticked() {
     const bbox = node.getBoundingClientRect()
@@ -51,12 +51,21 @@ export default function castContainer(node, {
 
     context.x = x
     context.y = y
-    context.alpha = _.isNumber(alpha) ? alpha : alpha() 
+
+    if (propagateOpacity) {
+      let el = node
+      
+     if (_.isString(propagateOpacity)) {
+        el = document.querySelector(propagateOpacity)
+      }
+      else if (!_.isBoolean(propagateOpacity)) {
+        el = propagateOpacity
+      }
+
+      context.alpha = window.getComputedStyle(el).opacity
+    }
 
     if (hasMask) {
-      mask.x = x
-      mask.y = y
-
       mask.clear()
       mask.beginFill(0x000000)
       mask.drawRect(-xOffset, -yOffset, bbox.width, bbox.height)

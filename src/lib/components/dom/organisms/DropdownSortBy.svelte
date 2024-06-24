@@ -8,7 +8,7 @@
   import DropdownMenu from "$lib/components/dom/molecules/DropdownMenu.svelte";
   import InputGroup from "$lib/components/dom/molecules/InputGroup.svelte";
 
-  const sortIds = [ "year", "industry"]
+  const sortIds = [ "dt", "industry" ]
 
   $: sortCategories = sortIds.map(id => ({
     id,
