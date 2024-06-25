@@ -6,23 +6,7 @@ import { app } from "./stores/canvas"
 import { cameraOffsetY } from './stores/zoom.js';
 import { selected } from "./stores/nodes";
 
-type Placement = (
-  "top"     | "top-start"     | "top-end"     |
-  "right"   | "right-start"   | "right-end"   |
-  "bottom"  | "bottom-start"  | "bottom-end"  |
-  "left"    | "left-start"    | "left-end"    |
-  "center"
-)
-
-interface IStep {
-  contentKey: string;
-  positionTo: string;
-  placement: Placement;
-  highlight?: string;
-  inner?: boolean;
-  onStart?: () => void;
-  onLeave?: () => void;
-}
+import type { OnboardingStep } from "./types/onboarding"
 
 
 const desktopEls = {
@@ -50,7 +34,7 @@ let cursorTl
 
 
 // DESKTOP
-const desktopSteps: IStep[] = [
+const desktopSteps: OnboardingStep[] = [
   {
     contentKey: "onboarding.desktop.1",
     positionTo: ".root",
@@ -94,7 +78,7 @@ const desktopSteps: IStep[] = [
   },
 ]
 
-const mobileSteps: IStep[] = [
+const mobileSteps: OnboardingStep[] = [
   {
     contentKey: "onboarding.mobile.1",
     positionTo: ".root",
@@ -243,4 +227,4 @@ function toggleFilterPanel() {
   filter.classList.toggle('filter-open')
 }
 
-export  { desktopEls, mobileEls, desktopSteps, mobileSteps }
+export  { desktopEls, mobileEls, desktopSteps, mobileSteps, OnboardingStep }

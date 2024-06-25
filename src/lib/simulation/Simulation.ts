@@ -20,6 +20,7 @@ import TransitionController from "./TransitionController";
 import DummyDeliverable from "./DummyDeliverable";
 import DeliverableGroup from "./DeliverableGroup";
 import ZoomController from "../zoom/ZoomController";
+import SoundController from "./SoundController";
 
 export const c: any = {}
 
@@ -45,7 +46,7 @@ export default class Simulation {
   private initialized = false
 
   private activeIds: number[] = []
-  private activeCount = 0
+  public activeCount = 0
 
   // Transition
   private attrId = 0
@@ -65,10 +66,14 @@ export default class Simulation {
   private clients: DeliverableGroup[] = []
   private projects: DeliverableGroup[] = []
 
+  // Sound
+  public sound: SoundController
+
   constructor() {
     this.transition = new TransitionController(this)
     this.zoom = new ZoomController(this)
     this.dummy = new DummyDeliverable(this)
+    this.sound = new SoundController(this)
 
     this.nodes.push(this.dummy)
   }
@@ -434,7 +439,7 @@ export default class Simulation {
       : (a: Deliverable, b: Deliverable) => +b.active - +a.active || a[sortBy].localeCompare(b[sortBy])
 
     this.getDeliverableNodes()
-      .sort(sortCb) // Descending because we want active (1) before unactive (0)
+      .sort(sortCb)
       .forEach((node, i) => {
         node.i = i
       })

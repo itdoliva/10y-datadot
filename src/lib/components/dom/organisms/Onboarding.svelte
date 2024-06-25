@@ -6,6 +6,7 @@
   import { gsap } from "gsap"
 
   import { ongoing, contentKeyIdx } from "../../../stores/onboarding"
+  import type { OnboardingStep } from "../../../types/onboarding"
   import { app } from "../../../stores/canvas"
 
   export let steps
@@ -13,8 +14,8 @@
 
   let index: number
 
-  let prvStep: undefined
-  let curStep: undefined
+  let prvStep: undefined | OnboardingStep
+  let curStep: undefined | OnboardingStep
 
   let prvPos
   let curPos
@@ -178,8 +179,8 @@
     updateStep()
   }
 
-  function endOnboarding(e) {
-    e.stopPropagation()
+  function endOnboarding(e = undefined) {
+    if (e) e.stopPropagation()
     
     const { xOffset, yOffset } = curPos
 
@@ -218,7 +219,7 @@
       loadCursor()
 
       update()
-    }, 2000)
+    }, 3000)
   })
 </script>
 

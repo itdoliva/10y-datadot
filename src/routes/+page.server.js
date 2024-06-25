@@ -1,4 +1,7 @@
+import * as Tone from 'tone';
 import { XATA_API_KEY, DATABASE_URL } from '$env/static/private';
+
+
 
 export async function load({ fetch }) {
 
@@ -72,7 +75,6 @@ export async function load({ fetch }) {
 
   })
 
-  
 
   return {
     deliverables,

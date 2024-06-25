@@ -1,19 +1,34 @@
 <script>
+  // Libraries
+  import * as Tone from 'tone';
+  import _ from 'lodash';
+
   // DOM Elements
   import Button from "$lib/components/dom/atoms/Button.svelte";
   import Icon from "$lib/components/dom/atoms/Icon.svelte";
-  
 
-  let active = false
+	import simulation from '$lib/simulation';
+
+  import { PUBLIC_AWS_SOUND_BASE_URL } from '$env/static/public';
+  import { onMount } from 'svelte';
+
+  let playing
+
+  onMount(() => {
+    simulation.sound.loadPlayers(PUBLIC_AWS_SOUND_BASE_URL)
+  })
 
   function onClick() {
-    active = !active
+    playing = simulation.sound.togglePlaying()
   }
+
+
+
 </script>
 
 <Button {onClick}>
-  <div class="container" class:active>
-    <Icon icon={active ? "pause" : "play"} />
+  <div class="container" class:active={playing}>
+    <Icon icon={playing ? "pause" : "play"} />
     <span>play my vis!</span>
     <Icon icon="wireless" />
   </div>
