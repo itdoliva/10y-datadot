@@ -1,10 +1,13 @@
 import { ITransition, TransitionType, Layout, ILayoutSize } from "../types/simulation";
 import Simulation from "./Simulation";
+import { ongoing } from "../stores/onboarding";
 
 export default class TransitionController {
   private simulation: Simulation
 
   private queue: ITransition[] = []
+
+  private firstTransition = false
   
   private cur?: ITransition
   public running: boolean = false
@@ -91,6 +94,12 @@ export default class TransitionController {
       .finally(() => {
         this.updateState()
         transition.onComplete && transition.onComplete()
+
+        if (!this.firstTransition) {
+          this.firstTransition = true
+          ongoing.set(true)
+        }
+
         this.playNext()
       })
 

@@ -12,6 +12,8 @@
   export let steps
   export let el
 
+  let onboardingInitialized = false
+
   let index: number
 
   let prvStep: undefined | OnboardingStep
@@ -22,12 +24,14 @@
 
   let outer: HTMLElement
   let inner: HTMLElement
+
+  $: if ($ongoing) {
+    startOnboarding()
+  }
   
 
   function next(e) {
     e.stopPropagation()
-
-    console.log(index, steps.length)
 
     if (index < steps.length - 1) {
       index++
@@ -172,20 +176,28 @@
     }
   }
 
+  function startOnboarding() {
+    if (onboardingInitialized) {
+      return
+    }
 
-  function toggleOnboarding() {
-    ongoing.update(cur => !cur)
+    onboardingInitialized = true
     index = 0
+    
+    loadCursor()
     updateStep()
+    update()
   }
 
   function endOnboarding(e = undefined) {
     if (e) e.stopPropagation()
+
+    if (curStep.onLeave) {
+      curStep.onLeave()
+    }
     
     const { xOffset, yOffset } = curPos
-
     const toFadeIn = Object.values(el)
-
     const tl = gsap.timeline()
 
     tl
@@ -195,10 +207,8 @@
         ongoing.set(false)
         index = 0
       })
-    
   }
 
-  
 
   function loadCursor() {
     PIXI.Assets.load('cursor')
@@ -212,15 +222,6 @@
       })
   }
 
-  onMount(() => {
-    setTimeout(() => {
-
-      toggleOnboarding()
-      loadCursor()
-
-      update()
-    }, 3000)
-  })
 </script>
 
 
