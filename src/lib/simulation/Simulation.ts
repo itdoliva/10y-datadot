@@ -48,6 +48,8 @@ export default class Simulation {
   private activeIds: number[] = []
   public activeCount = 0
 
+  public complexityScale 
+
   // Transition
   private attrId = 0
   public transition: TransitionController
@@ -336,6 +338,12 @@ export default class Simulation {
     this.activeIds = deliverableNodes.filter(d => d.active).map(d => d.id)
     this.activeCount = this.activeIds.length
 
+    this.complexityScale = d3.scaleLinear()
+      .domain(d3.extent(deliverableNodes, d => d.complexity))
+      .range([.75, 1.25
+        
+      ])
+
     d3.groups(deliverableNodes, (d: Deliverable) => d.client).forEach(([ id, deliverables]) => {
       const client = new DeliverableGroup(this, id, deliverables, 0x83BF00)
       this.clients.push(client)
@@ -366,6 +374,8 @@ export default class Simulation {
     this.getDeliverableNodes().forEach(node => {
       node.context.toScene(context, ticker)
     })
+
+    this.sound.toScene(context, ticker)
   }
 
   public getDeliverableNodes = (): Deliverable[] => {

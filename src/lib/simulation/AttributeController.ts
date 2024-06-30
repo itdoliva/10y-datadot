@@ -56,7 +56,7 @@ export default class AttributeController {
 
   public scale = () => {
     return get(complexityOn)
-      ? this.deliverable.complexity
+      ? this.simulation.complexityScale(this.deliverable.complexity)
       : 1
   }
 

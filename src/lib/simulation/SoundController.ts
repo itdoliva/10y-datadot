@@ -1,3 +1,5 @@
+import * as PIXI from "pixi.js"
+
 // Libraries
 import * as Tone from 'tone';
 import _ from 'lodash';
@@ -6,9 +8,64 @@ import { gsap } from 'gsap';
 import Simulation from "./Simulation";
 import Deliverable from './Deliverable';
 
+class PolySynth {
+  private poly: Tone.PolySynth
+  private duration = '8n'
+
+  constructor(params: any) {
+    this.poly = new Tone.PolySynth().toDestination()
+    this.poly.set(params)
+  }
+
+  public autoFilter() {
+    const autoFilter = new Tone.AutoFilter({ frequency: 15, wet: 0.8, depth: 0.9 }).toDestination()
+    autoFilter.start()
+
+    this.poly.connect(autoFilter)
+  }
+
+  public reverb() {
+    const reverb = new Tone.Reverb(3).toDestination()
+    this.poly.connect(reverb)
+  }
+
+  public trigger(note: string) {
+    this.poly.triggerAttackRelease(note, this.duration)
+
+    const now = Tone.now()
+    Tone.getTransport().scheduleOnce(() => {
+      this.poly.dispose()
+    }, now + Tone.Time("2n").toSeconds())
+  }
+}
+
+class PingPongDelay {
+  private player: Tone.Player
+  private pp: Tone.PingPongDelay
+
+  constructor(player: Tone.Player) {
+    this.player = player
+
+    this.pp = new Tone.PingPongDelay('4n', 0.2).toDestination()
+    this.player.connect(this.pp)
+
+    return this
+  }
+
+  public dispose() {
+    this.pp.dispose()
+    this.player.disconnect(this.pp)
+  }
+}
+
 
 export default class SoundController {
   private simulation: Simulation
+
+  private context = new PIXI.Container()
+  private graphics = new PIXI.Graphics()
+
+  private curNode
 
   private initialized = false
 
@@ -20,8 +77,13 @@ export default class SoundController {
   private stepCounter = 0
   private patternLength = 4
 
-  private scaleNotes = [ 'C', 'D', 'E', 'F', 'G', 'A', 'B' ]
-  private notes: string[]
+  
+  private notes = _.range(2, 6 + 1).map((octave) => {
+    return [ 'C', 'D', 'E', 'F', 'G', 'A', 'B' ].map((note) => {
+      return note + octave
+    })
+  }).flat()
+
   private noteIdx = 8
   private noteIncrement = -1
 
@@ -40,10 +102,19 @@ export default class SoundController {
 
   private snareCounter = 0
 
+
   constructor(simulation: Simulation) {
     this.simulation = simulation
 
-    this.notes = _.range(2, 7 + 1).map((n) => this.scaleNotes.map((note) => note + n)).flat();
+    
+    this.graphics = new PIXI.Graphics()
+
+    this.graphics.alpha = 1
+    this.graphics.blendMode = PIXI.BLEND_MODES.MULTIPLY
+
+    this.context.addChild(this.graphics)
+    this.context.renderable = false
+
   }
 
   public loadPlayers(baseURL: string) {
@@ -69,18 +140,28 @@ export default class SoundController {
     }
   }
 
+  public toScene(scene: PIXI.Container, ticker: PIXI.Ticker) {
+    ticker.add(this.visualTick)
+    scene.addChild(this.context)
+  }
 
+  private visualTick = () => {
+    this.context.renderable = !!this.curNode
 
-  public togglePlaying() {
-    if (!this.initialized) {
-      this.initialized = true
+    this.graphics.clear()
 
-      Promise.all([ Tone.start(), Tone.loaded() ]).then(() => {
-        new Tone.Loop(this.tick, this.columnTime).start(0)
-        Tone.Transport.start()
-      })
+    if (this.curNode && !this.simulation.transition.running && !this.simulation.onSelectedState) {
+      this.graphics.beginFill("#ffff00")
+      this.graphics.drawCircle(0, 0, 24)
+      this.graphics.endFill()
+
+      this.context.x = this.curNode.context.context.x
+      this.context.y = this.curNode.context.context.y
     }
 
+  }
+
+  public resetParams() {
     this.stepCounter = 0
 
     this.release = 20
@@ -91,8 +172,23 @@ export default class SoundController {
     this.noteIdx = 8
     this.noteIncrement = -1
 
+    this.curNode = undefined
+
     this.disposePingPongs()
-    
+  }
+
+
+  public togglePlaying() {
+    if (!this.initialized) {
+      this.initialized = true
+
+      Promise.all([ Tone.start(), Tone.loaded() ]).then(() => {
+        new Tone.Loop(this.tick, this.columnTime).start(0)
+        Tone.getTransport().start()
+      })
+    }
+
+    this.resetParams()
     this.playing = !this.playing
 
     return this.playing
@@ -110,8 +206,8 @@ export default class SoundController {
     const node = this.simulation.getDeliverableNodes().find(d => d.active && d.i === stepIdx)
     const nodesInPattern = this.simulation.getDeliverableNodes()
       .filter(d => Math.floor(d.i / this.patternLength) === patternIdx)
-
-    console.log('stepCounter', this.stepCounter, 'patternIdx', patternIdx, 'columnIdx', columnIdx)
+      
+    this.curNode = node
 
     if (!node) return
 
@@ -158,18 +254,19 @@ export default class SoundController {
       }
 
       if (categories.includes("channel.digital")) {
-        const poly = new Tone.PolySynth().toDestination();
-        poly.set({ envelope: { attack: this.attack, release: this.release } })
+        const poly = new PolySynth({ envelope: { attack: this.attack, release: this.release } })
 
         if (this.filterNext) {
-          this.filterSynth(poly)
+          this.filterNext = false
+          poly.autoFilter()
         }
 
         if (this.reverbNext) {
-          this.reverbSynth(poly)
+          this.reverbNext = false
+          poly.reverb()
         }
 
-        poly.triggerAttackRelease(this.notes[this.noteIdx], '8n')
+        poly.trigger(this.notes[this.noteIdx])
       }
 
 
@@ -177,10 +274,9 @@ export default class SoundController {
         const player = this.drumPlayers.kick.player('vm')
   
         if (categories.includes('goal.educacional')) {
-          const pp = new Tone.PingPongDelay('4n', 0.2).toDestination()
-          player.connect(pp)
+          const pp = new PingPongDelay(player)
   
-          this.pingPongs.push([ player, pp ])
+          this.pingPongs.push(pp)
         }
   
         player.start(time)
@@ -197,10 +293,9 @@ export default class SoundController {
         const player = this.drumPlayers.snare.player('vm')
   
         if (this.snareCounter % 3 === 0) {
-          const pp = new Tone.PingPongDelay('4n', 0.2).toDestination()
-          player.connect(pp)
+          const pp = new PingPongDelay(player)
   
-          this.pingPongs.push([ player, pp ])
+          this.pingPongs.push(pp)
         }
   
         if (this.snareCounter % 9 === 0) {
@@ -211,41 +306,16 @@ export default class SoundController {
       }
     }
 
-
-
-
-
     this.stepCounter++
   }
 
   private disposePingPongs() {
     while (this.pingPongs.length) {
-      const [ player, pp ] = this.pingPongs.pop()
+      const pp = this.pingPongs.pop()
       pp.dispose()
-      player.disconnect(pp)
     }
   }
 
-  private filterSynth(poly) {
-    this.filterNext = false
-
-    const autoFilter = new Tone.AutoFilter({ frequency: 15, wet: 0.8, depth: 0.9 }).toDestination()
-    autoFilter.start()
-
-    poly.connect(autoFilter)
-  }
-
-  private reverbSynth(poly) {
-    this.reverbNext = false
-
-    const reverb = new Tone.Reverb(3).toDestination()
-
-    poly.connect(reverb)
-  }
-
-  private incrementStep() {
-    this.stepCounter++
-  }
 
   private incrementNoteFrequency(k=1) {
     let idx = this.noteIdx + this.noteIncrement * k
