@@ -21,6 +21,7 @@ import DummyDeliverable from "./DummyDeliverable";
 import DeliverableGroup from "./DeliverableGroup";
 import ZoomController from "../zoom/ZoomController";
 import SoundController from "./SoundController";
+import LayoutInterface from "./LayoutInterface";
 
 export const c: any = {}
 
@@ -50,6 +51,10 @@ export default class Simulation {
 
   public complexityScale 
 
+  // Interface
+  public interface: LayoutInterface
+  public sectorTitle
+
   // Transition
   private attrId = 0
   public transition: TransitionController
@@ -76,6 +81,7 @@ export default class Simulation {
     this.zoom = new ZoomController(this)
     this.dummy = new DummyDeliverable(this)
     this.sound = new SoundController(this)
+    this.interface = new LayoutInterface(this)
 
     this.nodes.push(this.dummy)
   }
@@ -185,7 +191,12 @@ export default class Simulation {
       node.attr.set(new NodeAttributes(attrId, attr))
     })
 
-    return { width: blockWidth, height: blockHeight }
+    const layoutSize = {
+      width: blockWidth, 
+      height: blockHeight
+    }
+
+    return { layoutSize }
   }
 
   private chainNodesRadialAttr = (attrId: number) => {
@@ -246,6 +257,8 @@ export default class Simulation {
     let maxX = 0
     let minY = 0
     let maxY = 0
+
+    const attributes: any[] = []
     
     this.getDeliverableNodes().forEach(node => {
       const attr = { x: 0, y: 0, theta: 0, radius: 0, time: 0, active: node.active }
@@ -253,27 +266,47 @@ export default class Simulation {
       const sectorDataPoint = sectorData.find(d => d.id === node.id)
 
       if (sectorDataPoint) {
-        const { sectorIndex, pileIndex, inPileIndex } = sectorDataPoint
+        const { sectorIndex, pileIndex, inPileIndex, sectorName } = sectorDataPoint
 
         attr.theta = thetaScale(pileIndex + sectorIndex)
         attr.radius = minRadius + inPileIndex * (radialGap + s_nodeSize)
         attr.x = Math.cos(attr.theta) * attr.radius
         attr.y = Math.sin(attr.theta) * attr.radius
         attr.time = timeScale(attr.theta)
+
+        attributes.push({
+          sectorName,
+          ...attr,
+        })
       }
 
-      if (attr.x < minX) { minX = attr.x } else
-      if (attr.x > maxX) { maxX = attr.x }
-      if (attr.y < minY) { minY = attr.y } else
-      if (attr.y > maxY) { maxY = attr.y }
+      if ( attr.x < minX ) { minX = attr.x } else
+      if ( attr.x > maxX ) { maxX = attr.x }
+      if ( attr.y < minY ) { minY = attr.y } else
+      if ( attr.y > maxY ) { maxY = attr.y }
 
       node.attr.set(new NodeAttributes(attrId, attr))
     })
 
-    const width = maxX - minX
-    const height = maxY - minY
+    const sectorName = d3.rollup(attributes, arr => {
+      const [ thetaMin, thetaMax ] = d3.extent(arr, d => d.theta)
+      const theta = thetaMin + (thetaMax - thetaMin)/2
+      return theta
+    }, d => d.sectorName)
 
-    return { width, height }
+    const layoutData = {
+      sectorName,
+      minRadius: minRadius - s_nodeSize*2
+    }
+
+    this.interface.enqueue(attrId, layoutData)
+
+    const sectorSize = {
+      width: maxX - minX,
+      height: maxY - minY
+    }
+
+    return { sectorSize, layoutData }
   }
 
   private chainNodeAttributes = (transitionType: TransitionType, delay=0) => {
@@ -286,7 +319,7 @@ export default class Simulation {
 
     const attrId = ++this.attrId
 
-    const layoutSize = this.layout === "block"
+    const layoutSettings = this.layout === "block"
       ? this.chainNodesBlockAttr(attrId)
       : this.chainNodesRadialAttr(attrId)
 
@@ -295,7 +328,7 @@ export default class Simulation {
         type: transitionType, 
         attrId, 
         layout: this.layout, 
-        layoutSize
+        ...layoutSettings
       })
     }, delay)
   }
@@ -375,6 +408,7 @@ export default class Simulation {
       node.context.toScene(context, ticker)
     })
 
+    this.interface.toScene(context, ticker)
     this.sound.toScene(context, ticker)
   }
 

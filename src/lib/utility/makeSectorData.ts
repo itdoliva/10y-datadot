@@ -18,7 +18,7 @@ export default function makeSectorData(data: Deliverable[], groupBy: "year" | "i
   let inPileIndex = 0
 
   const sectorData: any = []
-  data.sort((a, b) => d3.ascending(acc(a), acc(b))).forEach((dataPoint) => {
+  data.sort((a, b) => d3.ascending(acc(a), acc(b) || a.i - b.i)).forEach((dataPoint) => {
     const sectorIndex = unique.indexOf(acc(dataPoint))
     
     // If the current sector is different from the previous one or
@@ -32,7 +32,8 @@ export default function makeSectorData(data: Deliverable[], groupBy: "year" | "i
       id: dataPoint.id,
       sectorIndex,
       pileIndex,
-      inPileIndex
+      inPileIndex,
+      sectorName: `${unique[sectorIndex]}`
     })
 
     inPileIndex++
@@ -46,7 +47,8 @@ export default function makeSectorData(data: Deliverable[], groupBy: "year" | "i
   
     const metadata: ISectorMetadata = { 
       nGaps, 
-      nPiles 
+      nPiles,
+      sectorNames: unique.map(d => `${d}`)
     }
 
     return [ sectorData, metadata ]

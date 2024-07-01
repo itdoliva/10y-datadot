@@ -73,7 +73,7 @@ export default class TransitionController {
     this.updateState(transition)
 
     if (transition.layout) {
-      const { layout, layoutSize } = transition
+      const { layout, layoutSize, layoutData } = transition
 
       const moveOptions = {
         duration: transition.type === "entrance" ? 0 : 750,
@@ -87,6 +87,8 @@ export default class TransitionController {
 
     const nodeTransitions = this.simulation.getDeliverableNodes()
       .map(node => node.attr.play(transition).then())
+
+    this.simulation.interface.updateLabels(transition)
 
 
     Promise.all(nodeTransitions)

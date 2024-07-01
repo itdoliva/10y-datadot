@@ -8,10 +8,9 @@ import { complexityOn, figureHeight } from "../stores/canvas";
 import Deliverable from "./Deliverable"
 import Simulation, { c } from "./Simulation"
 import NodeAttributes from "./NodeAttributes";
+import rotationOffset from "../utility/rotationOffset";
 
 import { TransitionType, IRenderAttributes, ITransition } from "../types/simulation"
-
-const rotationOffset = (theta: number) => theta + Math.PI/2
 
 export default class AttributeController {
   private simulation: Simulation

@@ -36,11 +36,16 @@ export interface ILayoutSize {
   height: number;
 }
 
+export interface ILayoutSectorData {
+  sectorName: any;
+}
+
 export interface ITransition {
   type: TransitionType;
   attrId?: number;
   layout?: Layout;
   layoutSize?: ILayoutSize;
+  layoutData?: ILayoutSectorData;
   onStart?: () => void;
   onComplete?: () => void;
 }
@@ -59,12 +64,14 @@ export interface ISectorDataPoint {
   id: string,
   sectorIndex: number,
   pileIndex: number,
-  inPileIndex: number
+  inPileIndex: number,
+  sectorName: string,
 }
 
 export interface ISectorMetadata {
   nGaps: number;
   nPiles: number;
+  sectorNames: string[];
   innerRadius?: number;
 }
 
