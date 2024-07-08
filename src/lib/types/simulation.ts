@@ -36,16 +36,31 @@ export interface ILayoutSize {
   height: number;
 }
 
-export interface ILayoutSectorData {
-  sectorName: any;
+export interface ISectorTitleDataPoint {
+  title: string;
+  thetaMin: number;
+  thetaMax: number;
+  theta: number;
 }
+
+export interface ILayoutBlockData {
+
+};
+
+export interface ILayoutSectorData {
+  sectorTitleData: ISectorTitleDataPoint[];
+  minRadius: number;
+  translate: boolean;
+}
+
+export type LayoutData = ILayoutSectorData;
 
 export interface ITransition {
   type: TransitionType;
   attrId?: number;
   layout?: Layout;
   layoutSize?: ILayoutSize;
-  layoutData?: ILayoutSectorData;
+  layoutData?: LayoutData;
   onStart?: () => void;
   onComplete?: () => void;
 }

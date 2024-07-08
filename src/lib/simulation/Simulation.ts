@@ -14,7 +14,7 @@ import { gap, nodeSize, sortBy, categories, categoriesEnriched } from "../stores
 import randomDensity from "../utility/randomDensity"
 import makeSectorData from "../utility/makeSectorData"
 import Deliverable from "./Deliverable"
-import { SortBy, Layout, TransitionType, ITransition } from "../types/simulation"
+import { SortBy, Layout, TransitionType, ITransition, ILayoutSectorData, ISectorTitleDataPoint } from "../types/simulation"
 import NodeAttributes from "./NodeAttributes";
 import TransitionController from "./TransitionController";
 import DummyDeliverable from "./DummyDeliverable";
@@ -208,7 +208,8 @@ export default class Simulation {
     const groupBy = s_sortBy === "dt" ? "year" : "industry"
 
     const data = this.getDeliverableNodes().filter(node => node.active)
-    const radialGap = s_nodeSize * 1.25
+    const radialGap = s_nodeSize * 1.75
+    const stackGap = s_nodeSize * 1
     const maxStack = this.activeCount**(1/3)
 
     let curSectorData
@@ -235,7 +236,7 @@ export default class Simulation {
         isFitting = circleLength < layoutCircleLength
       })
   
-      curRadius += radialGap
+      curRadius += stackGap
       
     } while (isFitting)
 
@@ -269,7 +270,7 @@ export default class Simulation {
         const { sectorIndex, pileIndex, inPileIndex, sectorName } = sectorDataPoint
 
         attr.theta = thetaScale(pileIndex + sectorIndex)
-        attr.radius = minRadius + inPileIndex * (radialGap + s_nodeSize)
+        attr.radius = minRadius + inPileIndex * (stackGap + s_nodeSize)
         attr.x = Math.cos(attr.theta) * attr.radius
         attr.y = Math.sin(attr.theta) * attr.radius
         attr.time = timeScale(attr.theta)
@@ -288,15 +289,22 @@ export default class Simulation {
       node.attr.set(new NodeAttributes(attrId, attr))
     })
 
-    const sectorName = d3.rollup(attributes, arr => {
+    const sectorTitleData: ISectorTitleDataPoint[] = Array.from(d3.rollup(attributes, arr => {
       const [ thetaMin, thetaMax ] = d3.extent(arr, d => d.theta)
       const theta = thetaMin + (thetaMax - thetaMin)/2
-      return theta
-    }, d => d.sectorName)
 
-    const layoutData = {
-      sectorName,
-      minRadius: minRadius - s_nodeSize*2
+      return {
+        title: (groupBy === "industry" ? "category." : "") + arr[0].sectorName,
+        thetaMin,
+        thetaMax,
+        theta,
+      }
+    }, d => d.sectorName).values())
+
+    const layoutData: ILayoutSectorData = {
+      sectorTitleData,
+      minRadius: minRadius - s_nodeSize*2,
+      translate: groupBy === "industry"
     }
 
     this.interface.enqueue(attrId, layoutData)
@@ -356,6 +364,10 @@ export default class Simulation {
     if (!width) return
 
     this.zoom.updateScaleExtent(this.layout, width)
+  }
+
+  public handleLanguageChange = (locale: string) => {
+    this.interface.updateText()
   }
 
   public load = (dataArr: any[]) => {

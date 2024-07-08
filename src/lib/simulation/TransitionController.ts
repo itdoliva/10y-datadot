@@ -88,7 +88,7 @@ export default class TransitionController {
     const nodeTransitions = this.simulation.getDeliverableNodes()
       .map(node => node.attr.play(transition).then())
 
-    this.simulation.interface.updateLabels(transition)
+    this.simulation.interface.setInterfaceLabels(transition)
 
 
     Promise.all(nodeTransitions)

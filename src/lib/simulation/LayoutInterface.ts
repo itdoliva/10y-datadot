@@ -4,10 +4,18 @@ import rotationOffset from "../utility/rotationOffset";
 import { nodeSize } from "../stores/nodes";
 import { get } from "svelte/store";
 import { _ } from "svelte-i18n"; 
+import gsap from "gsap";
+import { LayoutData } from "../types/simulation";
+import getFontSizeLabel from "../utility/getFontSizeLabel";
 
 export default class LayoutInterface {
   private simulation: Simulation
   private context = new PIXI.Container()
+
+  private cur: LayoutData
+  private prev: LayoutData
+
+  private nodes: any[] = []
 
   private queue: any[] = []
 
@@ -20,7 +28,7 @@ export default class LayoutInterface {
     scene.addChild(this.context)
   }
 
-  public enqueue(attrId, layoutData) {
+  public enqueue(attrId: number, layoutData: LayoutData) {
     this.queue.push({ 
       id: attrId,
       ...layoutData
@@ -37,32 +45,105 @@ export default class LayoutInterface {
     return attr
   }
 
-  public updateLabels(transition) {
-    const { attrId } = transition
 
-    const layoutData = this.pop(attrId)
+  public setInterfaceLabels(transition) {
 
-    if (!layoutData) return
+    // Fade out and destroy current labels
+    while (this.nodes.length) {
+      const node = this.nodes.pop()
+      const { outer } = node.context
 
-    const { sectorName, minRadius } = layoutData
+      gsap.timeline({ overwrite: true })
+        .to(outer, { alpha: 0, duration: .250 })
+        .call(() => {
+          outer.destroy({ children: true })
+        })
+    }
 
-    sectorName.forEach((theta, name) => {
-      const wrapper = new PIXI.Container() 
+    const { type, attrId } = transition
+
+    if (attrId) {
+      this.prev = this.cur
+      this.cur = this.pop(attrId)
+    }
+
+    if (!this.cur || type === "exit") return
+
+
+    const { sectorTitleData, minRadius } = this.cur
+
+    sectorTitleData.forEach(({ title, thetaMin }, i) => {
+      const outer = new PIXI.Container() 
       const inner = new PIXI.Container() 
-
-      const text = new PIXI.Text(name, {
-        fontSize: 12,
-        align: "center",
+      const text = new PIXI.Text('', { 
+        fontSize: getFontSizeLabel(), 
+        fontFamily: [ 'Rational', 'monospace' ],
+        fontWeight: '300'
       })
 
-      
-      text.x = minRadius - text.width - get(nodeSize)/3
-      // inner.rotation = Math.PI/2
-      wrapper.rotation = theta
+      const node = {
+        title,
+        thetaMin,
+        context: {
+          outer,
+          inner,
+          text
+        },
+      }
+
+      this.nodes.push(node)
+
+      text.alpha = 0
+      inner.x = minRadius + get(nodeSize) * 1.5
+      inner.y = -get(nodeSize) * 1.75
+      outer.rotation = thetaMin
+
+      const ease = "power2.out"
+
+      gsap.timeline()
+        .to(text, { 
+          alpha: 1, 
+          duration: 1, 
+          delay: .75, 
+          ease
+        })
+        .from(outer, { 
+          rotation: thetaMin-Math.PI/16, 
+          duration: 1, 
+          ease
+         }, '<')
+
 
       inner.addChild(text)
-      wrapper.addChild(inner)
-      this.context.addChild(wrapper)
+      outer.addChild(inner)
+      this.context.addChild(outer)
+
+    })
+
+    this.updateText()
+
+  }
+
+  public updateText() {
+    if (!this.cur) return
+
+    this.nodes.forEach(({ title, thetaMin, context }) => {
+
+      const label = (this.cur.translate ? get(_)(title) : title)
+        .toLowerCase()
+
+      const text = <PIXI.Text>context.text
+      text.text = label
+
+      if (thetaMin >= Math.PI/2 && thetaMin <= 3*Math.PI/2) {
+        text.pivot.set(text.width, text.height)
+        text.rotation = Math.PI
+        text.style.align = 'right'
+      }
+      else {
+        text.style.align = 'left'
+      }
+
     })
 
   }

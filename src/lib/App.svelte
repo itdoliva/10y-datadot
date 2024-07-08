@@ -1,5 +1,5 @@
 <script>
-  import { _ } from 'svelte-i18n'
+  import { _, locale } from 'svelte-i18n'
   import { onMount } from 'svelte';
 
   import simulation from "$lib/simulation"
@@ -67,6 +67,7 @@
   $: simulation.handleComplexity($complexityOn)
   $: simulation.handleLinks("clients", $linkClientOn)
   $: simulation.handleLinks("projects", $linkProjectOn)
+  $: simulation.handleLanguageChange($locale)
 
   function toggleTopMenuCollapse() {
     isTopMenuCollapsed = !isTopMenuCollapsed
