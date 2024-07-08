@@ -1,11 +1,12 @@
 <script>
   import { getContext } from "svelte";
-  import { _ } from 'svelte-i18n'
+  import { _, locale } from 'svelte-i18n'
 
   // Libraries
   import { onMount } from "svelte";
   import { tweened } from "svelte/motion";
   import * as d3 from "d3"
+  import wrapSVGText from "$lib/utility/wrapSVGText"
 
   // Stores
 	import { lineWidth } from '$lib/stores/nodes.js';
@@ -23,7 +24,16 @@
 
   const r_t = tweened(r, { duration: 300, delay: tweenDelay, ease: d3.easeQuadInOut })
 
+  let labelText
+
   $: $r_t = r
+
+  $: if ($_(alias) && labelText) {
+    const text = $_(alias)
+
+    d3.select(labelText)
+      .call(wrapSVGText, { maxWidth: 120, text })
+  }
 
 </script>
 
@@ -40,8 +50,7 @@
       </text> 
     {/if}
 
-    <text class="text__alias" text-anchor="middle" dominant-baseline="middle" dy="1.35em" filter="url(#text-bg)">
-      {$_(alias)}
+    <text bind:this={labelText} class="text__alias" text-anchor="middle" dominant-baseline="middle" dy="1.35em" filter="url(#text-bg)">
     </text>
 
 
