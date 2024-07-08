@@ -20,6 +20,12 @@
       "4": "Explore as nossas entregas em diferentes layouts...",
       "5": "...e a partir de diversos filtros.",
       "6": "Conheça nossa história através de outros sentidos"
+    },
+
+    "panel": {
+      "skip": "Skip",
+      "next": "Next",
+      "back": "Back"
     }
   },
 

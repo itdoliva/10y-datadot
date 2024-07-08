@@ -20,6 +20,7 @@
   import ReturnBackground from '$lib/icons/ReturnBackground.svelte';
   import MousePan from '$lib/icons/MousePan.svelte';
   import Pinch from '$lib/icons/Pinch.svelte';
+  import Close from '$lib/icons/Close.svelte';
 
   export let icon
 
@@ -44,7 +45,8 @@
     collapse: Collapse,
     logo: Logo,
     mousePan: MousePan,
-    pinch: Pinch
+    pinch: Pinch,
+    close: Close
   }
 
 </script>

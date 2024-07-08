@@ -7,6 +7,7 @@
 
   import { ongoing, contentKeyIdx } from "../../../stores/onboarding"
   import type { OnboardingStep } from "../../../types/onboarding"
+  import Icon from "../atoms/Icon.svelte";
   import { app } from "../../../stores/canvas"
 
   export let steps
@@ -67,7 +68,6 @@
     let yPercent = 0
     let xOffset = 0
     let yOffset = 0
-
     
     // Centered placements
     if (placement === "center") {
@@ -103,7 +103,6 @@
       yOffset = offset
     }
 
-    
 
     // End placements
     if (placement.includes("end")) {
@@ -130,7 +129,7 @@
     prvPos = curPos
     curPos = position(curStep)
 
-    const { left, top, xPercent, yPercent, xOffset, yOffset } = curPos
+    let { left, top, xPercent, yPercent, xOffset, yOffset } = curPos
 
     const toFadeOut = Object.values(el).filter(d => d !== curStep.highlight)
 
@@ -139,7 +138,7 @@
 
       curStep.onStart && curStep.onStart()
 
-      const toRemove = ["center", "top", "right", "bottom", "left"]
+      const toRemove = [ "center", "top", "right", "bottom", "left" ]
       toRemove.forEach(d => { inner.classList.remove(d) })
       inner.classList.add(curStep.placement.split("-")[0])
     }
@@ -165,11 +164,34 @@
       tl.call(prvStep.onLeave, [], "<")
     }
 
+
+    let xOffset2 = 0
+    let yOffset2 = 0
+
     // Entrance animation
-    tl.call(onEntry)
+    tl
+      .call(onEntry)
       .set(outer, { left, top })
-      .set(inner, { xPercent, yPercent, x: 0, y: 0, opacity: 0 })
-      .to(inner, { x: xOffset, y: yOffset, opacity: 1, duration: .3 }, "<")
+      .call(() => {
+        const xFinal = left + (inner.clientWidth * xPercent/100) + xOffset
+        const yFinal = top + (inner.clientHeight * yPercent/100) + yOffset
+
+        if (xFinal < 0)  {
+          xOffset2 = xFinal*-1 
+        }
+        else if (xFinal > document.body.clientWidth) {
+          xOffset2 = document.body.clientWidth - xFinal
+        }
+
+        if (yFinal < 0) {
+          yOffset2 = yFinal*-1 
+        }
+        else if (yFinal > document.body.clientHeight) {
+          yOffset2 = document.body.clientHeight - yFinal
+        }
+      })
+      .set(inner, { xPercent, yPercent, x: xOffset2, y: yOffset2, opacity: 0 })
+      .to(inner, { x: xOffset + xOffset2, y: yOffset + yOffset2, opacity: 1, duration: .3 }, "<")
 
     if (curStep.highlight) {
       tl.to(curStep.highlight, { opacity: 1, duration: .15 }, "<")
@@ -232,7 +254,9 @@
 
     <div bind:this={inner} class="panel">
       <div class="panel__header">
-        <button on:click={endOnboarding}>X</button>
+        <button class="clean-btn" on:click={endOnboarding}>
+          <Icon icon="close" />
+        </button>
       </div>
 
       <div class="panel__body">
@@ -244,8 +268,8 @@
       </div>
     
       <div class="panel__footer">
-        <button on:click={back} disabled={index === 0}>Retorne</button>
-        <button on:click={next}>Avançar</button>
+        <button class="clean-btn" on:click={index === 0 ? endOnboarding : back}>{$_(index === 0 ? "onboarding.panel.skip" : "onboarding.panel.back")}</button>
+        <button class="clean-btn" on:click={next}>{$_("onboarding.panel.next")}</button>
       </div>
     </div>
 
@@ -265,7 +289,7 @@
 
     .onboarding {
       position: absolute;
-      width: 180px;
+      width: 220px;
   
       .panel {
         z-index: 999;
@@ -273,37 +297,63 @@
 
         padding: var(--fs-label);
   
-        background: rgba(255, 255, 255, .1);
+        background: var(--clr-dark-gray);
     
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-rows: min-content min-content max-content;
+        grid-template-areas: 
+          "header"
+          "body"
+          "footer";
+
         gap: var(--fs-label);
   
         &:global(.top) {
-          border-bottom: 3px solid var(--clr-black);
+          border-bottom: 4px solid var(--clr-accent);
         }
   
         &:global(.right) {
-          border-left: 3px solid var(--clr-black);
+          border-left: 4px solid var(--clr-accent);
         }
   
         &:global(.bottom), &:global(.center) {
-          border-top: 3px solid var(--clr-black);
+          border-top: 4px solid var(--clr-accent);
         }
   
         &:global(.left) {
-          border-right: 3px solid var(--clr-black);
+          border-right: 4px solid var(--clr-accent);
         }
 
+        &__header { grid-area: header; }
+        &__body { grid-area: body; }
+        &__footer { grid-area: footer; }
+
         &__header {
-          display: flex;
-          justify-content: flex-end;
+          height: calc(2.2*var(--fs-label));
+
+          button {
+            padding: 0;
+
+            width: calc(2.2*var(--fs-label));
+
+            color: var(--clr-white);
+
+            &:hover {
+              color: var(--clr-accent);
+            }
+
+            &:active {
+              color: var(--clr-accent-low);
+            }
+          }
         }
         
         &__body {
+          padding: 0 var(--fs-label);
+
           p {
+            color: var(--clr-white);
             font-size: var(--fs-title);
-            font-weight: 500;
   
             :global(span) {
               font-weight: inherit;
@@ -312,8 +362,32 @@
         }
     
         &__footer {
+          padding: calc(.5*var(--fs-label)) var(--fs-label);
+
           display: flex;
           justify-content: space-between;
+
+          button {
+            font-size: var(--fs-label);
+            text-transform: lowercase;
+
+            padding: calc(.5*var(--fs-label)) calc(1*var(--fs-label));
+
+            color: var(--clr-white);
+            
+            border-radius: 2px;
+            border: 1px solid var(--clr-white);
+
+            &:hover {
+              border: 1px solid var((--clr-accent));
+              color: var(--clr-accent);
+            }
+
+            &:active {
+              border: 1px solid var((--clr-accent-low));
+              color: var(--clr-accent-low);
+            }
+          }
         }
       }
   
