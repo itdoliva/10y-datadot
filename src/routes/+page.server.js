@@ -1,10 +1,24 @@
-import * as Tone from 'tone';
 import { XATA_API_KEY, DATABASE_URL } from '$env/static/private';
-
-
 
 export async function load({ fetch }) {
 
+  // Define columns to get from each table
+  const deliverableColumns = [ 
+    "client", 
+    "industry", 
+    "project", 
+    "description", 
+    "dt_start", 
+    "channel", 
+    "product", 
+    "design", 
+    "goal", 
+    "complexity"
+  ]
+
+  const categoryColumns = [ "name", "data", "type" ]
+
+  // Fetch Function
   async function getRecords(table, columns, parseCallback) {
     const url = DATABASE_URL + `/tables/${table}/query`
 
@@ -20,11 +34,16 @@ export async function load({ fetch }) {
       })
     })
     .then(response => response.json())
-    .then(json => json.records.map(parseCallback))
+    .then(json => json.records.map(parseCallback).filter(d => d))
   }
 
   const deliverablesParse = (row, i) => {
     const dt = new Date(row.dt_start)
+
+    if (!row.industry) {
+      return
+    }
+
     return {
       id: i,
       
@@ -52,8 +71,9 @@ export async function load({ fetch }) {
     data: JSON.parse(row.data)
   })
 
-  const deliverables = await getRecords('deliverables', [ "client", "industry", "project", "description", "dt_start", "channel", "product", "design", "goal", "complexity" ], deliverablesParse)
-  const categories = await getRecords('categories', [ "name", "data", "type" ], categoriesParse)
+
+  const deliverables = await getRecords('deliverables', deliverableColumns, deliverablesParse)
+  const categories = await getRecords('categories', categoryColumns, categoriesParse)
 
   const projects = new Set()
   const clients = new Set()

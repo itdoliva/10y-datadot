@@ -72,7 +72,7 @@ export default class AttributeController {
     return this[type](layout === "block")
   }
 
-  public makeTimeline = (forTransitionType:TransitionType|undefined=undefined, overwrite="auto") => {
+  public makeTimeline = (forTransitionType?: TransitionType, overwrite="auto") => {
 
     const onComplete = () => {
       tl.kill()
@@ -155,7 +155,7 @@ export default class AttributeController {
         .set(this.render, { px: this.cur.x, py: this.cur.y })
         .set(this.render, { 
           renderable: this.cur.active, 
-          delay: (this.cur.time * c.filterDuration) + c.filterHalf1 + c.filterBetweenGap 
+          delay: (this.cur.time * c.filterDuration) + .4 + c.filterBetweenGap 
         })
       }
   
@@ -166,8 +166,8 @@ export default class AttributeController {
           py: this.cur.y,
   
           ease: d3.easeQuadInOut,
-          duration: c.filterHalf2,
-          delay: this.prev.time * c.filterHalf1
+          duration: .6,
+          delay: this.prev.time * .4
         })
       }
     }
@@ -183,7 +183,7 @@ export default class AttributeController {
 
         duration: .15,
         ease: d3.easeQuadInOut,
-        delay: d3.easeQuadInOut(this.cur.time) * c.filterHalf1
+        delay: d3.easeQuadInOut(this.cur.time) * .3
       })
 
       // Fade in and rotate towards
@@ -202,9 +202,9 @@ export default class AttributeController {
         rotation: rotationOffset(this.cur.theta),
         alpha: 1,
         
-        duration: .15,
+        duration: .6,
         ease: d3.easeQuadInOut,
-        delay: d3.easeQuadInOut(this.cur.time) * c.filterHalf2
+        delay: d3.easeQuadInOut(this.cur.time) * .4
       })
     }
 
@@ -231,8 +231,8 @@ export default class AttributeController {
     }
 
     else {
-      const delayHalf1 = this.prev.time * c.filterHalf1
-      const durationStepHalf2 = c.filterHalf2/2
+      const delayHalf1 = this.prev.time * .4
+      const durationStepHalf2 = .6/2
 
       const isLeaving = this.prev.active && !this.cur.active
       
@@ -244,7 +244,7 @@ export default class AttributeController {
           radius: this.prev.radius + 24,
           alpha: 0,
 
-          duration: c.filterHalf1,
+          duration: .4,
           delay: delayHalf1,
           ease: d3.easeQuadIn
         })
@@ -294,12 +294,13 @@ export default class AttributeController {
         py: this.cur.y,
 
         ease: d3.easeQuadInOut,
-        duration: c.filterHalf2,
-        delay: this.prev.time * c.filterHalf1
+        duration: .6,
+        delay: this.prev.time * .4
       })
     }
 
     else {
+
       tl
       // Fade out and rotate anticlockwise
       .to(this.render, {
@@ -308,7 +309,7 @@ export default class AttributeController {
         rotation: rotationOffset(this.prev.theta - Math.PI/24),
         alpha: 0,
         duration: .15,
-        delay: this.cur.time,
+        delay: d3.easeQuadInOut(this.cur.time)*.3,
         ease: d3.easeQuadInOut
       })
 
@@ -325,9 +326,9 @@ export default class AttributeController {
         rotation: rotationOffset(this.cur.theta),
         alpha: 1,
 
-        duration: c.filterHalf2,
+        duration: .6,
         ease: d3.easeQuadInOut,
-        delay: this.cur.time
+        delay: d3.easeQuadInOut(this.cur.time)*.4
       })
     }
 

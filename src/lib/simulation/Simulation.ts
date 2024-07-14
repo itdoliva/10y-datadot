@@ -562,6 +562,9 @@ export default class Simulation {
       this.onSelectedState = !!selected
     }
 
+    this.interface.toggleOpacity(+selected)
+
+
     this.nodes.forEach(node => node.handleSelected(selected))
     
     this.handleLinks("clients", !selected && get(linkClientOn))
