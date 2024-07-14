@@ -17,6 +17,7 @@
   let w
   let h
 
+  let initialized = false
   let svg
   let simulationNodes
 
@@ -66,9 +67,10 @@
 
     forceCollide.radius(collideRadius)
 
+    initialized = true
   })
 
-  $: if (simulationNodes) {
+  $: if (initialized) {
     $categoriesEnriched.filter(d => d.type === "industry").forEach(industry => {
       const simulationNode = simulationNodes.find(({ id }) => id === industry.id)
       simulationNode.r = rScale(industry.pctNodes)
