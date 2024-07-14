@@ -34,8 +34,6 @@ c.fullColEntranceMaxDuration = c.shifts - c.colEntranceUpTo
 c.filterTotalDuration = c.shifts
 c.filterBetweenGap = c.filterTotalDuration * .15
 c.filterDuration = c.filterTotalDuration - c.filterBetweenGap
-c.filterHalf1 = c.filterDuration * .4
-c.filterHalf2 = c.filterDuration * .6
 
 // Do not edit
 c.maxDurationRadial = (c.shifts - c.maxDelayRadial)
@@ -314,7 +312,7 @@ export default class Simulation {
       height: maxY - minY
     }
 
-    return { sectorSize, layoutData }
+    return { layoutSize: sectorSize, layoutData }
   }
 
   private chainNodeAttributes = (transitionType: TransitionType, delay=0) => {

@@ -154,7 +154,10 @@ export default class LayoutInterface {
     // Fade out and destroy current labels
     while (this.nodes.length) {
       const node = this.nodes.pop()
-      node.exit()
+      
+      if (node) {
+        node.exit()
+      }
     }
 
     const { type, attrId } = transition
