@@ -121,7 +121,9 @@ export default class Simulation {
           const filter_ = (node: Deliverable) => node.categories.includes(category.id)
 
           enriched.nNodes = activeNodes.filter(filter_).length
-          enriched.pctNodes = +(enriched.nNodes / activeNodes.length).toFixed(2)
+          enriched.pctNodes = activeNodes.length > 0
+            ? +(enriched.nNodes / activeNodes.length).toFixed(2)
+            : 0
         }
 
         return enriched
@@ -383,9 +385,7 @@ export default class Simulation {
 
     this.complexityScale = d3.scaleLinear()
       .domain(d3.extent(deliverableNodes, d => d.complexity))
-      .range([.75, 1.25
-        
-      ])
+      .range([.75, 1.25])
 
     d3.groups(deliverableNodes, (d: Deliverable) => d.client).forEach(([ id, deliverables]) => {
       const client = new DeliverableGroup(this, id, deliverables, 0x83BF00)
