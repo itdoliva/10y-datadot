@@ -6,7 +6,7 @@ import { app } from "./stores/canvas"
 import { cameraOffsetY } from './stores/zoom.js';
 import { selected } from "./stores/nodes";
 
-import type { OnboardingStep } from "./types/onboarding"
+import type { OnboardingStepSettings } from "./types/onboarding"
 
 
 const desktopEls = {
@@ -34,23 +34,26 @@ let cursorTl
 
 
 // DESKTOP
-const desktopSteps: OnboardingStep[] = [
+const desktopSteps: OnboardingStepSettings[] = [
   {
     contentKey: "onboarding.desktop.1",
     positionTo: ".root",
     placement: "center",
+    borderPosition: "top",
   },
   {
     contentKey: "onboarding.desktop.2",
     highlight: desktopEls.vizContainer,
     positionTo: ".viz-container",
     placement: "left-start",
+    borderPosition: "right",
   },
   {
     contentKey: "onboarding.desktop.3",
     highlight: desktopEls.vizContainer,
     positionTo: ".viz-container",
     placement: "left-start",
+    borderPosition: "right",
     onStart: clickAnimation,
     onLeave: undoClickAnimation,
   },
@@ -59,6 +62,7 @@ const desktopSteps: OnboardingStep[] = [
     highlight: desktopEls.leftContainer,
     positionTo: ".left-container",
     placement: "right",
+    borderPosition: "left",
     onStart: panelsAnimation,
     onLeave: undoPanelsAnimation
   },
@@ -67,6 +71,7 @@ const desktopSteps: OnboardingStep[] = [
     highlight: desktopEls.activate,
     positionTo: ".dropdown-activate",
     placement: "top",
+    borderPosition: "bottom",
     onStart: toggleActivateDropdown,
     onLeave: toggleActivateDropdown
   },
@@ -75,26 +80,30 @@ const desktopSteps: OnboardingStep[] = [
     positionTo: ".play-btn",
     highlight: desktopEls.playMyVis,
     placement: "bottom",
+    borderPosition: "top",
   },
 ]
 
-const mobileSteps: OnboardingStep[] = [
+const mobileSteps: OnboardingStepSettings[] = [
   {
     contentKey: "onboarding.mobile.1",
     positionTo: ".root",
     placement: "center",
+    borderPosition: "top",
   },
   {
     contentKey: "onboarding.mobile.2",
     highlight: mobileEls.vizContainer,
-    positionTo: mobileEls.vizContainer,
+    positionTo: mobileEls.layoutContainer,
     placement: "top",
+    borderPosition: "top",
   },
   {
     contentKey: "onboarding.mobile.3",
     highlight: mobileEls.vizContainer,
-    positionTo: mobileEls.vizContainer,
+    positionTo: mobileEls.layoutContainer,
     placement: "top",
+    borderPosition: "top",
     onStart: clickAnimation,
     onLeave: undoClickAnimation,
   },
@@ -103,12 +112,14 @@ const mobileSteps: OnboardingStep[] = [
     highlight: mobileEls.layoutContainer,
     positionTo: mobileEls.layoutContainer,
     placement: "top",
+    borderPosition: "bottom",
   },
   {
     contentKey: "onboarding.mobile.5",
     highlight: mobileEls.filterContainer,
-    positionTo: mobileEls.filterContainer,
+    positionTo: mobileEls.layoutContainer,
     placement: "top",
+    borderPosition: "top",
     onStart: toggleFilterPanel,
     onLeave: toggleFilterPanel,
   },
@@ -117,6 +128,7 @@ const mobileSteps: OnboardingStep[] = [
     positionTo: mobileEls.playMyVis,
     highlight: mobileEls.playMyVis,
     placement: "top",
+    borderPosition: "bottom",
   },
 
 ]
@@ -227,4 +239,4 @@ function toggleFilterPanel() {
   filter.classList.toggle('filter-open')
 }
 
-export  { desktopEls, mobileEls, desktopSteps, mobileSteps, OnboardingStep }
+export  { desktopEls, mobileEls, desktopSteps, mobileSteps, OnboardingStepSettings }

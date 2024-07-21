@@ -1,17 +1,27 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, afterUpdate } from "svelte";
   import { get } from 'svelte/store'
   import * as PIXI from "pixi.js"
   import { _ } from "svelte-i18n"
   import { gsap } from "gsap"
 
-  import { ongoing, contentKeyIdx } from "../../../stores/onboarding"
-  import type { OnboardingStep } from "../../../types/onboarding"
+  import { ongoing, finished, contentKeyIdx } from "../../../stores/onboarding"
+  import type { OnboardingStepSettings, OnboardingStep } from "../../../types/onboarding"
   import Icon from "../atoms/Icon.svelte";
   import { app } from "../../../stores/canvas"
 
-  export let steps
+  import LanguageChange from "./LanguageChange.svelte";
+
+  export let steps: OnboardingStepSettings[]
   export let el
+
+  const fadeOutDuration = .15
+
+  const tl = gsap.timeline({ overwrite: true })
+
+  const history = {
+    lastIndex: undefined
+  }
 
   let onboardingInitialized = false
 
@@ -20,27 +30,28 @@
   let prvStep: undefined | OnboardingStep
   let curStep: undefined | OnboardingStep
 
-  let prvPos
-  let curPos
-
   let outer: HTMLElement
   let inner: HTMLElement
 
-  $: if ($ongoing) {
-    startOnboarding()
-  }
-  
+  $: $ongoing && start()
 
+  afterUpdate(fadeIn)
+  
   function next(e) {
     e.stopPropagation()
+
+    if (!e.target.classList.contains("onboarding-layer") && 
+        !e.target.classList.contains("onboarding") && 
+        !e.target.classList.contains("onboarding-nav-btn")) {
+      return
+    }
 
     if (index < steps.length - 1) {
       index++
       updateStep()
-      update()
     }
     else if (index === steps.length - 1) {
-      endOnboarding()
+      end()
     }
   }
 
@@ -50,15 +61,57 @@
     if (index >= 1) {
       index--
       updateStep()
-      update()
     }
   }
 
-  function position(step) {
-    const { positionTo, placement } = step
+  function updateStep() {
 
-    const el = document.querySelector(positionTo)
-    const { x, y, width, height } = el.getBoundingClientRect()
+    const curSettings = steps[index]
+
+    prvStep = curStep
+    curStep = curSettings 
+      ? { index, position: undefined, settings: curSettings }
+      : undefined
+
+    fadeOut()
+  }
+
+  function fadeOut() {
+    // Select DOM elements not in current step's highlight
+    const toFadeOut = Object.values(el).filter(d => d !== curStep.settings.highlight).join(", ")
+
+    tl.to(toFadeOut, { opacity: .1, duration: fadeOutDuration })
+
+    if (prvStep) {
+      const { position, settings } = prvStep
+
+      tl.to(inner, { 
+        x: position.xOffset*2, 
+        y: position.yOffset*2,
+        opacity: 0, 
+        duration: fadeOutDuration 
+      }, "<")
+
+      if (settings.onLeave) {
+        tl.call(settings.onLeave, [], "<")
+      }
+    }
+
+    tl.call(() => contentKeyIdx.set(index))
+  }
+
+  function fadeIn() {
+    if (!curStep || index !== $contentKeyIdx || history.lastIndex === $contentKeyIdx) {
+      return
+    }
+
+    // Prevents repeated animations when changing language
+    history.lastIndex = $contentKeyIdx
+
+    const { positionTo, placement, borderPosition, highlight, onStart } = curStep.settings
+
+    const positionToEl = document.querySelector(positionTo)
+    const { x, y, width, height } = positionToEl.getBoundingClientRect()
 
     const offset = 12
 
@@ -68,6 +121,10 @@
     let yPercent = 0
     let xOffset = 0
     let yOffset = 0
+
+    // Offset to prevent panel from going out of screen
+    let xOffset2 = 0
+    let yOffset2 = 0
     
     // Centered placements
     if (placement === "center") {
@@ -116,89 +173,47 @@
       }
     }
 
-    return { left, top, xPercent, yPercent, xOffset, yOffset }
+    // In-screen offset
+    const xFinal = left + (inner.clientWidth * xPercent/100) + xOffset
+    const yFinal = top + (inner.clientHeight * yPercent/100) + yOffset
+
+    if (xFinal < 0)  {
+      xOffset2 = xFinal*-1 + offset
+    }
+    else if (xFinal > document.body.clientWidth) {
+      xOffset2 = document.body.clientWidth - xFinal - offset
+    }
+
+    if (yFinal < 0) {
+      yOffset2 = yFinal*-1 + offset
+    }
+    else if (yFinal > document.body.clientHeight) {
+      yOffset2 = document.body.clientHeight - yFinal - offset
+    }
+
+    curStep.position = { left, top, xPercent, yPercent, xOffset, yOffset, xOffset2, yOffset2 }
     
-  }
-
-  function updateStep() {
-    prvStep = curStep
-    curStep = steps[index]
-  }
-
-  function update() {
-    prvPos = curPos
-    curPos = position(curStep)
-
-    let { left, top, xPercent, yPercent, xOffset, yOffset } = curPos
-
-    const toFadeOut = Object.values(el).filter(d => d !== curStep.highlight)
-
-    function onEntry() {
-      contentKeyIdx.set(index)
-
-      curStep.onStart && curStep.onStart()
-
-      const toRemove = [ "center", "top", "right", "bottom", "left" ]
-      toRemove.forEach(d => { inner.classList.remove(d) })
-      inner.classList.add(curStep.placement.split("-")[0])
-    }
-
-    const tl = gsap.timeline({ overwrite: "auto" })
-
-    // Exit animation
-    tl.to(toFadeOut.join(", "), {
-      opacity: .1,
-      duration: .15
-    })
-
-    if (prvPos) {
-      tl.to(inner, { 
-        x: prvPos.xOffset*2, 
-        y: prvPos.yOffset*2,
-        opacity: 0, 
-        duration: .15 
-      }, "<")
-    }
-
-    if (prvStep && prvStep.onLeave) {
-      tl.call(prvStep.onLeave, [], "<")
-    }
-
-
-    let xOffset2 = 0
-    let yOffset2 = 0
 
     // Entrance animation
     tl
-      .call(onEntry)
-      .set(outer, { left, top })
       .call(() => {
-        const xFinal = left + (inner.clientWidth * xPercent/100) + xOffset
-        const yFinal = top + (inner.clientHeight * yPercent/100) + yOffset
+        onStart && onStart()
 
-        if (xFinal < 0)  {
-          xOffset2 = xFinal*-1 
-        }
-        else if (xFinal > document.body.clientWidth) {
-          xOffset2 = document.body.clientWidth - xFinal
-        }
-
-        if (yFinal < 0) {
-          yOffset2 = yFinal*-1 
-        }
-        else if (yFinal > document.body.clientHeight) {
-          yOffset2 = document.body.clientHeight - yFinal
-        }
+        // Change styling based on placement direction
+        const toRemoveClasses = [ "top", "right", "bottom", "left" ]
+        toRemoveClasses.forEach(d => { inner.classList.remove(d) })
+        inner.classList.add(borderPosition)
       })
+      .set(outer, { left, top })
       .set(inner, { xPercent, yPercent, x: xOffset2, y: yOffset2, opacity: 0 })
       .to(inner, { x: xOffset + xOffset2, y: yOffset + yOffset2, opacity: 1, duration: .3 }, "<")
 
-    if (curStep.highlight) {
-      tl.to(curStep.highlight, { opacity: 1, duration: .15 }, "<")
+    if (highlight) {
+      tl.to(highlight, { opacity: 1, duration: .15 }, "<")
     }
   }
 
-  function startOnboarding() {
+  function start() {
     if (onboardingInitialized) {
       return
     }
@@ -208,31 +223,31 @@
     
     loadCursor()
     updateStep()
-    update()
   }
 
-  function endOnboarding(e = undefined) {
+  function end(e = undefined) {
     if (e) e.stopPropagation()
 
-    if (curStep.onLeave) {
-      curStep.onLeave()
+    if (curStep.settings.onLeave) {
+      curStep.settings.onLeave()
     }
     
-    const { xOffset, yOffset } = curPos
-    const toFadeIn = Object.values(el)
-    const tl = gsap.timeline()
+    const { xOffset, yOffset } = curStep.position
+    const toFadeIn = Object.values(el).join(", ")
 
     tl
-      .to(toFadeIn.join(", "), { opacity: 1, duration: .5 })
+      .to(toFadeIn, { opacity: 1, duration: .5 })
       .to(inner, { x: xOffset*2, y: yOffset*2, opacity: 0, duration: .5 }, "<")
       .call(() => {
         ongoing.set(false)
+        finished.set(true)
         index = 0
       })
   }
 
-
   function loadCursor() {
+    console.log(Date.now(), "loadCursor()")
+
     PIXI.Assets.load('cursor')
       .then(asset => new PIXI.Sprite(asset))
       .then(sprite => {
@@ -254,9 +269,10 @@
 
     <div bind:this={inner} class="panel">
       <div class="panel__header">
-        <button class="clean-btn" on:click={endOnboarding}>
+        <button class="clean-btn" on:click={end}>
           <Icon icon="close" />
         </button>
+
       </div>
 
       <div class="panel__body">
@@ -268,8 +284,8 @@
       </div>
     
       <div class="panel__footer">
-        <button class="clean-btn" on:click={index === 0 ? endOnboarding : back}>{$_(index === 0 ? "onboarding.panel.skip" : "onboarding.panel.back")}</button>
-        <button class="clean-btn" on:click={next}>{$_("onboarding.panel.next")}</button>
+        <button class="clean-btn onboarding-nav-btn" on:click={$contentKeyIdx === 0 ? end : back}>{$_($contentKeyIdx === 0 ? "onboarding.panel.skip" : "onboarding.panel.back")}</button>
+        <button class="clean-btn onboarding-nav-btn" on:click={next}>{$_("onboarding.panel.next")}</button>
       </div>
     </div>
 
@@ -292,7 +308,7 @@
       width: 220px;
   
       .panel {
-        z-index: 999;
+        z-index: 9999;
         opacity: 0;
 
         padding: var(--fs-label);
@@ -309,19 +325,19 @@
         gap: var(--fs-label);
   
         &:global(.top) {
-          border-bottom: 4px solid var(--clr-accent);
-        }
-  
-        &:global(.right) {
-          border-left: 4px solid var(--clr-accent);
-        }
-  
-        &:global(.bottom), &:global(.center) {
           border-top: 4px solid var(--clr-accent);
         }
   
-        &:global(.left) {
+        &:global(.right) {
           border-right: 4px solid var(--clr-accent);
+        }
+  
+        &:global(.bottom) {
+          border-bottom: 4px solid var(--clr-accent);
+        }
+  
+        &:global(.left) {
+          border-left: 4px solid var(--clr-accent);
         }
 
         &__header { grid-area: header; }
@@ -329,6 +345,8 @@
         &__footer { grid-area: footer; }
 
         &__header {
+          display: flex;
+          justify-content: space-between;
           height: calc(2.2*var(--fs-label));
 
           button {
@@ -366,6 +384,7 @@
 
           display: flex;
           justify-content: space-between;
+          gap: 1rem;
 
           button {
             font-size: var(--fs-label);

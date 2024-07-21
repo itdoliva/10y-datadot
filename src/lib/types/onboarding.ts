@@ -6,12 +6,19 @@ export type Placement = (
   "center"
 )
 
-export interface OnboardingStep {
+export interface OnboardingStepSettings {
   contentKey: string;
   positionTo: string;
   placement: Placement;
   highlight?: string;
   inner?: boolean;
+  borderPosition?: "top" | "right" | "bottom" | "left";
   onStart?: () => void;
   onLeave?: () => void;
+}
+
+export interface OnboardingStep {
+  index: number;
+  position: any;
+  settings: OnboardingStepSettings;
 }
