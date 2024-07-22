@@ -21,8 +21,10 @@ export default function initPixi(view) {
 }
 
 function addAssets() {
+  console.log("addAssets")
   PIXI.Assets.add({ alias: 'petal', src: '/sprites/petal.png' })
   PIXI.Assets.add({ alias: 'cursor', src: '/sprites/cursor.png' })
+  PIXI.Assets.add({ alias: 'soundFX', src: '/sprites/sound-fx.json' })
 }
 
 

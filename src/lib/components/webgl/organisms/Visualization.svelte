@@ -37,7 +37,6 @@
 
 
   onMount(() => {
-    console.log("ON MOUNT")
     simulation.zoom.initZoom(container)
     simulation.toScene(scene, $app.ticker)
   })

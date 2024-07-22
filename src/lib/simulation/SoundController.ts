@@ -62,9 +62,6 @@ class PingPongDelay {
 export default class SoundController {
   private simulation: Simulation
 
-  private context = new PIXI.Container()
-  private graphics = new PIXI.Graphics()
-
   private curNode
 
   private initialized = false
@@ -105,16 +102,6 @@ export default class SoundController {
 
   constructor(simulation: Simulation) {
     this.simulation = simulation
-
-    
-    this.graphics = new PIXI.Graphics()
-
-    this.graphics.alpha = 1
-    this.graphics.blendMode = PIXI.BLEND_MODES.MULTIPLY
-
-    this.context.addChild(this.graphics)
-    this.context.renderable = false
-
   }
 
   public loadPlayers(baseURL: string) {
@@ -141,25 +128,8 @@ export default class SoundController {
   }
 
   public toScene(scene: PIXI.Container, ticker: PIXI.Ticker) {
-    ticker.add(this.visualTick)
-    scene.addChild(this.context)
   }
 
-  private visualTick = () => {
-    this.context.renderable = !!this.curNode
-
-    this.graphics.clear()
-
-    if (this.curNode && !this.simulation.transition.running && !this.simulation.onSelectedState) {
-      this.graphics.beginFill("#ffff00")
-      this.graphics.drawCircle(0, 0, 24)
-      this.graphics.endFill()
-
-      this.context.x = this.curNode.context.context.x
-      this.context.y = this.curNode.context.context.y
-    }
-
-  }
 
   public resetParams() {
     this.stepCounter = 0
@@ -211,7 +181,14 @@ export default class SoundController {
 
     if (!node) return
 
+    let animate = false
+    const animateParams = {
+      tint: 0xFFFFFF,
+      rotate: 0
+    }
+
     const { categories } = node
+
 
     if (categories.includes("product.outras-interfaces")) {
       this.incrementNoteFrequency(2)
@@ -245,6 +222,7 @@ export default class SoundController {
     }
 
     if (columnIdx % 2 === 0 && categories.includes('design.infografia')) {
+      animate = true
       this.drumPlayers.hihatClosed.player('vh').start(time);
     }
 
@@ -254,6 +232,7 @@ export default class SoundController {
       }
 
       if (categories.includes("channel.digital")) {
+        animate = true
         const poly = new PolySynth({ envelope: { attack: this.attack, release: this.release } })
 
         if (this.filterNext) {
@@ -271,6 +250,7 @@ export default class SoundController {
 
 
       if (evenPattern && categories.includes("design.ilustracao")) {
+        animate = true
         const player = this.drumPlayers.kick.player('vm')
   
         if (categories.includes('goal.educacional')) {
@@ -284,11 +264,12 @@ export default class SoundController {
   
       if (categories.includes('design.motion-graphics')) {
 
-        this.snareCounter++
-  
         if (!categories.includes('product.outras-interfaces')) {
           this.incrementNoteFrequency()
         }
+        
+        this.snareCounter++
+        animate = true
   
         const player = this.drumPlayers.snare.player('vm')
   
@@ -304,6 +285,10 @@ export default class SoundController {
   
         player.start(time)
       }
+    }
+
+    if (animate) {
+      node.context.animateSound(animateParams)
     }
 
     this.stepCounter++

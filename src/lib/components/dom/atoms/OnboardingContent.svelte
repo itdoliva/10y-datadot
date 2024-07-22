@@ -22,11 +22,9 @@
   })
 
   $: if (tip && active) {
-    console.log(index, "tip show!", tip)
     tip.show()
   } 
   else if (tip && !active) {
-    console.log(index, "tip hide!", tip)
     tip.hide()
   }
 

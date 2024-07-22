@@ -246,8 +246,6 @@
   }
 
   function loadCursor() {
-    console.log(Date.now(), "loadCursor()")
-
     PIXI.Assets.load('cursor')
       .then(asset => new PIXI.Sprite(asset))
       .then(sprite => {

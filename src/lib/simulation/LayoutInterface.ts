@@ -149,7 +149,6 @@ export default class LayoutInterface {
 
 
   public setInterfaceLabels(transition) {
-    console.log('setInterfaceLabels')
 
     // Fade out and destroy current labels
     while (this.nodes.length) {
@@ -180,7 +179,7 @@ export default class LayoutInterface {
   }
 
   public updateText() {
-    console.log('updateText')
+    ('updateText')
     if (!this.cur) return
 
     this.nodes.forEach((node) => {

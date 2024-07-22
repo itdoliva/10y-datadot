@@ -318,12 +318,7 @@ export default class Simulation {
   }
 
   private chainNodeAttributes = (transitionType: TransitionType, delay=0) => {
-    // console.groupCollapsed("chainNodeAttributes()")
-
     if (!this.initialized) return // console.groupEnd()
-
-    // console.log(`chainNodes${_.capitalize(this.layout)}Attr()`)
-    // console.groupEnd()
 
     const attrId = ++this.attrId
 
@@ -400,7 +395,6 @@ export default class Simulation {
     this.sort(<SortBy>get(sortBy), true)
 
     Promise.all(loading).then(() => {
-      console.log("-> LOAD COMPLETED")    
 
       this.updateCategories()
       this.initSimulation()
@@ -469,9 +463,6 @@ export default class Simulation {
   }
 
   public setLayout = (newLayout: Layout) => {
-    // console.groupCollapsed("setLayout()")
-    // console.log(`${this.layout} --> ${newLayout}`)
-    // console.groupEnd()
 
     if (newLayout === this.layout) return
 
@@ -485,8 +476,6 @@ export default class Simulation {
   }
 
   public sort = (sortBy: SortBy, suppressEvents: boolean = false) => {
-    // console.groupCollapsed("sort()")
-    // console.groupEnd()
 
     const sortCb = sortBy === "dt"
       ? (a: Deliverable, b: Deliverable) => +b.active - +a.active || b[sortBy] - a[sortBy]
@@ -509,8 +498,6 @@ export default class Simulation {
   public filter = (fyears: number[], findustries: string[], fdesigns: string[], fgoals: string[], fproducts: string[]) => {
     if (!this.initialized) return
 
-    // console.groupCollapsed("filter()")
-
     this.getDeliverableNodes().forEach(node => {
       node.setActive(fyears, findustries, fdesigns, fgoals, fproducts)
     })
@@ -525,8 +512,6 @@ export default class Simulation {
         ? "filterOut" 
         : "filterIn"
 
-      // console.log(transitionType)
-      // console.groupEnd()
 
       this.activeIds = activeIds
       this.activeCount = activeIds.length
@@ -538,17 +523,11 @@ export default class Simulation {
 
     }
     else {
-      // console.log("no real filtering")
-      // console.groupEnd()
     }
 
   }
 
   public handleSelected = (selected: any) => {
-    // console.groupCollapsed("handleSelected()")
-    // console.log(selected)
-    // console.groupEnd()
-
     // If unselecting, force playNext
     if (this.onSelectedState && !selected) {
       this.transition.playNext(true)
@@ -576,10 +555,6 @@ export default class Simulation {
   }
 
   public handleComplexity = (complexityOn: boolean) => {
-    // console.groupCollapsed("handleComplexity()")
-    // console.log(complexityOn)
-    // console.groupEnd()
-
     this.getDeliverableNodes().forEach(node => node.attr.complexity())
   }
 
