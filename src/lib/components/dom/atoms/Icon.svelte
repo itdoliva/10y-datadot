@@ -21,6 +21,7 @@
   import MousePan from '$lib/icons/MousePan.svelte';
   import Pinch from '$lib/icons/Pinch.svelte';
   import Close from '$lib/icons/Close.svelte';
+  import CloseX from '$lib/icons/CloseX.svelte';
 
   export let icon
 
@@ -46,7 +47,8 @@
     logo: Logo,
     mousePan: MousePan,
     pinch: Pinch,
-    close: Close
+    close: Close,
+    closeX: CloseX
   }
 
 </script>

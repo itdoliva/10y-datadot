@@ -4,6 +4,20 @@
     "hero": "10 years"
   },
 
+  "techsheet": {
+    "main": "Traduzimos nossos projetos dos últimos 10 anos em uma visualização de dados para tornar visível a nossa história por meio dos projetos que já realizamos. A partir da ideia de que as infovis podem nos auxiliar a enxergar a complexidade do mundo, buscamos uma maneira de facilitar o acesso sem reduzir a riqueza da informação. Assim, criamos estruturas que se moldam, complementam e transformam de acordo com as diversas combinações informacionais possíveis.",
+    "encourage": "Esperamos que você aproveite a jornada e explore nossa história.",
+    "made-by": "Feito por",
+    "roles": {
+      "flavia": "direção criativa e design",
+      "otavio": "direção criativa e design",
+      "italo": "design e desenvolvimento",
+      "quintino": "edição de arte e design",
+      "ludmila": "colaboração workshops",
+      "gabriel": "colaboração workshops"
+    }
+  },
+
   "onboarding": {
     "desktop": {
       "1": "Construímos esta peça para contar a nossa história da forma que mais gostamos: através da visualização de dados",

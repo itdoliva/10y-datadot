@@ -16,6 +16,7 @@
   import { selected, sortBy, fyears, fdesigns, fgoals, findustries, fproducts } from '$lib/stores/nodes.js';
   import { cameraOffsetY } from '$lib/stores/zoom.js';
   import { nodesLoaded } from '$lib/stores/loading.js';
+  import { isOpen } from '$lib/stores/techsheet.js';
 
   // Actions
   import castContainer from "$lib/actions/castContainer"
@@ -37,6 +38,7 @@
   import DropdownActivate from "$lib/components/dom/organisms/DropdownActivate.svelte";
   import LanguageChange from "$lib/components/dom/organisms/LanguageChange.svelte";
   import File from "$lib/components/dom/organisms/File.svelte";
+  import TechSheet from '$lib/components/dom/molecules/TechSheet.svelte';
 
   // WebGL Components
   import Visualization from '$lib/components/webgl/organisms/Visualization.svelte';
@@ -98,7 +100,18 @@
         <div class="logo-container">
           <ProjectLogo />
         </div>
-        <LanguageChange />
+
+        <div class="options-wrapper">
+
+          <div class="techsheet-wrapper">
+            <Button onClick={() => isOpen.set(true)}>
+              <Icon icon="infoDefault" />
+            </Button>
+          </div>
+
+          <LanguageChange />
+        </div>
+
       </header>
 
       <main class="viz-container" bind:this={mobileVizContainer} on:resize={positionMobileFilter}>
@@ -177,6 +190,12 @@
             bind:clientHeight={topInputGroupHeight}
           >
             <InputProduct parent={productContainer} />
+          </div>
+
+          <div class="techsheet-wrapper">
+            <Button onClick={() => isOpen.set(true)}>
+              <Icon icon="infoDefault" />
+            </Button>
           </div>
         </section>
 
@@ -265,6 +284,8 @@
     el={$width < 768 ? mobileEls : desktopEls}
   />
 
+  <TechSheet />
+
 </div>
 
 
@@ -323,6 +344,19 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
+
+      .options-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        align-items: flex-end;
+
+        .techsheet-wrapper {
+          width: calc(2*var(--fs-label));
+          height: calc(2*var(--fs-label));
+        }
+      }
     }
   
     .layout-container {
@@ -380,6 +414,8 @@
       z-index: 5;
 
       .collapsible {
+        position: relative;
+
         overflow: hidden;
 
         max-height: var(--input-group-height);
@@ -392,6 +428,16 @@
             calc(2*var(--fs-label)) 
             calc(4*var(--fs-label));
         } 
+
+        .techsheet-wrapper {
+          position: absolute;
+
+          top: calc(4*var(--fs-label));
+          right: calc(4*var(--fs-label));
+
+          width: calc(3.6*var(--fs-label));
+          height: calc(3.6*var(--fs-label));
+        }
       }
 
       &.collapsed {
