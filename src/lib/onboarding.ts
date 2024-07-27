@@ -117,9 +117,9 @@ const mobileSteps: OnboardingStepSettings[] = [
   {
     contentKey: "onboarding.mobile.5",
     highlight: mobileEls.filterContainer,
-    positionTo: mobileEls.layoutContainer,
-    placement: "top",
-    borderPosition: "top",
+    positionTo: ".root",
+    placement: "top-start",
+    borderPosition: "bottom",
     onStart: toggleFilterPanel,
     onLeave: toggleFilterPanel,
   },
