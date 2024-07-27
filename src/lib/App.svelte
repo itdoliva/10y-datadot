@@ -102,13 +102,6 @@
         </div>
 
         <div class="options-wrapper">
-
-          <div class="techsheet-wrapper">
-            <Button onClick={() => isOpen.set(true)}>
-              <Icon icon="infoDefault" />
-            </Button>
-          </div>
-
           <LanguageChange />
         </div>
 
@@ -175,6 +168,13 @@
       </section>
 
       <section class="play-container">
+
+        <div class="techsheet-wrapper">
+          <Button onClick={() => isOpen.set(true)}>
+            <Icon icon="infoDefault" />
+          </Button>
+        </div>
+
         <PlayButton />
       </section>
     
@@ -351,11 +351,6 @@
         justify-content: space-between;
 
         align-items: flex-end;
-
-        .techsheet-wrapper {
-          width: calc(2*var(--fs-label));
-          height: calc(2*var(--fs-label));
-        }
       }
     }
   
@@ -369,6 +364,16 @@
     .play-container {
       z-index: 1;
       border-top: 1px solid var(--clr-black-fade-out);
+
+      display: grid;
+      grid-template-columns: min-content 1fr;
+
+      .techsheet-wrapper {
+        width: calc(4*var(--fs-label));
+        height: calc(4*var(--fs-label));
+
+        border-right: 1px solid var(--clr-dark-gray);
+      }
     }
   
     .viz-container {
