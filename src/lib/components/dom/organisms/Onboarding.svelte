@@ -246,15 +246,13 @@
   }
 
   function loadCursor() {
-    PIXI.Assets.load('cursor')
-      .then(asset => new PIXI.Sprite(asset))
-      .then(sprite => {
-        sprite.renderable = false
-        sprite.name = "cursor"
+    const asset = PIXI.Assets.get('cursor')
+    const sprite = new PIXI.Sprite(asset)
+    sprite.renderable = false
+    sprite.name = "cursor"
 
-        const parent = get(app).stage.getChildByName("viz-container", true)
-        parent.addChild(sprite)
-      })
+    const parent = get(app).stage.getChildByName("viz-container", true)
+    parent.addChild(sprite)
   }
 
 </script>

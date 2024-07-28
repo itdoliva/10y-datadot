@@ -14,8 +14,6 @@ export default class DeliverableContext {
 
   public context = new PIXI.Container()
   private graphics = new PIXI.Graphics()
-  private soundAnimation
-  
 
   private baseGraphics: PIXI.Graphics
 
@@ -84,21 +82,6 @@ export default class DeliverableContext {
     
     this.loading = Promise.all(sprtIds.map(this.addGraphics))
 
-    PIXI.Assets.load("soundFX")
-      .then(asset => {
-        const animation = new PIXI.AnimatedSprite(asset.animations.tile)
-
-        animation.anchor.x = .5
-        animation.anchor.y = .5
-        animation.loop = false
-        animation.zIndex = 10
-        animation.blendMode = PIXI.BLEND_MODES.MULTIPLY
-        
-        this.context.addChild(animation)
-
-        this.soundAnimation = animation
-      })
-
     return this
   }
 
@@ -161,20 +144,36 @@ export default class DeliverableContext {
   public animateSound(params) {
     const tints = [
       0x828AFA,
-      0xCEFD6C,
-      0x6D9DFC,
-      0xFC826D,
-      0xFAF982,      
+      // 0xCEFD6C,
+      // 0x6D9DFC,
+      // 0xFC826D,
+      // 0xFAF982,      
     ]
 
-    const angle = [
-      0,
-      135,
-      255,
-    ]
+    const angle = [ 0, 135, 255 ]
 
-    this.soundAnimation.tint = tints[Math.floor(Math.random() * tints.length)]
-    this.soundAnimation.angle = angle[Math.floor(Math.random() * angle.length)]
-    this.soundAnimation.gotoAndPlay(0)
+    const asset = PIXI.Assets.get("soundFX")
+    const sprite = new PIXI.AnimatedSprite(asset.animations.tile)
+
+    sprite.x = this.context.x
+    sprite.y = this.context.y
+    sprite.anchor.x = .5
+    sprite.anchor.y = .5
+    sprite.loop = false
+    sprite.zIndex = 10
+    sprite.blendMode = PIXI.BLEND_MODES.MULTIPLY
+
+    sprite.tint = tints[Math.floor(Math.random() * tints.length)]
+    sprite.angle = angle[Math.floor(Math.random() * angle.length)]
+
+    this.context.parent.addChild(sprite)
+
+    sprite.gotoAndPlay(0)
+
+    sprite.onComplete = () => {
+      this.context.parent.removeChild(sprite)
+      sprite.destroy()
+    }
+    
   }
 }
