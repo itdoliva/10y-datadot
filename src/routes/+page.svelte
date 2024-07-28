@@ -11,7 +11,7 @@
   import simulation from "$lib/simulation"
   
   // Stores
-  import { nodesLoaded } from "$lib/stores/loading"
+  import { loaded } from "$lib/stores/loading"
   import { categories, projects, clients } from "$lib/stores/nodes"
   import { width, height, pixelRatio, app } from "$lib/stores/canvas"
   import { page } from '$app/stores';
@@ -66,7 +66,7 @@
 
 <App />
 
-{#if !$nodesLoaded}
+{#if !$loaded}
   <LoadingScreen width={$width} height={$height} />
 {/if}
 

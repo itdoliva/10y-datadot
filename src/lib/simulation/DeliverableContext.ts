@@ -144,10 +144,10 @@ export default class DeliverableContext {
   public animateSound(params) {
     const tints = [
       0x828AFA,
-      // 0xCEFD6C,
-      // 0x6D9DFC,
-      // 0xFC826D,
-      // 0xFAF982,      
+      0xCEFD6C,
+      0x6D9DFC,
+      0xFC826D,
+      0xFAF982,      
     ]
 
     const angle = [ 0, 135, 255 ]

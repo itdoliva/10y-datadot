@@ -399,7 +399,7 @@ export default class Simulation {
       this.updateCategories()
       this.initSimulation()
 
-      loader.handleNodesLoaded()
+      loader.setLoaded("nodes")
     })
 
   }

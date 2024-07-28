@@ -15,7 +15,7 @@
 	import { width, figureWidth, complexityOn, linkClientOn, linkProjectOn, hovered } from '$lib/stores/canvas.js';
   import { selected, sortBy, fyears, fdesigns, fgoals, findustries, fproducts } from '$lib/stores/nodes.js';
   import { cameraOffsetY } from '$lib/stores/zoom.js';
-  import { nodesLoaded } from '$lib/stores/loading.js';
+  import { loaded } from '$lib/stores/loading.js';
   import { isOpen } from '$lib/stores/techsheet.js';
 
   // Actions
@@ -93,7 +93,7 @@
 </script>
 
 <div class="root">
-  {#if $nodesLoaded}
+  {#if $loaded}
     {#if $width < 768} 
 
       <header class="mobile-header-container">

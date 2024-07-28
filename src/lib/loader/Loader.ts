@@ -1,32 +1,33 @@
-import { nodesLoaded } from "../stores/loading";
+import { loaded } from "../stores/loading";
 
 export class Loader {
   private initAt: number
   private minLoadingTime: number
 
-  private nodesLoaded = false
+  private toLoad = [
+    "nodes"
+  ]
 
   constructor(minLoadingTime: number) {
     this.initAt = Date.now()
     this.minLoadingTime = minLoadingTime
   }
 
-  public handleNodesLoaded = ()  => {
-    if (this.nodesLoaded) {
+  public setLoaded = (key: string) => {
+    if (!this.toLoad.includes(key)) {
       return
     }
 
-    this.nodesLoaded = true
+    const index = this.toLoad.indexOf(key)
+    this.toLoad.splice(index, 1)
 
-    // Interval between app load and nodes loaded
-    const interval = Date.now() - this.initAt
+    if (this.toLoad.length === 0) {
+      // Interval between app load and nodes loaded
+      const runningTime = Date.now() - this.initAt
 
-    // Check how much time it still needs to wait, based on the minLoadingTime
-    // to set nodesLoaded = true
-    const startDelay = Math.max(this.minLoadingTime - interval, 0)
-
-    setTimeout(() => {
-      nodesLoaded.set(true)
-    }, startDelay)
+      setTimeout(() => {
+        loaded.set(true)
+      }, Math.max(this.minLoadingTime - runningTime, 0))
+    }
   }
 }
