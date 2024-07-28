@@ -1,6 +1,7 @@
 <script>
   import { setContext } from 'svelte';
 	import Icon from '$lib/components/dom/atoms/Icon.svelte';
+  
   export let title
 
   let active = false
@@ -33,11 +34,15 @@
 >
   <button class="button" on:pointerup={handlePointerUp}>
 
-    <div class="button__icon">
-      <Icon icon='caret' />
-    </div>
+    {#if title}
+      <div class="button__icon">
+        <Icon icon='caret' />
+      </div>
 
-    <span class="button__label">{title}</span>
+      <span class="button__label">{title}</span>
+    {:else}
+      <span class="button__label">...</span>
+    {/if}
   </button>
 
   <div class="content">
@@ -100,6 +105,11 @@
       transform: translateY(-.15rem);
       transition: opacity 150ms ease-in-out, transform 150ms ease-in-out;
       z-index: 10;
+
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: calc(2*var(--fs-label));
     }
 
     &:global(.active) {

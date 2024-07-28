@@ -104,6 +104,8 @@
 </div>
 
 <style lang="scss">
+  @import "$lib/scss/_breakpoints.scss";
+
   .container {
 
     &.on-dark {
@@ -181,7 +183,11 @@
         grid-auto-flow: column;
         grid-template-rows: max-content;
         grid-template-columns: none;
-        grid-auto-columns: calc(8.6*var(--fs-label));
+        grid-auto-columns: calc(5.6*var(--fs-label));
+        
+        @include lg {
+          grid-auto-columns: calc(8.6*var(--fs-label));
+        }
 
         column-gap: calc(.8*var(--fs-label));
 
@@ -194,9 +200,22 @@
               "bubble"
               "label";
 
-            &__label {
+              
+              &__label {
               p {
                 text-align: center;
+
+                @include md {
+                  white-space: nowrap;        /* Prevents text from wrapping to a new line */
+                  overflow: hidden;           /* Hides the overflow text */
+                  text-overflow: ellipsis;    /* Adds the ellipsis (...) */
+                }
+
+                @include lg {
+                  white-space: inherit;
+                  overflow: visible;
+                  text-overflow: none;
+                }
               }
             }
           }

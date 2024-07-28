@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
 
   import simulation from "$lib/simulation"
-  import { mobileSteps, desktopSteps, mobileEls, desktopEls } from '$lib/onboarding';
+  import { mobileSteps, tabletSteps, desktopSteps, mobileEls, desktopEls } from '$lib/onboarding';
 
   // Initialize
   import "./pixi.js"
@@ -36,6 +36,7 @@
   import InputIndustry from "$lib/components/dom/organisms/InputIndustry.svelte";
   import DropdownSortBy from "$lib/components/dom/organisms/DropdownSortBy.svelte";
   import DropdownActivate from "$lib/components/dom/organisms/DropdownActivate.svelte";
+  import DropdownAll from "$lib/components/dom/organisms/DropdownAll.svelte";
   import LanguageChange from "$lib/components/dom/organisms/LanguageChange.svelte";
   import File from "$lib/components/dom/organisms/File.svelte";
   import TechSheet from '$lib/components/dom/molecules/TechSheet.svelte';
@@ -200,13 +201,20 @@
         </section>
 
         <ul class="panel-menu">
-          <li class="panel-menu__item dropdown-sortby">
-            <DropdownSortBy />
-          </li>
+          
+          {#if $width >= 1024}
+            <li class="panel-menu__item dropdown-sortby">
+              <DropdownSortBy />
+            </li>
 
-          <li class="panel-menu__item dropdown-activate">
-            <DropdownActivate />
-          </li>
+            <li class="panel-menu__item dropdown-activate">
+              <DropdownActivate />
+            </li>
+          {:else}
+            <li class="panel-menu__item dropdown-all">
+              <DropdownAll />
+            </li>
+          {/if}
 
           <li class="panel-menu__item clear-all-btn">
             <ClearAllFilterButton />
@@ -280,7 +288,7 @@
   {/if}
 
   <Onboarding 
-    steps={$width < 768 ? mobileSteps : desktopSteps}
+    steps={$width < 768 ? mobileSteps : $width < 1024 ? tabletSteps : desktopSteps}
     el={$width < 768 ? mobileEls : desktopEls}
   />
 
@@ -455,9 +463,16 @@
 
       .panel-menu {
         display: grid;
-        grid-template-columns: auto auto auto max-content max-content 1fr min-content;
         grid-template-rows: calc(4*var(--fs-label));
         align-items: stretch;
+
+        @include md {
+          grid-template-columns: auto auto max-content max-content 1fr min-content;
+        }
+
+        @include lg {
+          grid-template-columns: auto auto auto max-content max-content 1fr min-content;
+        }
 
         
         &__item {
@@ -487,6 +502,12 @@
             position: relative;
             z-index: 5;
 
+            display: none;
+
+            @include lg {
+              display: block;
+            }
+
             .collapse-btn__wrapper {
               position: absolute;
               top: 100%;
@@ -513,6 +534,7 @@
             display: flex;
             align-items: center;
           }
+
         }
       }
     }

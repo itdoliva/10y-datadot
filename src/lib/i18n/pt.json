@@ -113,6 +113,11 @@
         "link-project": "ver conexões por projeto"
       }
     },
+
+    "merged": {
+      "title": "opções"
+    },
+    
     "unselect-all": "limpar filtros",
     "play": "play my vis!"
   },

@@ -113,6 +113,10 @@
         "link-project": "show project links"
       }
     },
+
+    "merged": {
+      "title": "options"
+    },
     "unselect-all": "clear filters",
     "play": "play my vis!"
   },

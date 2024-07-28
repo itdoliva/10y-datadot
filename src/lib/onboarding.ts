@@ -13,10 +13,11 @@ const desktopEls = {
   collapsible: ".top-container > .collapsible",
   activate: ".top-container > .panel-menu > .dropdown-activate",
   playMyVis: ".top-container > .panel-menu > .play-btn",
-  otherMenuItems: ".top-container > .panel-menu > :is(.dropdown-sortby, .clear-all-btn, .project-logo, .collapse-btn, .language-change)",
+  otherMenuItems: ".top-container > .panel-menu > :is(.dropdown-sortby, .dropdown-all, .clear-all-btn, .project-logo, .collapse-btn, .language-change)",
   vizContainer: ".viz-container",
   leftContainer: ".left-container",
 } 
+
 
 const mobileEls = {
   headerContainer: ".mobile-header-container",
@@ -84,6 +85,49 @@ const desktopSteps: OnboardingStepSettings[] = [
   },
 ]
 
+// DESKTOP
+const tabletSteps: OnboardingStepSettings[] = [
+  {
+    contentKey: "onboarding.desktop.1",
+    positionTo: ".root",
+    placement: "center",
+    borderPosition: "top",
+  },
+  {
+    contentKey: "onboarding.desktop.2",
+    highlight: desktopEls.vizContainer,
+    positionTo: ".viz-container",
+    placement: "left-start",
+    borderPosition: "right",
+  },
+  {
+    contentKey: "onboarding.desktop.3",
+    highlight: desktopEls.vizContainer,
+    positionTo: ".viz-container",
+    placement: "left-start",
+    borderPosition: "right",
+    onStart: clickAnimation,
+    onLeave: undoClickAnimation,
+  },
+  {
+    contentKey: "onboarding.desktop.4",
+    highlight: desktopEls.leftContainer,
+    positionTo: ".left-container",
+    placement: "right",
+    borderPosition: "left",
+    onStart: panelsAnimation,
+    onLeave: undoPanelsAnimation
+  },
+  {
+    contentKey: "onboarding.desktop.6",
+    positionTo: ".play-btn",
+    highlight: desktopEls.playMyVis,
+    placement: "bottom",
+    borderPosition: "top",
+  },
+]
+
+// MOBILE
 const mobileSteps: OnboardingStepSettings[] = [
   {
     contentKey: "onboarding.mobile.1",
@@ -239,4 +283,4 @@ function toggleFilterPanel() {
   filter.classList.toggle('filter-open')
 }
 
-export  { desktopEls, mobileEls, desktopSteps, mobileSteps, OnboardingStepSettings }
+export  { desktopEls, mobileEls, desktopSteps, tabletSteps, mobileSteps, OnboardingStepSettings }
