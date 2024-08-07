@@ -27,7 +27,7 @@
   let client = ''
   let description = ''
   let date = ''
-
+  let projectWords = []
 
 
   $: update($selected)
@@ -46,6 +46,7 @@
     ]
 
     project = selected.project
+    projectWords = project.split(" ")
     client = selected.client
     description = selected.description
     date = selected.date
@@ -79,6 +80,7 @@
     .set(container, { scale: 1, display: "none" })
     .add(() => {
       traceIds = []
+      projectWords = []
       project = ''
       client = ''
       description = ''
@@ -125,7 +127,14 @@
 
       <div class="header">
         <div class="project-name">
-            <h3>{project}</h3>
+            <h3>
+              {#each projectWords as word, i}
+                <span>{word}</span>
+                {#if i < (projectWords.length -1)}
+                  
+                {/if}
+              {/each}
+            </h3>
         </div>
           <h4 class="project-client">{client}</h4>
       </div>
@@ -289,11 +298,19 @@
       }
   
       &__description {
-        --fs-name: calc(var(--fs-label)*2.4);
-        --fs-client: calc(var(--fs-label)*1.6);
+        --fs-name: calc(var(--fs-label)*2);
+        --fs-client: calc(var(--fs-label)*1.4);
         --fs-tags: var(--fs-label);
-        --fs-desc: calc(var(--fs-label)*1.4);
-        --fs-date: calc(var(--fs-label)*1.6);
+        --fs-desc: var(--fs-label);
+        --fs-date: calc(var(--fs-label)*1.2);
+
+        @include md {
+          --fs-name: calc(var(--fs-label)*2.4);
+          --fs-client: calc(var(--fs-label)*1.6);
+          --fs-desc: calc(var(--fs-label)*1.2);
+          --fs-tags: calc(var(--fs-label)*1.2);
+          --fs-date: calc(var(--fs-label)*1.4);
+        }
 
         height: 100%;
         width: 100%;
@@ -322,19 +339,25 @@
               font-weight: 700;
               text-transform: uppercase;
               font-size: var(--fs-name);
+              line-height: 1;
               
               // background: rgba(255, 255, 255, .8);
-              background: var(--clr-black);
-              color: var(--clr-white);
+              
+              span {
+                background: var(--clr-black);
+                color: var(--clr-white);
 
-              @include md {
-                background: none;
-                color: var(--clr-black);
+                @include md {
+                  background: none;
+                  color: var(--clr-black);
+                }
               }
+
             }
           }
 
           .project-client {
+            margin-top: .6em;
             text-decoration: underline;
             font-size: var(--fs-client);
           }

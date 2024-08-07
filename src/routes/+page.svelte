@@ -22,7 +22,7 @@
 
   export let data
 
-  console.log("data", $page.data)
+  // console.log("data", $page.data)
 
   clients.set(data.clients)
   projects.set(data.projects)

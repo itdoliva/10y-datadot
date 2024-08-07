@@ -114,7 +114,7 @@
         <File nColumns=2 outerClose={true} />
       </main>
 
-      <div class="filter-container" class:filter-open={isMobileFilterOpen} bind:this={mobileFilterContainer}>
+      <div class="filter-container" class:filter-open={isMobileFilterOpen} class:toggle-hidden={!!$selected} bind:this={mobileFilterContainer}>
 
         <button class="filter-toggle" on:click={() => isMobileFilterOpen = true}>
           <p>> {$_("menu.filters")}</p>

@@ -248,4 +248,14 @@ button.clean-btn {
       pointer-events: none;
     }
   }
+
+  &.toggle-hidden {
+    .filter-toggle {
+      transform: translate(100%, 0);
+
+      // Exit Transition
+      transition: transform 200ms ease-in-out;
+      pointer-events: none;
+    }
+  }
 }
