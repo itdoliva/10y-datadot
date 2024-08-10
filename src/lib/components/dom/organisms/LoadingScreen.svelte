@@ -1,6 +1,7 @@
 <script>
   import { LottiePlayer } from '@lottiefiles/svelte-lottie-player';
   import { scale } from 'svelte/transition';
+  import loadingLottie from "$lib/loadingLottie.json";
 
   export let width
   export let height
@@ -15,7 +16,7 @@
 >
   
   <LottiePlayer
-    src="./src/lib/loadingLottie.json"
+    src={loadingLottie}
     autoplay={true}
     loop={true}
     controls={false}
