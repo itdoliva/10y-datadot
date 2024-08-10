@@ -128,12 +128,13 @@
       <div class="header">
         <div class="project-name">
             <h3>
-              {#each projectWords as word, i}
+              {project}
+              <!-- {#each projectWords as word, i}
                 <span>{word}</span>
                 {#if i < (projectWords.length -1)}
                   
                 {/if}
-              {/each}
+              {/each} -->
             </h3>
         </div>
           <h4 class="project-client">{client}</h4>
@@ -340,17 +341,17 @@
               text-transform: uppercase;
               font-size: var(--fs-name);
               line-height: 1;
-              
-              // background: rgba(255, 255, 255, .8);
-              
-              span {
-                background: var(--clr-black);
-                color: var(--clr-white);
 
-                @include md {
-                  background: none;
-                  color: var(--clr-black);
-                }
+              text-decoration: underline;
+              text-decoration-color: var(--clr-black);
+              text-decoration-thickness: calc(1.3*var(--fs-name));
+              text-underline-offset: calc(-1*var(--fs-name));
+              text-decoration-skip-ink: none;
+              color: white;
+              
+              @include md {
+                color: var(--clr-black);
+                text-decoration: none;
               }
 
             }
