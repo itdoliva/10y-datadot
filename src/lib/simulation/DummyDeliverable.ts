@@ -3,8 +3,8 @@ import { gsap } from "gsap";
 import * as d3 from "d3"
 
 import Simulation from "./Simulation";
-import { cameraOffsetX, cameraOffsetY } from "../stores/zoom";
-import { figureHeight, figureWidth } from "../stores/canvas";
+import { cameraOffsetX, cameraOffsetY, zoom } from "../stores/zoom";
+import { width, figureHeight, figureWidth } from "../stores/canvas";
 
 export default class DummyDeliverable {
   public simulation: Simulation
@@ -27,17 +27,25 @@ export default class DummyDeliverable {
 
     if (selected) {
       const { fx, fy } = selected.attr.render
-      const tx = -get(cameraOffsetX)
-      const ty = -get(cameraOffsetY)
-      const tr = Math.max(get(figureWidth), get(figureHeight)) * .4
+      
+      let r
+      
+      tl.set(this, { fx, fy, r: 0 })
 
-      tl
-      .fromTo(this, 
-        { fx, fy },
-        { fx: tx, fy: ty, duration: .3, ease: d3.easeQuadInOut })
-      .fromTo(this,
-        { r: 0 },
-        { r: tr, duration: .15, ease: d3.easeCubicInOut }, "<")
+      if (get(width) < 768) {
+        r = Math.max(get(figureWidth), get(figureHeight)) * .95 * (1/get(zoom))
+      }
+      else {
+        const tx = -get(cameraOffsetX)
+        const ty = -get(cameraOffsetY)
+
+        r = Math.max(get(figureWidth), get(figureHeight)) * .4
+        tl.to(this, { fx: tx, fy: ty, duration: .3, ease: d3.easeQuadInOut })
+      }
+
+      tl.to(this, { r, duration: .15, ease: d3.easeCubicInOut }, "<")
+
+      
     }
     else {
       tl.set(this, { r: 0 })
