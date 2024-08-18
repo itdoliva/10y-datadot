@@ -122,7 +122,9 @@
     "play": "play my vis!"
   },
   
-  "file": {}
+  "file": {
+    "back": "Voltar"
+  }
   
 
 }

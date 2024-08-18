@@ -1,6 +1,7 @@
 <script>
   import { _, locale } from 'svelte-i18n'
   import { onMount } from 'svelte';
+  import { fly } from "svelte/transition";
 
   import simulation from "$lib/simulation"
   import { mobileSteps, tabletSteps, desktopSteps, mobileEls, desktopEls } from '$lib/onboarding';
@@ -56,7 +57,7 @@
 
   let mobileVizContainer
   let mobileFilterContainer
-
+  
   $: positionMobileFilter(mobileVizContainer)
 
   $: simulation.setLayout(layout)
@@ -165,7 +166,18 @@
       </div>
 
       <section class="layout-container">
-        <InputLayout bind:layout direction="row"/>
+        {#if !$selected}
+          <div in:fly={{ y: -12 }}>
+            <InputLayout bind:layout direction="row"/>
+          </div>
+        {:else}
+          <button class="exit-file" on:click={() => selected.set(null)} in:fly={{ y: -12 }}>
+            <div>
+              <Icon icon="return" />
+            </div>
+            <p>{$_("file.back")}</p>
+          </button>
+        {/if}
       </section>
 
       <section class="play-container">
@@ -313,7 +325,7 @@
 
     display: grid;
 
-    grid-template-rows: min-content 1fr min-content calc(4*var(--fs-label));
+    grid-template-rows: min-content 1fr calc(3.6*var(--fs-label)) calc(4*var(--fs-label));
     grid-template-areas:
       "header"
       "viz"
@@ -366,7 +378,27 @@
       z-index: 1;
       border-top: 1px solid var(--clr-black-fade-out);
   
-      padding: 2vw 0 2vw 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      button.exit-file {
+        display: grid;
+        grid-template-columns: repeat(2, min-content);
+
+        align-items: center;
+        justify-items: end;
+
+        background: none;
+        outline: none;
+        border: none;
+
+        div {
+          width: calc(4*var(--fs-label));
+          height: calc(2.4*var(--fs-label));
+          stroke: black;
+        }
+      }
     }
   
     .play-container {

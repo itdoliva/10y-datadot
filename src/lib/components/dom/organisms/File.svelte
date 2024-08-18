@@ -27,11 +27,8 @@
   let client = ''
   let description = ''
   let date = ''
-  let projectWords = []
-
 
   $: update($selected)
-
 
   function update(selected) {
     if (!selected) {
@@ -46,7 +43,6 @@
     ]
 
     project = selected.project
-    projectWords = project.split(" ")
     client = selected.client
     description = selected.description
     date = selected.date
@@ -69,7 +65,9 @@
   }
 
   function exit() {
-    if (!container) return
+    if (!container) {
+      return
+    }
 
     const tl = gsap.timeline({ overwrite: true })
 
@@ -80,7 +78,6 @@
     .set(container, { scale: 1, display: "none" })
     .add(() => {
       traceIds = []
-      projectWords = []
       project = ''
       client = ''
       description = ''
@@ -127,15 +124,7 @@
 
       <div class="header">
         <div class="project-name">
-            <h3>
-              {project}
-              <!-- {#each projectWords as word, i}
-                <span>{word}</span>
-                {#if i < (projectWords.length -1)}
-                  
-                {/if}
-              {/each} -->
-            </h3>
+            <h3>{project}</h3>
         </div>
           <h4 class="project-client">{client}</h4>
       </div>
@@ -158,12 +147,6 @@
       </div>
         
     </div>
-
-    {#if outerClose}
-      <button class="file__close" on:click={onClick} in:fly={{ y: 80, duration: 2000, delay: 1000 }}>
-        <Icon icon="returnBackground"/>
-      </button>
-    {/if}
 
   </div>
 
@@ -189,7 +172,8 @@
     flex-direction: column;
     justify-content: center;
 
-    padding: 0 calc(3.2*var(--fs-label));
+    padding-left: calc(3.2*var(--fs-label));
+    padding-right: calc(3.2*var(--fs-label));
     padding-top: calc(4.2*var(--fs-label));
 
     opacity: 0;
@@ -198,12 +182,9 @@
       padding: 0;
     }
 
-
-
     &.active {
       pointer-events: all;
     }
-
 
     .file {
       transition: opacity 1s ease-in-out;
@@ -342,18 +323,7 @@
               font-size: var(--fs-name);
               line-height: 1;
 
-              text-decoration: underline;
-              text-decoration-color: var(--clr-black);
-              text-decoration-thickness: calc(1.3*var(--fs-name));
-              text-underline-offset: calc(-1*var(--fs-name));
-              text-decoration-skip-ink: none;
-              color: white;
-              
-              @include md {
-                color: var(--clr-black);
-                text-decoration: none;
-              }
-
+              color: var(--clr-black);
             }
           }
 
@@ -420,7 +390,6 @@
       }
 
       &__close {
-
         position: absolute;
         bottom: var(--fs-label);
         right: 50%;
