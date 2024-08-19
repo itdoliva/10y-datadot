@@ -49,7 +49,7 @@
     description = selected.description
     date = selected.date
 
-    itemsByColumn = Math.ceil((traceIds.length + 1)/nColumns)
+    itemsByColumn = Math.ceil((traceIds.length)/nColumns)
 
     entrance()
   }
@@ -174,11 +174,11 @@
     flex-direction: column;
     justify-content: center;
 
-    padding-left: calc(3.2*var(--fs-label));
-    padding-right: calc(3.2*var(--fs-label));
-    padding-top: calc(4.2*var(--fs-label));
+    padding: 0 calc(3.2*var(--fs-label));
 
     opacity: 0;
+
+    overflow: auto;
 
     @include md {
       padding: 0;
@@ -189,13 +189,13 @@
     }
 
     .file {
+      padding: calc(4.2*var(--fs-label)) 0;
+
       transition: opacity 1s ease-in-out;
 
       pointer-events: none;
       position: relative;
 
-      width: 100%;
-      height: 100%;
       
       display: grid;
       grid-template-rows: max-content 1fr;

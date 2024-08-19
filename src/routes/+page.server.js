@@ -18,6 +18,50 @@ export async function load({ fetch }) {
 
   const categoryColumns = [ "name", "data", "type" ]
 
+  const categoryOrders = [
+      'channel.digital',
+      'channel.impresso',
+      'channel.consultoria',
+
+      'goal.educacional',
+      'goal.informacional',
+      'goal.impacto-positivo',
+      'goal.jornalistico-editorial',
+      'goal.institucional',
+
+      'industry.servicos-e-tecnologia',
+      'industry.automotivo',
+      'industry.varejo',
+      'industry.educacao',
+      'industry.financeiro',
+      'industry.ongs-orgs',
+      'industry.consultorias',
+      'industry.imobiliario',
+      'industry.comunicacao',
+      'industry.jornalismo',
+      'industry.pesquisa',
+
+      'product.video', 
+      'product.infografico',
+      'product.publicacao',
+      'product.apresentacao',
+      'product.site-editorial',
+      'product.site-institucional',
+      'product.relatorios',
+      'product.outras-interfaces',
+
+      'design.ilustracao',
+      'design.infografia',
+      'design.motion-graphics',
+      'design.editorial',
+      'design.user-interface',
+      'design.datavis', 
+      'design.design-de-servicos',
+  ]
+
+
+
+
   // Fetch Function
   async function getRecords(table, columns, parseCallback) {
     const url = DATABASE_URL + `/tables/${table}/query`
@@ -74,6 +118,10 @@ export async function load({ fetch }) {
 
   const deliverables = await getRecords('deliverables', deliverableColumns, deliverablesParse)
   const categories = await getRecords('categories', categoryColumns, categoriesParse)
+
+  categories.sort((a, b) => categoryOrders.indexOf(a.id) - categoryOrders.indexOf(b.id))
+
+  console.log({ deliverables, categories })
 
   const projects = new Set()
   const clients = new Set()
