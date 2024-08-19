@@ -2,11 +2,13 @@
   // Lib
   import * as PIXI from "pixi.js"
   import { _ } from "svelte-i18n";
+  import { get } from "svelte/store";
   import { fly } from "svelte/transition";
   import { onMount } from "svelte";
   import { gsap } from "gsap";
 
   // Stores
+  import { app } from "$lib/stores/canvas";
   import { selected, categories } from "$lib/stores/nodes";
   
   // Actions
@@ -106,7 +108,7 @@
           {#if category}
     
             <li>
-              <div class="primitive-holder" use:castContainer={{ context, propagateOpacity: container }}>
+              <div class="primitive-holder" use:castContainer={{ parent: get(app).stage.getChildByName('viz-container'), context, propagateOpacity: container }}>
                 <FileTrace {id} {context}/>
               </div>
       
