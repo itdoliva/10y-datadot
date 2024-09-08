@@ -34,6 +34,7 @@
 
   $: if (svg && !isBehaviourSet) {
     const dragBehaviour = d3.drag()
+      .on('start', dragStart)
       .on('drag', dragged)
       .on('end', dragEnd)
 
@@ -64,10 +65,18 @@
     }
   }
 
+  function dragStart() {
+    if (disabled) return
+    document.body.style.cursor = "pointer"
+  }
+
   function dragEnd() {
+    document.body.style.cursor = "default"
     if (disabled) return
     selected = drag
   }
+
+
 
 
 </script>
@@ -84,6 +93,7 @@
     {/each}
   </ul>
 
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div 
     class="slider-container"
     bind:clientWidth={w} 
@@ -110,6 +120,7 @@
               class:unclickable={unclickable}
               transform="translate({x}, 0)"
               data-index={i}
+              style:cursor="pointer"
             >
 
               <circle class="outer-circle" r={rCircle} />

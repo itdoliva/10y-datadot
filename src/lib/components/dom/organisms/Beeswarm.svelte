@@ -33,8 +33,8 @@
   const simulation = d3.forceSimulation()
     .alphaTarget(0.3) // stay hot
     .velocityDecay(0.25) // low friction
-    .force("center", d3.forceCenter(0, 0))
-    .force("charge", d3.forceManyBody().strength(30))
+    .force("charge", d3.forceManyBody().strength(10).distanceMin(50))
+    .force("center", d3.forceCenter().x(0).y(0).strength(1))
     .force("collide", forceCollide)
   
 
@@ -47,7 +47,6 @@
   $: collideRadius = (d) => rScale(d.pctNodes) + 5
 
   $: forceCollide.radius(collideRadius)
-
 
 
   onMount(() => {
@@ -110,7 +109,6 @@
       simulationNodes.find(d => d.id === id)
     ]
   }
-
 
 </script>
 
