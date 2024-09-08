@@ -10,7 +10,7 @@
 	import PanelItem from '$lib/components/dom/molecules/PanelItem.svelte';
   import InputGroupProduct from "$lib/components/dom/molecules/InputGroupProduct.svelte";
 
-  export let parent
+  export let parent = undefined
   export let nColumns = 1
 
   export let theme = "on-light"

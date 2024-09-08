@@ -24,6 +24,7 @@
     background="transparent"
     width={size}
     height={size}
+    controlsLayout={[]}
   />
 
 </section>

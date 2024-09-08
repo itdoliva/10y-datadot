@@ -62,7 +62,6 @@ export default class DeliverableContext {
     this.context.renderable = false
     this.context.cursor = 'pointer'
     this.context.eventMode = 'none'
-    this.context.interactive = true;
 
     this.context.onpointerenter = this.onpointerenter
     this.context.onpointerleave = this.onpointerleave
