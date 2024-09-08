@@ -38,9 +38,8 @@
     }
 
     @include md {
-      bottom: 5%;
-      right: 50%;
-      transform: translate(50%, 0);
+      right: auto;
+      left: calc(1.6*var(--fs-label));
     }
 
     .signal {
