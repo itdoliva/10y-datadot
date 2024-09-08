@@ -23,7 +23,7 @@ import { goalTemplateFactory } from "$lib/templates/drawers/goal"
 
 const templates = {
   "channel.digital": digital,
-  "channel.impressa": print,
+  "channel.impresso": print,
   "channel.consultoria": consulting,
   
   "product.site-editorial": siteEditorial,

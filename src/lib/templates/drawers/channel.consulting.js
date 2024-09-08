@@ -17,5 +17,6 @@ export default function consultingTemplate(template=new PIXI.Graphics(), size, s
   template.drawCircle(0, 0, size/2)
   template.endFill()
 
+
   return template
 }

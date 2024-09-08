@@ -8,10 +8,10 @@ settings.RESOLUTION = window.devicePixelRatio;
 
 export default function initPixi(view) {
   const app = globalThis.__PIXI_APP__ = new PIXI.Application({ 
-    roundPixels: true,
     view, 
     resizeTo: window, 
-    backgroundColor: 0xFFFFFF
+    backgroundColor: 0xFFFFFF,
+    antialias: true,
   })
 
   addAssets()

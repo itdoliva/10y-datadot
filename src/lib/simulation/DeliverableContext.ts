@@ -31,7 +31,7 @@ export default class DeliverableContext {
     ],
     base: [ 
       "channel.digital",
-      "channel.impressa",
+      "channel.impresso",
       "channel.consultoria"
     ],
     front: [ 
@@ -73,11 +73,13 @@ export default class DeliverableContext {
     const baseId = intersection(this.ids.base, categories)[0]
     const bkgrIds = intersection(this.ids.background, categories)
     const frntIds = intersection(this.ids.front, categories)
+    const maskIds = intersection(this.ids.mask, categories)
     const sprtIds = intersection(this.ids.sprite, categories)
 
 
     bkgrIds.forEach(this.addGraphics)
     this.baseGraphics = this.addGraphics(baseId)
+    maskIds.forEach(this.addGraphics)
     frntIds.forEach(this.addGraphics)
     
     this.loading = Promise.all(sprtIds.map(this.addGraphics))
@@ -108,8 +110,8 @@ export default class DeliverableContext {
     }
 
     return graphics
-  }
-
+  } 
+    
   private onpointerenter = () => {
     hovered.set(this.deliverable)
   } 

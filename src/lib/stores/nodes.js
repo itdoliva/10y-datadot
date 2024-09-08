@@ -32,7 +32,7 @@ export const nodeSize = derived(([ width ]), ([ $width ]) => {
 })
 
 export const lineWidth = derived(([ nodeSize ]), ([ $nodeSize ]) => {
-  return $nodeSize / 20
+  return Math.max(1, Math.round($nodeSize / 20))
 })
 
 export const gap = derived(nodeSize, ($nodeSize) => {

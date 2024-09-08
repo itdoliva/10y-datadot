@@ -1,4 +1,5 @@
 import { XATA_API_KEY, DATABASE_URL } from '$env/static/private';
+import { dev } from '$app/environment';
 
 export async function load({ fetch }) {
 
@@ -115,14 +116,29 @@ export async function load({ fetch }) {
     data: JSON.parse(row.data)
   })
 
-
   const deliverables = await getRecords('deliverables', deliverableColumns, deliverablesParse)
   const categories = await getRecords('categories', categoryColumns, categoriesParse)
 
   categories.sort((a, b) => categoryOrders.indexOf(a.id) - categoryOrders.indexOf(b.id))
 
-  console.log({ deliverables, categories })
-
+  // if (dev) {
+  
+  //   const allDeliverableCategories = Array.from(new Set(deliverables.map(d => ([
+  //     d.channel,
+  //     d.industy,
+  //     ...d.product,
+  //     ...d.design,
+  //     ...d.goal
+  //   ])).flat())).sort((a, b) => a.localeCompare(b))
+  
+  //   const soloCategories = categories.map(d => d.id)
+  
+  //   console.log({ 
+  //     missingCategories: soloCategories.filter(d => !allDeliverableCategories.includes(d)),
+  //     missingDeliverableCategories: allDeliverableCategories.filter(d => !soloCategories.includes(d)),
+  //   })
+  // }
+  
   const projects = new Set()
   const clients = new Set()
   
