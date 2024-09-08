@@ -62,6 +62,8 @@ export default class DeliverableContext {
     this.context.renderable = false
     this.context.cursor = 'pointer'
     this.context.eventMode = 'none'
+    this.context.interactive = true;
+
     this.context.onpointerenter = this.onpointerenter
     this.context.onpointerleave = this.onpointerleave
     this.context.onpointerup = this.select
@@ -75,7 +77,6 @@ export default class DeliverableContext {
     const frntIds = intersection(this.ids.front, categories)
     const maskIds = intersection(this.ids.mask, categories)
     const sprtIds = intersection(this.ids.sprite, categories)
-
 
     bkgrIds.forEach(this.addGraphics)
     this.baseGraphics = this.addGraphics(baseId)

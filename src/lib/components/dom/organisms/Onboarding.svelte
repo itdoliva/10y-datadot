@@ -264,11 +264,11 @@
   <div bind:this={outer} class="onboarding">
 
     <div bind:this={inner} class="panel">
+
       <div class="panel__header">
         <button class="clean-btn" on:click={end}>
           <Icon icon="close" />
         </button>
-
       </div>
 
       <div class="panel__body">
@@ -283,6 +283,7 @@
         <button class="clean-btn onboarding-nav-btn" on:click={$contentKeyIdx === 0 ? end : back}>{$_($contentKeyIdx === 0 ? "onboarding.panel.skip" : "onboarding.panel.back")}</button>
         <button class="clean-btn onboarding-nav-btn" on:click={next}>{$_("onboarding.panel.next")}</button>
       </div>
+
     </div>
 
   </div>
@@ -301,13 +302,16 @@
 
     .onboarding {
       position: absolute;
-      width: 220px;
+      
   
       .panel {
         z-index: 9999;
         opacity: 0;
 
-        padding: var(--fs-label);
+        width: 240px;
+        margin: 0 auto;
+
+        padding: var(--fs-label) calc(1.4*var(--fs-label));
   
         background: var(--clr-dark-gray);
     
@@ -363,7 +367,7 @@
         }
         
         &__body {
-          padding: 0 var(--fs-label);
+          padding: 0;
 
           p {
             color: var(--clr-white);
@@ -376,7 +380,7 @@
         }
     
         &__footer {
-          padding: calc(.5*var(--fs-label)) var(--fs-label);
+          padding: calc(.5*var(--fs-label)) 0;
 
           display: flex;
           justify-content: space-between;
