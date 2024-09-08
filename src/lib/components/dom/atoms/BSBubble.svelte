@@ -37,7 +37,7 @@
 
 </script>
 
-<g class="bs-bubble {theme}" class:active transform="translate({x}, {y})">
+<g class="bs-bubble {theme}" class:active transform="translate({x}, {y})" style:cursor="pointer">
 
   <circle class="circle outer" r={$r_t} {fill} stroke-width={$lineWidth} />
   <circle class="circle inner" r={2.4*$lineWidth} />

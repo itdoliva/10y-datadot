@@ -52,7 +52,6 @@
 
     &:disabled {
       color: var(--clr-disabled);
-      cursor: default;
     }
   }
 
