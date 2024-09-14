@@ -75,8 +75,8 @@ export default class SoundController {
   private patternLength = 4
 
   
-  private notes = _.range(2, 6 + 1).map((octave) => {
-    return [ 'C', 'D', 'E', 'F', 'G', 'A', 'B' ].map((note) => {
+  private notes = _.range(3, 4 + 1).map((octave) => {
+    return [ 'C', 'D', 'E', 'G', 'A' ].map((note) => {
       return note + octave
     })
   }).flat()
@@ -233,7 +233,7 @@ export default class SoundController {
 
       if (categories.includes("channel.digital")) {
         animate = true
-        const poly = new PolySynth({ envelope: { attack: this.attack, release: this.release } })
+        const poly = new PolySynth({ envelope: { attack: this.attack, release: this.release }})
 
         if (this.filterNext) {
           this.filterNext = false
@@ -298,6 +298,7 @@ export default class SoundController {
     while (this.pingPongs.length) {
       const pp = this.pingPongs.pop()
       pp.dispose()
+      pp = null
     }
   }
 
@@ -313,3 +314,10 @@ export default class SoundController {
     this.noteIdx = idx
   }
 }
+
+
+
+
+
+
+

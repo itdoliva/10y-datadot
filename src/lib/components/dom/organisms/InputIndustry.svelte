@@ -8,7 +8,7 @@
 
   // Components
 	import PanelItem from '$lib/components/dom/molecules/PanelItem.svelte';
-  import Beeswarm from "$lib/components/dom/organisms/Beeswarm.svelte";
+  import Beeswarm from "$lib/components/dom/organisms/BeeswarmAlt.svelte";
   
   export let theme = "on-light"
 

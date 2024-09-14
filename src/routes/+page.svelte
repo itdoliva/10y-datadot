@@ -1,18 +1,18 @@
 
 <script>
   // Libraries
-  import { onMount } from 'svelte';
+  import { onMount } from 'svelte'
   import { _ } from 'svelte-i18n'
-  import initPixi from '$lib/pixi.js';
-
+  import initPixi from '$lib/pixi.js'
 
   // Files
-  import "$lib/scss/global.scss";
+  import "$lib/scss/global.scss"
+  import "$lib/style.css"
   import simulation from "$lib/simulation"
   
   // Stores
   import { loaded } from "$lib/stores/loading"
-  import { categories, projects, clients } from "$lib/stores/nodes"
+  import { categories, categoriesEnriched, projects, clients } from "$lib/stores/nodes"
   import { width, height, pixelRatio, app } from "$lib/stores/canvas"
   import { page } from '$app/stores';
   
@@ -22,11 +22,12 @@
 
   export let data
 
-  // console.log("data", $page.data)
-
   clients.set(data.clients)
   projects.set(data.projects)
   categories.set(data.categories)
+
+  $: console.log($categories)
+  $: console.log($categoriesEnriched)
 
   let canvas
 

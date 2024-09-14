@@ -1,6 +1,7 @@
 @import url(./_fonts.scss);
 @import "./breakpoints.scss";
 @import "./animations.scss";
+@import "./modules/beeswarm.scss";
 
 :root {
   --fs-label: clamp(.625rem, .45rem + 1.25vw, 14px);

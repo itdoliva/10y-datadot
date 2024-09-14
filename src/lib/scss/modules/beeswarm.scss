@@ -1,0 +1,88 @@
+@import "$lib/scss/breakpoints.scss";
+
+.bs-bubble {
+
+  circle {
+    z-index: 0;
+
+    &.outer {
+      stroke: var(--clr-accent);
+    }
+
+    &.inner {
+      fill: var(--clr-accent);
+    }
+  }
+
+  text {
+    z-index: 1;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+
+    pointer-events: none;
+
+    tspan {
+      font-weight: inherit;
+    }
+
+
+    &.percentage {
+      font-weight: 700;
+      font-size: calc(2*var(--fs-label));
+      fill: var(--clr-white);
+
+      opacity: 0;
+
+      @include md {
+        fill: var(--clr-black);
+      }
+    }
+
+    &.label {
+      text-transform: lowercase;
+      font-size: var(--fs-label);
+      font-weight: 500;
+
+      @include md {
+        opacity: 0;
+      }
+    }
+
+  }
+
+  &.active {
+    circle {
+      &.outer {
+        fill: var(--clr-accent);
+      }
+    }
+
+    text {
+      &.percentage {
+        opacity: 1;
+      }
+    }
+  }
+
+  @include md {
+    &:hover, &.active {
+      circle {
+        &.outer {
+          fill: var(--clr-accent);
+        }
+      }
+
+      text {
+        &.percentage {
+          opacity: 1;
+        }
+
+        &.label {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+}
