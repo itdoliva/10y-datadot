@@ -7,8 +7,6 @@
   let wrapper
 
   $: if (wrapper && $isOpen) {
-    console.log("isOpen")
-
     const tl = gsap.timeline({ 
       overwrite: true,
       onStart: addOpenClass,

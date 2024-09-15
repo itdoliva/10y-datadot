@@ -26,9 +26,6 @@
   projects.set(data.projects)
   categories.set(data.categories)
 
-  $: console.log($categories)
-  $: console.log($categoriesEnriched)
-
   let canvas
 
   onMount(() => {

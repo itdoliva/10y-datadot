@@ -121,23 +121,6 @@ export async function load({ fetch }) {
 
   categories.sort((a, b) => categoryOrders.indexOf(a.id) - categoryOrders.indexOf(b.id))
 
-  // if (dev) {
-  
-  //   const allDeliverableCategories = Array.from(new Set(deliverables.map(d => ([
-  //     d.channel,
-  //     d.industy,
-  //     ...d.product,
-  //     ...d.design,
-  //     ...d.goal
-  //   ])).flat())).sort((a, b) => a.localeCompare(b))
-  
-  //   const soloCategories = categories.map(d => d.id)
-  
-  //   console.log({ 
-  //     missingCategories: soloCategories.filter(d => !allDeliverableCategories.includes(d)),
-  //     missingDeliverableCategories: allDeliverableCategories.filter(d => !soloCategories.includes(d)),
-  //   })
-  // }
   
   const projects = new Set()
   const clients = new Set()
