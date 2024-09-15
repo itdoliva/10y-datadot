@@ -413,7 +413,6 @@ export default class Simulation {
     })
 
     this.interface.toScene(context, ticker)
-    this.sound.toScene(context, ticker)
   }
 
   public getDeliverableNodes = (): Deliverable[] => {

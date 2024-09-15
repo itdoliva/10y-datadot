@@ -1,5 +1,6 @@
 import * as PIXI from "pixi.js"
 
+
 // Libraries
 import * as Tone from 'tone';
 import _ from 'lodash';
@@ -8,56 +9,6 @@ import { gsap } from 'gsap';
 import Simulation from "./Simulation";
 import Deliverable from './Deliverable';
 
-class PolySynth {
-  private poly: Tone.PolySynth
-  private duration = '8n'
-
-  constructor(params: any) {
-    this.poly = new Tone.PolySynth().toDestination()
-    this.poly.set(params)
-  }
-
-  public autoFilter() {
-    const autoFilter = new Tone.AutoFilter({ frequency: 15, wet: 0.8, depth: 0.9 }).toDestination()
-    autoFilter.start()
-
-    this.poly.connect(autoFilter)
-  }
-
-  public reverb() {
-    const reverb = new Tone.Reverb(3).toDestination()
-    this.poly.connect(reverb)
-  }
-
-  public trigger(note: string) {
-    this.poly.triggerAttackRelease(note, this.duration)
-
-    const now = Tone.now()
-    Tone.getTransport().scheduleOnce(() => {
-      this.poly.dispose()
-    }, now + Tone.Time("2n").toSeconds())
-  }
-}
-
-class PingPongDelay {
-  private player: Tone.Player
-  private pp: Tone.PingPongDelay
-
-  constructor(player: Tone.Player) {
-    this.player = player
-
-    this.pp = new Tone.PingPongDelay('4n', 0.2).toDestination()
-    this.player.connect(this.pp)
-
-    return this
-  }
-
-  public dispose() {
-    this.pp.dispose()
-    this.player.disconnect(this.pp)
-  }
-}
-
 
 export default class SoundController {
   private simulation: Simulation
@@ -65,6 +16,9 @@ export default class SoundController {
   private curNode
 
   private initialized = false
+  
+  private volPlayer = -5
+  private volSynth = -15
 
   private columnTime = '12n'
 
@@ -99,6 +53,10 @@ export default class SoundController {
 
   private snareCounter = 0
 
+  private autoFilter
+  private reverb
+  private pingPong
+
 
   constructor(simulation: Simulation) {
     this.simulation = simulation
@@ -106,28 +64,37 @@ export default class SoundController {
 
   public loadPlayers(baseURL: string) {
     const soundURL = (route: string) => baseURL + route;
-    const volumeObject = (dynamicRoute: string) => {
-      return Object.fromEntries([ "vh", "vm", "vl" ].map(v => [ v, soundURL(dynamicRoute.replace("{v}", v)) ]))
-    }
 
-    const reverb = new Tone.Convolver(soundURL('/small-drum-room.wav')).toDestination();
-    const snarePanner = new Tone.Panner().connect(reverb);
+    // Effects
+    this.autoFilter = new Tone.AutoFilter({ frequency: 15, wet: 0.8, depth: 0.9 }).toDestination()
+    this.reverb = new Tone.Reverb(3).toDestination()
+    this.pingPong = new Tone.PingPongDelay('4n', 0.2).toDestination()
+
+    // Instruments
+    const drumReverb = new Tone.Convolver(soundURL('/small-drum-room.wav')).toDestination();
+    const snarePanner = new Tone.Panner().connect(drumReverb);
     new Tone.LFO(0.13, -0.25, 0.25).connect(snarePanner.pan);
   
     this.drumPlayers = {
-      kick: new Tone.Players(volumeObject('/808-kick-{v}.mp3')).toDestination(),
-      snare: new Tone.Players(volumeObject('/flares-snare-{v}.mp3')).connect(snarePanner),
-      hihatClosed: new Tone.Players(volumeObject('/808-hihat-{v}.mp3')).connect(new Tone.Panner(-0.5).connect(reverb)),
-      hihatOpen: new Tone.Players(volumeObject('/808-hihat-open-{v}.mp3')).connect(new Tone.Panner(-0.5).connect(reverb)),
-      tomLow: new Tone.Players(volumeObject('/slamdam-tom-low-{v}.mp3')).connect(new Tone.Panner(-0.4).connect(reverb)),
-      tomMid: new Tone.Players(volumeObject('/slamdam-tom-mid-{v}.mp3')).connect(reverb),
-      tomHigh: new Tone.Players(volumeObject('/slamdam-tom-high-{v}.mp3')).connect(new Tone.Panner(0.4).connect(reverb)),
-      clap: new Tone.Players(volumeObject('/909-clap-{v}.mp3')).connect(new Tone.Panner(0.5).connect(reverb)),
-      rim: new Tone.Players(volumeObject('/909-rim-{v}.wav')).connect(new Tone.Panner(0.5).connect(reverb)),
+      kick: new Tone.Player(soundURL('/808-kick-vm.mp3')).toDestination(),
+      snare: new Tone.Player(soundURL('/flares-snare-vm.mp3')).connect(snarePanner),
+      hihatClosed: new Tone.Player(soundURL('/808-hihat-vm.mp3')).connect(new Tone.Panner(-0.5).connect(drumReverb)),
+      hihatOpen: new Tone.Player(soundURL('/808-hihat-open-vm.mp3')).connect(new Tone.Panner(-0.5).connect(drumReverb)),
+      tomLow: new Tone.Player(soundURL('/slamdam-tom-low-vm.mp3')).connect(new Tone.Panner(-0.4).connect(drumReverb)),
+      tomMid: new Tone.Player(soundURL('/slamdam-tom-mid-vm.mp3')).connect(drumReverb),
+      tomHigh: new Tone.Player(soundURL('/slamdam-tom-high-vm.mp3')).connect(new Tone.Panner(0.4).connect(drumReverb)),
+      clap: new Tone.Player(soundURL('/909-clap-vm.mp3')).connect(new Tone.Panner(0.5).connect(drumReverb)),
+      rim: new Tone.Player(soundURL('/909-rim-vm.wav')).connect(new Tone.Panner(0.5).connect(drumReverb)),
     }
-  }
 
-  public toScene(scene: PIXI.Container, ticker: PIXI.Ticker) {
+    Object.entries(this.drumPlayers).forEach(([key, player]) => {
+      player.volume.value = this.volPlayer;
+
+      const pingPongPlayer = new Tone.Player(player.buffer).connect(this.pingPong);
+      pingPongPlayer.volume.value = this.volPlayer;
+
+      this.drumPlayers[key + "PingPong"] = pingPongPlayer;
+    });
   }
 
 
@@ -143,8 +110,6 @@ export default class SoundController {
     this.noteIncrement = -1
 
     this.curNode = undefined
-
-    this.disposePingPongs()
   }
 
 
@@ -221,9 +186,28 @@ export default class SoundController {
          })
     }
 
-    if (columnIdx % 2 === 0 && categories.includes('design.infografia')) {
-      animate = true
-      this.drumPlayers.hihatClosed.player('vh').start(time);
+
+    if (columnIdx % 2 === 0) {
+      if (categories.includes('design.infografia')) {
+        animate = true
+        this.drumPlayers.hihatClosed.start(time);
+      }
+
+      if (categories.includes("design.user-interface") || categories.includes("design.design-de-servicos")) {
+        animate = true
+        this.drumPlayers.hihatOpen.start(time)
+      }
+
+      if (categories.includes('industry.comunicacao')) {
+        animate = true
+        this.drumPlayers.clapPingPong.start(time);
+      }
+    }
+    else {
+      if (categories.includes('industry.educacao')) {
+        animate = true
+        this.drumPlayers.rimPingPong.start(time);
+      }
     }
 
     if (columnIdx === 0) {
@@ -233,33 +217,32 @@ export default class SoundController {
 
       if (categories.includes("channel.digital")) {
         animate = true
-        const poly = new PolySynth({ envelope: { attack: this.attack, release: this.release }})
+
+        const poly = new Tone.PolySynth().toDestination()
+        poly.set({ envelope: { attack: this.attack, release: this.release } })
+        poly.volume.value = this.volSynth
 
         if (this.filterNext) {
+          poly.connect(this.autoFilter)
           this.filterNext = false
-          poly.autoFilter()
         }
 
         if (this.reverbNext) {
+          poly.connect(this.reverb)
           this.reverbNext = false
-          poly.reverb()
         }
 
-        poly.trigger(this.notes[this.noteIdx])
+        this.triggerAndRelease(poly, this.notes[this.noteIdx])
       }
-
 
       if (evenPattern && categories.includes("design.ilustracao")) {
         animate = true
-        const player = this.drumPlayers.kick.player('vm')
-  
-        if (categories.includes('goal.educacional')) {
-          const pp = new PingPongDelay(player)
-  
-          this.pingPongs.push(pp)
-        }
-  
-        player.start(time)
+
+        const playerKey = categories.includes('goal.educacional')
+          ? 'kickPingPong'
+          : 'kick'
+
+        this.drumPlayers[playerKey].start(time)
       }
   
       if (categories.includes('design.motion-graphics')) {
@@ -271,19 +254,11 @@ export default class SoundController {
         this.snareCounter++
         animate = true
   
-        const player = this.drumPlayers.snare.player('vm')
-  
-        if (this.snareCounter % 3 === 0) {
-          const pp = new PingPongDelay(player)
-  
-          this.pingPongs.push(pp)
-        }
-  
-        if (this.snareCounter % 9 === 0) {
-          this.disposePingPongs()
-        }
-  
-        player.start(time)
+        const playerKey = this.snareCounter % 3 === 0
+          ? 'snarePingPong'
+          : 'snare'
+
+        this.drumPlayers[playerKey].start(time)
       }
     }
 
@@ -294,12 +269,12 @@ export default class SoundController {
     this.stepCounter++
   }
 
-  private disposePingPongs() {
-    while (this.pingPongs.length) {
-      const pp = this.pingPongs.pop()
-      pp.dispose()
-      pp = null
-    }
+  private triggerAndRelease(poly, note, duration='8n') {
+    poly.triggerAttackRelease(note, duration)
+
+    Tone.getTransport().scheduleOnce(() => {
+      poly.dispose()
+    }, Tone.now() + Tone.Time("2n").toSeconds())
   }
 
 
@@ -314,10 +289,3 @@ export default class SoundController {
     this.noteIdx = idx
   }
 }
-
-
-
-
-
-
-
