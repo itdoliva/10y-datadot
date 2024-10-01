@@ -8,12 +8,8 @@ import grahamScan from "../utility/grahamScan"
 import Simulation from "./Simulation";
 import { nodeSize } from "../stores/nodes";
 
-const defaults = {
-  alpha: .15,
-  alphaHover: .85,
-  lineWidth: 1,
-  radius: 0,
-}
+import { LINK_STYLES } from "../utility/constants";
+
 
 export default class DeliverableGroup {
   private simulation: Simulation
@@ -27,9 +23,9 @@ export default class DeliverableGroup {
   private hovered: boolean = false
 
   private render = {
-    lineWidth: defaults.lineWidth,
-    radius: defaults.radius,
-    alpha: defaults.alpha,
+    lineWidth: LINK_STYLES.lineWidth,
+    radius: LINK_STYLES.radius,
+    alpha: LINK_STYLES.alpha,
     renderable: false
   }
 
@@ -67,8 +63,8 @@ export default class DeliverableGroup {
       width: this.render.lineWidth,
       color: this.color,
       alpha: this.render.alpha,
-      join: PIXI.LINE_JOIN.ROUND,
-      cap: PIXI.LINE_CAP.ROUND,
+      join: LINK_STYLES.join,
+      cap: LINK_STYLES.cap,
     }
 
     this.context.lineStyle(lineStyle)
@@ -95,9 +91,9 @@ export default class DeliverableGroup {
     this.hovered = isHovered
 
     if (prevHovered !== this.hovered) {
-      const lineWidth = isHovered ? get(nodeSize)*.12 : defaults.lineWidth
-      const alpha = isHovered ? defaults.alphaHover : defaults.alpha
-      const radius = isHovered ? get(nodeSize) : defaults.radius
+      const lineWidth = isHovered ? LINK_STYLES.lineWidthHover : LINK_STYLES.lineWidth
+      const alpha = isHovered ? LINK_STYLES.alphaHover : LINK_STYLES.alpha
+      const radius = isHovered ? get(nodeSize) : LINK_STYLES.radius
 
       
       gsap.to(this.render, {
@@ -127,13 +123,13 @@ export default class DeliverableGroup {
     if (!prev && cur) {
       tl
       .set(this.render, { lineWidth: 0, alpha: 0, renderable: true })
-      .to(this.render, { lineWidth: defaults.lineWidth, duration: .5, ease: "elastic.out(2,1)", delay: Math.random() })
-      .to(this.render, { alpha: defaults.alphaHover*.5, duration: .5, ease: "power2.out"}, "<")
-      .to(this.render, { alpha: defaults.alpha, duration: .5, ease: "power2.in"})
+      .to(this.render, { lineWidth: LINK_STYLES.lineWidth, duration: .5, ease: "elastic.out(2,1)", delay: Math.random() })
+      .to(this.render, { alpha: LINK_STYLES.alphaHover*.5, duration: .5, ease: "power2.out"}, "<")
+      .to(this.render, { alpha: LINK_STYLES.alpha, duration: .5, ease: "power2.in"})
     }
     else if (prev && !cur) {
       tl
-      .set(this.render, { alpha: 0, renderable: false })
+      .set(this.render, { alpha: LINK_STYLES.alpha, renderable: false })
     }
 
   }

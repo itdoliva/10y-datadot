@@ -10,21 +10,21 @@ import type { OnboardingStepSettings } from "./types/onboarding"
 
 
 const desktopEls = {
-  collapsible: ".top-container > .collapsible",
-  activate: ".top-container > .panel-menu > .dropdown-activate",
-  playMyVis: ".top-container > .panel-menu > .play-btn",
-  otherMenuItems: ".top-container > .panel-menu > :is(.dropdown-sortby, .dropdown-all, .clear-all-btn, .project-logo, .collapse-btn, .language-change)",
-  vizContainer: ".viz-container",
-  leftContainer: ".left-container",
+  collapsible: "#shrink-panel",
+  activate: "#panel-menu > #activate",
+  playMyVis: "#panel-menu > #play-my-vis",
+  otherMenuItems: "#top-panel-menu > :is(#sortby, #sortby-activate, #clear-all, #project-logo, #shrink-button-wrapper, #change-language)",
+  vizContainer: "#vis-container",
+  leftContainer: "#left-container",
 } 
 
 
 const mobileEls = {
-  headerContainer: ".mobile-header-container",
-  vizContainer: ".viz-container",
-  filterContainer: ".filter-container",
-  layoutContainer: ".layout-container",
-  playMyVis: ".play-container"
+  headerContainer: "#mobile-header",
+  vizContainer: "#vis-container",
+  filterContainer: "#filter-container",
+  layoutContainer: "#layout-container",
+  playMyVis: "#play-container"
 }
 
 let panelsTl
@@ -38,21 +38,21 @@ let cursorTl
 const desktopSteps: OnboardingStepSettings[] = [
   {
     contentKey: "onboarding.desktop.1",
-    positionTo: ".root",
+    positionTo: "#root",
     placement: "center",
     borderPosition: "top",
   },
   {
     contentKey: "onboarding.desktop.2",
     highlight: desktopEls.vizContainer,
-    positionTo: ".viz-container",
+    positionTo: "#vis-container",
     placement: "left-start",
     borderPosition: "right",
   },
   {
     contentKey: "onboarding.desktop.3",
     highlight: desktopEls.vizContainer,
-    positionTo: ".viz-container",
+    positionTo: "#vis-container",
     placement: "left-start",
     borderPosition: "right",
     onStart: clickAnimation,
@@ -89,21 +89,21 @@ const desktopSteps: OnboardingStepSettings[] = [
 const tabletSteps: OnboardingStepSettings[] = [
   {
     contentKey: "onboarding.desktop.1",
-    positionTo: ".root",
+    positionTo: "#root",
     placement: "center",
     borderPosition: "top",
   },
   {
     contentKey: "onboarding.desktop.2",
     highlight: desktopEls.vizContainer,
-    positionTo: ".viz-container",
+    positionTo: "#vis-container",
     placement: "left-start",
     borderPosition: "right",
   },
   {
     contentKey: "onboarding.desktop.3",
     highlight: desktopEls.vizContainer,
-    positionTo: ".viz-container",
+    positionTo: "#vis-container",
     placement: "left-start",
     borderPosition: "right",
     onStart: clickAnimation,
@@ -131,7 +131,7 @@ const tabletSteps: OnboardingStepSettings[] = [
 const mobileSteps: OnboardingStepSettings[] = [
   {
     contentKey: "onboarding.mobile.1",
-    positionTo: ".root",
+    positionTo: "#root",
     placement: "center",
     borderPosition: "top",
   },
@@ -161,7 +161,7 @@ const mobileSteps: OnboardingStepSettings[] = [
   {
     contentKey: "onboarding.mobile.5",
     highlight: mobileEls.filterContainer,
-    positionTo: ".root",
+    positionTo: "#root",
     placement: "top-start",
     borderPosition: "bottom",
     onStart: toggleFilterPanel,
@@ -179,7 +179,7 @@ const mobileSteps: OnboardingStepSettings[] = [
 
 function clickAnimation() {
 
-  const vizEl = <HTMLElement>document.querySelector(".viz-container")
+  const vizEl = <HTMLElement>document.querySelector("#vis-container")
   const bbox = vizEl.getBoundingClientRect()
 
   const x = bbox.width*.5
@@ -279,7 +279,7 @@ function toggleActivateDropdown() {
 }
 
 function toggleFilterPanel() {
-  const filter = <HTMLElement>document.querySelector(".filter-container")
+  const filter = <HTMLElement>document.querySelector("#filter-container")
   filter.classList.toggle('filter-open')
 }
 

@@ -383,12 +383,12 @@ export default class Simulation {
       .range([.75, 1.25])
 
     d3.groups(deliverableNodes, (d: Deliverable) => d.client).forEach(([ id, deliverables]) => {
-      const client = new DeliverableGroup(this, id, deliverables, 0x83BF00)
+      const client = new DeliverableGroup(this, id, deliverables, 0xB0E038)
       this.clients.push(client)
     })
 
     d3.groups(deliverableNodes, (d: Deliverable) => d.project).forEach(([ id, deliverables]) => {
-      const project = new DeliverableGroup(this, id, deliverables, 0X818AFC)
+      const project = new DeliverableGroup(this, id, deliverables, 0XCEFD6C)
       this.projects.push(project)
     })
 

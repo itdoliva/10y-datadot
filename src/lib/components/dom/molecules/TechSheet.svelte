@@ -1,12 +1,12 @@
 <script lang="ts">
   import { _ } from "svelte-i18n";
   import { gsap } from "gsap";
-  import { isOpen } from "../../../stores/techsheet"
+  import { isSheetOpen } from "../../../stores/techsheet"
   import Icon from "../atoms/Icon.svelte";
 
   let wrapper
 
-  $: if (wrapper && $isOpen) {
+  $: if (wrapper && $isSheetOpen) {
     const tl = gsap.timeline({ 
       overwrite: true,
       onStart: addOpenClass,
@@ -17,7 +17,7 @@
       .fromTo(".techsheet-panel", { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: .3 }, "<")
   } 
 
-  else if (wrapper && !$isOpen) {
+  else if (wrapper && !$isSheetOpen) {
     const tl = gsap.timeline({ 
       overwrite: true,
       onComplete: removeOpenClass,
@@ -30,7 +30,7 @@
   }
 
   function handleClose() {
-    isOpen.set(false)
+    isSheetOpen.set(false)
   }
 
   function addOpenClass() {
@@ -63,22 +63,22 @@
       <div class="content">
 
         <div class="content__body">
-          <h3>datadot {$_("page.hero")}</h3>
+          <h3 class="text-lg">datadot {$_("page.hero")}</h3>
     
           <div>
-            <p>{$_("techsheet.main")}</p>
-            <p><strong>{$_("techsheet.encourage")}</strong></p>
+            <p class="text-xs">{$_("techsheet.main")}</p>
+            <p class="text-xs"><span class="font-medium">{$_("techsheet.encourage")}</span></p>
           </div>
     
           <div>
             <h5>{$_("techsheet.made-by")}</h5>  
-            <ul>
-              <li><strong>Flávia Marinho</strong> ({($_("techsheet.roles.flavia"))})</li>
-              <li><strong>Otávio Burin</strong> ({($_("techsheet.roles.otavio"))})</li>
-              <li><strong>Italo Oliveira</strong> ({($_("techsheet.roles.italo"))})</li>
-              <li><strong>Quintino Andrade</strong> ({($_("techsheet.roles.quintino"))})</li>
-              <li><strong>Ludmila Souza</strong> ({($_("techsheet.roles.ludmila"))})</li>
-              <li><strong>Gabriel Maciel</strong> ({($_("techsheet.roles.gabriel"))})</li>
+            <ul class="text-xs">
+              <li><span class="font-medium">Flávia Marinho</span> ({($_("techsheet.roles.flavia"))})</li>
+              <li><span class="font-medium">Otávio Burin</span> ({($_("techsheet.roles.otavio"))})</li>
+              <li><span class="font-medium">Italo Oliveira</span> ({($_("techsheet.roles.italo"))})</li>
+              <li><span class="font-medium">Quintino Andrade</span> ({($_("techsheet.roles.quintino"))})</li>
+              <li><span class="font-medium">Ludmila Souza</span> ({($_("techsheet.roles.ludmila"))})</li>
+              <li><span class="font-medium">Gabriel Maciel</span> ({($_("techsheet.roles.gabriel"))})</li>
             </ul>
           </div>
     
@@ -200,20 +200,20 @@
             }
   
             p {
-              font-size: var(--fs-label);
+              // font-size: var(--fs-label);
               margin: var(--fs-label) 0;
   
               @include md {
-                font-size: calc(1.1*var(--fs-label));
+                // font-size: calc(1.1*var(--fs-label));
               }
             }
   
             ul {
               li {
-                font-size: var(--fs-label);
+                // font-size: var(--fs-label);
   
                 @include md {
-                  font-size: calc(1.1*var(--fs-label));
+                  // font-size: calc(1.1*var(--fs-label));
                 }
               }
             }

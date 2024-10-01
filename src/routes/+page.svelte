@@ -3,7 +3,6 @@
   // Libraries
   import { onMount } from 'svelte'
   import { _ } from 'svelte-i18n'
-  import initPixi from '$lib/pixi.js'
 
   // Files
   import "$lib/scss/global.scss"
@@ -12,13 +11,11 @@
   
   // Stores
   import { loaded } from "$lib/stores/loading"
-  import { categories, categoriesEnriched, projects, clients } from "$lib/stores/nodes"
-  import { width, height, pixelRatio, app } from "$lib/stores/canvas"
-  import { page } from '$app/stores';
+  import { categories, projects, clients } from "$lib/stores/nodes"
+  import { width, height, pixelRatio } from "$lib/stores/canvas"
   
   // Components
   import App from "$lib/App.svelte";
-  import LoadingScreen from "$lib/components/dom/organisms/LoadingScreen.svelte";
 
   export let data
 
@@ -26,17 +23,13 @@
   projects.set(data.projects)
   categories.set(data.categories)
 
-  let canvas
 
   onMount(() => {
-    $app = initPixi(canvas)
-
     simulation.load(data.deliverables)
-    
   })
 
   function handleResize() {
-    window.location.reload();
+    // window.location.reload();
   }
 
 
@@ -52,30 +45,24 @@
 
 <svelte:head>
   <title>{$_("page.title")}</title>
+  <meta name="author" content="datadot + italo doliva">
+
+  <meta property="og:title" content="{$_("page.title")}">
+  <meta property="og:description" content="{$_("page.description")}">
+  <!-- <meta property="og:image" content="URL-to-image.jpg"> -->
+  <!-- <meta property="og:url" content="https://example.com"> -->
+
+  <!-- <meta name="twitter:card" content="summary_large_image"> -->
+  <meta name="twitter:title" content="{$_("page.title")}">
+  <meta name="twitter:description" content="{$_("page.description")}">
+  <!-- <meta name="twitter:image" content="URL-to-image.jpg"> -->
+  
+  <meta name="theme-color" content="#6D78FC">
+  
+  <meta charset="UTF-8">
+  <meta name="robots" content="index, follow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 </svelte:head>
 
 
-<canvas 
-  id="canvas" 
-  style:width="{$width}px"
-  style:height="{$height}px"
-  bind:this={canvas} 
-/>
-
 <App />
-
-{#if !$loaded}
-  <LoadingScreen width={$width} height={$height} />
-{/if}
-
-
-<style>
-  canvas {
-    position: absolute;
-    left: 0;
-    top: 0;
-
-    z-index: 0;
-  }
-</style>
-

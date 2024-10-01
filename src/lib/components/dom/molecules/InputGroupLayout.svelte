@@ -1,6 +1,6 @@
 <script>
   // Store
-  import { hoveredFilter } from '$lib/stores/canvas.js';
+  import { hoveredFilter } from '$lib/stores';
 
   // DOM Components
 	import CheckIcon from '$lib/components/dom/atoms/CheckIcon.svelte';
@@ -28,7 +28,7 @@
 
       <li class="input-group__item" class:active={active}>
 
-        <label class="item"
+        <label class="item text-xxs"
           on:mouseenter={() => hoveredFilter.set(id)}
           on:mouseleave={() => hoveredFilter.set()}
         >
@@ -70,7 +70,6 @@
       &__item {
 
         .item {
-          font-size: var(--fs-label);
           text-transform: lowercase;
           overflow: hidden;
 

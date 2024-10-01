@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  * {
+    @apply font-light box-border;
+  }
+
+
+  h1, h2, h3, h4, h5, p {
+    @apply m-0;
+  }
+
+  a {
+    @apply font-bold text-primary hover:text-primary-300;
+  }
+
+  p {
+    @apply text-sm;
+  }
+}
+
+@layer components {
+  .onboarding-nav {
+    @apply text-sm lowercase text-white py-1.5 px-3 rounded-sm border border-white md:hover:border-secondary md:hover:text-secondary active:opacity-80
+  }
+
+  .clear-filter-button {
+    @apply text-xxs w-full h-full flex items-center justify-center transition-colors text-primary enabled:hover:text-primary-500 enabled:hover:font-bold enabled:cursor-pointer disabled:text-primary-100;
+  }
+}
+

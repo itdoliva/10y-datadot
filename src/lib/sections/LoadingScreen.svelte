@@ -3,11 +3,10 @@
   import { scale } from 'svelte/transition';
   import loadingLottie from "$lib/loadingLottie.json";
 
-  export let width
-  export let height
+  import { width, height } from '$lib/stores'
 
-  // $: size =  Math.min(width, height) * ( width < 768 ? 1 : .85 )
-  $: size =  Math.min(200, Math.min(width, height) * ( width < 768 ? 1 : .85 ))
+  $: size =  Math.min(200, Math.min($width, $height) * ($width < 768 ? 1 : .85 ))
+
 </script>
 
 <section 

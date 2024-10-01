@@ -16,7 +16,6 @@
 	import Wireless from '$lib/icons/Wireless.svelte';
 	import Return from '$lib/icons/Return.svelte';
 	import Collapse from '$lib/icons/Collapse.svelte';
-	import Logo from '$lib/icons/Logo.svelte';
   import ReturnBackground from '$lib/icons/ReturnBackground.svelte';
   import MousePan from '$lib/icons/MousePan.svelte';
   import Pinch from '$lib/icons/Pinch.svelte';
@@ -44,7 +43,6 @@
     return: Return,
     returnBackground: ReturnBackground,
     collapse: Collapse,
-    logo: Logo,
     mousePan: MousePan,
     pinch: Pinch,
     close: Close,
@@ -53,13 +51,6 @@
 
 </script>
 
-<div class="icon-wrapper">
+<div class="w-full h-full">
   <svelte:component this={componentMapper[icon]} />
 </div>
-
-<style>
-  div {
-    width: 100%;
-    height: 100%;
-  }
-</style>

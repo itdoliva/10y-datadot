@@ -1,7 +1,8 @@
 {
   "page": {
     "title": "10 years • datadot design studio",
-    "hero": "10 years"
+    "hero": "10 years",
+    "description": "We have encoded our projects from the last 10 years into a data visualization. We hope you enjoy the journey and explore our history."
   },
 
   "techsheet": {
@@ -20,15 +21,15 @@
 
   "onboarding": {
     "desktop": {
-      "1": "We built this piece to tell our story in the way we like best: through data visualization",
+      "1": "To celebrate 10 years of Datadot's life, we built this platform to tell our story in the way we like best: through data visualization. We hope you enjoy it :)",
       "2": "Each unit is a delivery made over the life of the datadot",
       "3": "You can interact with the units",
-      "4": "Explore our deliveries in different ways through the <span class='left'>left</span> and <span class='top'>top</span> panels. The clear filters button returns you to the initial state",
+      "4": "Explore our deliveries in different ways through the <span class='left text-secondary font-semibold'>left</span> and <span class='top text-secondary font-semibold'>top</span> panels. The clear filters button returns you to the initial state",
       "5": "Discover hidden properties",
       "6": "Discover our history through other senses"
     },
     "mobile": {
-      "1": "We built this piece to tell our story in the way we like best: through data visualization",
+      "1": "To celebrate 10 years of Datadot's life, we built this platform to tell our story in the way we like best: through data visualization. We hope you enjoy it :)",
       "2": "Each unit is a delivery made over the life of the datadot",
       "3": "You can interact with the units",
       "4": "Explore our deliveries in different layouts...",
@@ -45,11 +46,11 @@
 
   "category": {
     "channel.digital": "Digital channel",
-    "channel.impressa": "Print channel",
+    "channel.impresso": "Print channel",
     "channel.consultoria": "Consulting",
 
     "product.site-editorial": "Editorial website",
-    "product.outras-interfaces": "Other digital interfaces",
+    "product.outras-interfaces": "Other interfaces",
     "product.relatorios": "Reports",
     "product.apresentacao": "Presentation",
     "product.infografico": "Infographic",
@@ -102,6 +103,7 @@
       "title": "sort by",
       "values": {
         "year": "date",
+        "dt": "date",
         "industry": "industry"
       }
     },
@@ -109,8 +111,8 @@
       "title": "activate",
       "values": {
         "complexity": "complexity",
-        "link-client": "show client links",
-        "link-project": "show project links"
+        "link-client": "client links",
+        "link-project": "project links"
       }
     },
 

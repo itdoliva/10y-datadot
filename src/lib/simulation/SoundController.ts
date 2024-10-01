@@ -1,6 +1,3 @@
-import * as PIXI from "pixi.js"
-
-
 // Libraries
 import * as Tone from 'tone';
 import _ from 'lodash';
@@ -12,8 +9,6 @@ import Deliverable from './Deliverable';
 
 export default class SoundController {
   private simulation: Simulation
-
-  private curNode
 
   private initialized = false
   
@@ -49,8 +44,6 @@ export default class SoundController {
   private attackMax = .4
   private attackMin = .005
   
-  private pingPongs: any[] = []
-
   private snareCounter = 0
 
   private autoFilter
@@ -97,8 +90,16 @@ export default class SoundController {
     });
   }
 
+  private init() {
+    Promise.all([ Tone.start(), Tone.loaded() ]).then(() => {
+      new Tone.Loop(this.tick, this.columnTime).start(0)
+      Tone.getTransport().start()
+      this.initialized = true
+    })
+  }
 
-  public resetParams() {
+
+  private resetParams() {
     this.stepCounter = 0
 
     this.release = 20
@@ -108,19 +109,12 @@ export default class SoundController {
     this.reverbNext = false
     this.noteIdx = 8
     this.noteIncrement = -1
-
-    this.curNode = undefined
   }
 
 
   public togglePlaying() {
     if (!this.initialized) {
-      this.initialized = true
-
-      Promise.all([ Tone.start(), Tone.loaded() ]).then(() => {
-        new Tone.Loop(this.tick, this.columnTime).start(0)
-        Tone.getTransport().start()
-      })
+      this.init()
     }
 
     this.resetParams()
@@ -129,6 +123,7 @@ export default class SoundController {
     return this.playing
   }
 
+  
   private tick = (time) => {
     if (!this.playing || !_.isNumber(this.stepCounter)) return
 
@@ -142,15 +137,10 @@ export default class SoundController {
     const nodesInPattern = this.simulation.getDeliverableNodes()
       .filter(d => Math.floor(d.i / this.patternLength) === patternIdx)
       
-    this.curNode = node
-
     if (!node) return
 
-    let animate = false
-    const animateParams = {
-      tint: 0xFFFFFF,
-      rotate: 0
-    }
+    let shouldAnimate = false
+
 
     const { categories } = node
 
@@ -189,23 +179,23 @@ export default class SoundController {
 
     if (columnIdx % 2 === 0) {
       if (categories.includes('design.infografia')) {
-        animate = true
+        shouldAnimate = true
         this.drumPlayers.hihatClosed.start(time);
       }
 
       if (categories.includes("design.user-interface") || categories.includes("design.design-de-servicos")) {
-        animate = true
+        shouldAnimate = true
         this.drumPlayers.hihatOpen.start(time)
       }
 
       if (categories.includes('industry.comunicacao')) {
-        animate = true
+        shouldAnimate = true
         this.drumPlayers.clapPingPong.start(time);
       }
     }
     else {
       if (categories.includes('industry.educacao')) {
-        animate = true
+        shouldAnimate = true
         this.drumPlayers.rimPingPong.start(time);
       }
     }
@@ -216,9 +206,10 @@ export default class SoundController {
       }
 
       if (categories.includes("channel.digital")) {
-        animate = true
+        shouldAnimate = true
 
-        const poly = new Tone.PolySynth().toDestination()
+        const note = this.notes[this.noteIdx]
+        let poly = new Tone.PolySynth().toDestination()
         poly.set({ envelope: { attack: this.attack, release: this.release } })
         poly.volume.value = this.volSynth
 
@@ -232,11 +223,16 @@ export default class SoundController {
           this.reverbNext = false
         }
 
-        this.triggerAndRelease(poly, this.notes[this.noteIdx])
+        poly.triggerAttackRelease(note, '8n')
+
+        Tone.getTransport().scheduleOnce(() => {
+          poly.dispose()
+          poly = null
+        }, Tone.now() + Tone.Time("2n").toSeconds())
       }
 
       if (evenPattern && categories.includes("design.ilustracao")) {
-        animate = true
+        shouldAnimate = true
 
         const playerKey = categories.includes('goal.educacional')
           ? 'kickPingPong'
@@ -252,7 +248,7 @@ export default class SoundController {
         }
         
         this.snareCounter++
-        animate = true
+        shouldAnimate = true
   
         const playerKey = this.snareCounter % 3 === 0
           ? 'snarePingPong'
@@ -262,19 +258,13 @@ export default class SoundController {
       }
     }
 
-    if (animate) {
-      node.context.animateSound(animateParams)
-    }
+    if (shouldAnimate) this.animate(node)
 
     this.stepCounter++
   }
 
-  private triggerAndRelease(poly, note, duration='8n') {
-    poly.triggerAttackRelease(note, duration)
-
-    Tone.getTransport().scheduleOnce(() => {
-      poly.dispose()
-    }, Tone.now() + Tone.Time("2n").toSeconds())
+  private animate(node) {
+    node.context.animateSound()
   }
 
 

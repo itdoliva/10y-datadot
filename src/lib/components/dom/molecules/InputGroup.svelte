@@ -37,7 +37,7 @@
 
       <li class="input-group__item" class:active={active}>
 
-        <label class="item"
+        <label class="item text-xxs"
           on:mouseenter={() => $hoveredFilter = id}
           on:mouseleave={() => $hoveredFilter = undefined}
         >
@@ -118,7 +118,6 @@
 
       &__item {
         .item {
-          font-size: var(--fs-label);
           text-transform: lowercase;
 
           display: grid;

@@ -10,26 +10,3 @@
 	}
 }
 
-@mixin xl {
-	@media (min-width: 1280px) {
-		@content;
-	}
-}
-
-@mixin xxl {
-	@media (min-width: 1920px) {
-		@content;
-	}
-}
-
-@mixin xxxl {
-	@media (min-width: 2560px) {
-		@content;
-	}
-}
-
-@mixin x4k {
-	@media (min-width: 3840px) {
-		@content;
-	}
-}

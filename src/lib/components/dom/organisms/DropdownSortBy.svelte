@@ -20,6 +20,7 @@
 <DropdownMenu title={$_("menu.sort.title")}>
   <InputGroup
     direction="column"
+    i18nPrefix="menu.sort.values."
     categories={sortCategories}
     multiselect={false}
     onDark={true}

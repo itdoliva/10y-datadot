@@ -27,6 +27,7 @@
 <DropdownMenu title={$_("menu.active.title")}>
   <InputGroup
     direction="column"
+    i18nPrefix="menu.active.values."
     categories={featCategories}
     multiselect={true}
     unselectBtn={false}

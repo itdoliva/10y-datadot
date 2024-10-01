@@ -7,6 +7,7 @@ import templates from "../templates"
 
 import { selected } from "../stores/nodes"
 import { hovered } from "../stores/canvas"
+import getRandomSoundSprite from "../utility/getRandomSoundSprite"
 
 
 export default class DeliverableContext {
@@ -143,30 +144,12 @@ export default class DeliverableContext {
     this.context.scale.set(scale) 
   }
 
-  public animateSound(params) {
-    const tints = [
-      0x828AFA,
-      0xCEFD6C,
-      0x6D9DFC,
-      0xFC826D,
-      0xFAF982,      
-    ]
+  public animateSound() {
 
-    const angle = [ 0, 135, 255 ]
-
-    const asset = PIXI.Assets.get("soundFX")
-    const sprite = new PIXI.AnimatedSprite(asset.animations.tile)
-
+    const sprite = getRandomSoundSprite()
+    
     sprite.x = this.context.x
     sprite.y = this.context.y
-    sprite.anchor.x = .5
-    sprite.anchor.y = .5
-    sprite.loop = false
-    sprite.zIndex = 10
-    sprite.blendMode = PIXI.BLEND_MODES.MULTIPLY
-
-    sprite.tint = tints[Math.floor(Math.random() * tints.length)]
-    sprite.angle = angle[Math.floor(Math.random() * angle.length)]
 
     this.context.parent.addChild(sprite)
 

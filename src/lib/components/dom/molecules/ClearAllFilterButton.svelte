@@ -1,11 +1,10 @@
 <script>
   import { _ } from 'svelte-i18n'
 
+  import ClearFilterButton from './ClearFilterButton.svelte';
+
   // Stores
   import { fyears, fdesigns, fgoals, findustries, fproducts } from "$lib/stores/nodes";
-
-  // DOM Components
-  import Button from "$lib/components/dom/atoms/Button.svelte";
 
   $: disabled = (
     ($fdesigns.length + $fgoals.length + $findustries.length + $fproducts.length) === 0 &&
@@ -25,53 +24,6 @@
 
 </script>
 
-<Button {disabled} onClick={clearFilters}
-  colorDefault="var(--clr-accent)"
-  colorActive="var(--clr-accent)"
-  colorHover="var(--clr-accent)"
-  colorDisabled="var(--clr-accent-low)"
->
-  <div class:disabled={disabled}>
-    <p style:text-transform="uppercase">
-      X 
-      <span style:text-decoration="underline">{$_("menu.unselect-all")}</span>
-    </p>
-  </div> 
-  
-</Button>
-
-<style lang="scss">
-  @import "$lib/scss/breakpoints.scss";
-
-  div {
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-    flex-direction: center;
-    align-items: center;
-
-    p {
-      span {
-        font-weight: inherit;
-      }
-    }
-
-    &:not(.disabled):hover {
-
-      p {
-        font-weight: 700;
-      }
-    }
-
-    &.disabled {
-      p {
-        opacity: .4;
-  
-        @include md {
-          opacity: 1;
-        }
-      }
-    }
-  }
-</style>
+<ClearFilterButton uppercase={true} onClick={clearFilters} {disabled}>
+  X&nbsp;<span class="font-inherit underline">{$_("menu.unselect-all")}</span>
+</ClearFilterButton>

@@ -8,8 +8,7 @@
   import { gsap } from "gsap";
 
   // Stores
-  import { app } from "$lib/stores/canvas";
-  import { selected, categories } from "$lib/stores/nodes";
+  import { app, selected, categories } from "$lib/stores";
   
   // Actions
   import castContainer from '$lib/actions/castContainer';
@@ -94,116 +93,129 @@
 
 </script>
 
-<div bind:this={container} class="container file" class:active={!!$selected}>
+<section bind:this={container} class="hidden absolute top-0 left-0 w-full h-full z-40 {!!$selected ? 'pointer-events-auto': 'pointer-events-none'} flex flex-col justify-center">
 
-  <div class="file">
+  <!-- Prev: .file -->
+  <article class="max-w-full max-h-full mx-auto px-6 py-8 grid grid-rows-[max-content_minmax(auto,1fr)] gap-10 md:py-0 md:max-w-3xl md:grid-rows-none md:grid-cols-[max-content_minmax(auto,1fr)] overflow-hidden">
 
-    <!-- TRACES -->
-    <div class="file__traces">
-      <ul style:--n-columns={nColumns} style:--items-by-column={itemsByColumn}>
-        {#each traceIds as id, i (id)}
-        {@const context = new PIXI.Container()}
-        {@const category = $categories.find(d => d.id === id)}
+    <!-- Prev .file__traces ul -->
+    <ul 
+      class="row-start-2 md:row-start-1 md:col-start-1 gap-y-6 gap-x-2 content-center grid overflow-y-auto overflow-x-hidden pr-2"
+      style:grid-template-columns="repeat({nColumns}, minmax(0,1fr))"
+      style:grid-template-rows="repeat({itemsByColumn}, minmax(0,1fr))"
+    >
+      {#each traceIds as id, i (id)}
+      {@const context = new PIXI.Container()}
+      {@const category = $categories.find(d => d.id === id)}
 
-          {#if category}
+        {#if category}
+  
+          <li class="grid grid-cols-[2rem_minmax(0,1fr)] gap-2.5 md:grid-cols-[2.25rem_minmax(0,1fr)] items-center">
+
+            <!-- Prev .primitive-holder -->
+            <figure 
+              class="opacity-[inherit] aspect-square" 
+              use:castContainer={{ 
+                parent: get(app).stage.getChildByName('vis-container'), 
+                context, 
+                propagateOpacity: container 
+              }}
+            >
+              <FileTrace {id} {context}/>
+            </figure>
     
-            <li>
-              <div class="primitive-holder" use:castContainer={{ parent: get(app).stage.getChildByName('viz-container'), context, propagateOpacity: container }}>
-                <FileTrace {id} {context}/>
-              </div>
-      
-              <p class="label">
-                {$_("category." + category.id)}
-              </p>
-            </li>
-          {/if}
-        {/each}
-      </ul>
-    </div>
+            <p class="text-xxs md:text-xs self-center lowercase underline">
+              {$_("category." + category.id)}
+            </p>
+          </li>
+        {/if}
+      {/each}
+    </ul>
 
     <!-- DESCRIPTION -->
-    <div class="file__description">
+    <div class="flex flex-col gap-3 justify-center md:py-8">
 
-      <div class="header">
-        <div class="project-name">
-            <h3>{project}</h3>
-        </div>
-          <h4 class="project-client">{client}</h4>
+      <!-- Header -->
+      <div class="flex flex-col">
+          <h3 class="inline-block font-bold uppercase text-2xl md:text-3xl">{project}</h3>
+          <h4 class="mt-1.5 underline text-lg">{client}</h4>
       </div>
     
-      <div class="body">
-
-        <p class="project-description">
-          {description}
-        </p>
-      </div>
+      <!-- Body -->
+      <p>
+        {description}
+      </p>
     
-      <div class="footer">
-        <p class="project-date">{date}</p>
+      <!-- Footer -->
+      <div class="flex flex-col gap-4 items-start">
+        <p class="underline">{date}</p>
     
         {#if !outerClose}
-          <button on:click={onClick}>
-            <Icon icon="return"/>
+          <button class="stroke-black stroke-1 hover:stroke-primary hover:text-primary flex flex-col" on:click={onClick} >
+            <figure class="w-10 h-10">
+              <Icon icon="return"/>
+            </figure>
+            <p>{$_('file.back')}</p>
           </button>
         {/if}
       </div>
         
     </div>
 
-  </div>
+  </article>
 
-</div>
+</section>
 
 <style lang="scss">
   @import "$lib/scss/breakpoints.scss";
 
   .container {
-    overflow: hidden;
-    position: absolute;
+    // overflow: hidden;
+    // position: absolute;
 
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    // top: 0;
+    // left: 0;
+    // width: 100%;
+    // height: 100%;
 
-    z-index: 10;
+    // z-index: 10;
 
-    pointer-events: none;
+    // pointer-events: none;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: center;
 
-    padding: 0 calc(3.2*var(--fs-label));
+    // padding: 0 calc(3.2*var(--fs-label));
 
-    opacity: 0;
+    // opacity: 0;
 
-    overflow: auto;
+    // overflow: auto;
 
-    @include md {
-      padding: 0;
-    }
+    // @include md {
+    //   padding: 0;
+    // }
 
     &.active {
-      pointer-events: all;
+      // pointer-events: all;
     }
 
     .file {
-      padding: calc(4.2*var(--fs-label)) 0;
+      // padding: calc(4.2*var(--fs-label)) 0;
 
-      transition: opacity 1s ease-in-out;
+      // transition: opacity 1s ease-in-out;
 
-      pointer-events: none;
-      position: relative;
+      // pointer-events: none;
+      // position: relative;
 
       
-      display: grid;
-      grid-template-rows: max-content 1fr;
-      grid-template-areas: 
-        "description"
-        "traces";
-      align-content: stretch;
-      row-gap: calc(var(--fs-label)*3.6);
+      // display: grid;
+      // grid-template-rows: max-content 1fr;
+      // grid-template-areas: 
+      //   "description"
+      //   "traces";
+      // align-content: stretch;
+      // row-gap: calc(var(--fs-label)*3.6);
 
 
       @include md {
@@ -235,46 +247,46 @@
         }
 
         ul {
-          width: 100%;
+          // width: 100%;
           
-          position: relative;
-          display: grid;
-          grid-template-rows: repeat(var(--items-by-column), 1fr);
-          grid-template-columns: repeat(var(--n-columns), 1fr);
+          // position: relative;
+          // display: grid;
+          // grid-template-rows: repeat(var(--items-by-column), 1fr);
+          // grid-template-columns: repeat(var(--n-columns), 1fr);
 
-          column-gap: calc(1.2*var(--fs-label));
-          row-gap: calc(2*var(--fs-label));
+          // column-gap: calc(1.2*var(--fs-label));
+          // row-gap: calc(2*var(--fs-label));
+          // align-content: center;
 
           @include md {
-            row-gap: calc(2*var(--fs-label));
+            // row-gap: calc(2*var(--fs-label));
           }
 
-          align-content: center;
 
           li {
-            display: grid;
-            grid-template-columns: calc(var(--fs-label)*2.6) 1fr;
-            grid-template-rows: calc(var(--fs-label)*2.2);
-            column-gap: calc(var(--fs-label)*1.6);
+            // display: grid;
+            // grid-template-columns: calc(var(--fs-label)*2.6) 1fr;
+            // grid-template-rows: calc(var(--fs-label)*2.2);
+            // column-gap: calc(var(--fs-label)*1.6);
 
-            justify-content: end;
-            align-items: center;
+            // justify-content: end;
+            // align-items: center;
 
             @include md {
-              grid-template-columns: calc(var(--fs-label)*3.2) 1fr;
-              column-gap: calc(var(--fs-label)*2);
+              // grid-template-columns: calc(var(--fs-label)*3.2) 1fr;
+              // column-gap: calc(var(--fs-label)*2);
             }
 
             .primitive-holder {
-              opacity: inherit;
-              aspect-ratio: 1/1;
+              // opacity: inherit;
+              // aspect-ratio: 1/1;
             }
 
             .label {
-              align-self: center;
-              text-transform: lowercase;
-              text-decoration: underline;
-              font-size: var(--fs-label);
+              // align-self: center;
+              // text-transform: lowercase;
+              // text-decoration: underline;
+              // font-size: var(--fs-label);
             }
 
           }
@@ -296,42 +308,42 @@
           --fs-date: calc(var(--fs-label)*1.4);
         }
 
-        height: 100%;
-        width: 100%;
-        max-width: calc(var(--fs-label)*28);
+        // height: 100%;
+        // width: 100%;
+        // max-width: calc(var(--fs-label)*28);
 
-        display: grid;
-        justify-self: start;
-        grid-auto-rows: min-content;
+        // display: grid;
+        // justify-self: start;
+        // grid-auto-rows: min-content;
 
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: center;
-        row-gap: var(--fs-label);
+        // display: flex;
+        // flex-direction: column;
+        // align-items: stretch;
+        // justify-content: center;
+        // row-gap: var(--fs-label);
 
         .header {
-          display: flex;
-          flex-direction: column;
-          gap: 0;
+          // display: flex;
+          // flex-direction: column;
+          // gap: 0;
           letter-spacing: .1em;
 
           .project-name {
 
             h3 {
-              display: inline-block;
-              font-weight: 700;
-              text-transform: uppercase;
+              // display: inline-block;
+              // font-weight: 700;
+              // text-transform: uppercase;
               font-size: var(--fs-name);
-              line-height: 1;
+              // line-height: 1;
 
-              color: var(--clr-black);
+              // color: var(--clr-black);
             }
           }
 
           .project-client {
-            margin-top: .6em;
-            text-decoration: underline;
+            // margin-top: .6em;
+            // text-decoration: underline;
             font-size: var(--fs-client);
           }
         }

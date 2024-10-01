@@ -57,8 +57,7 @@
     rScale = (v) => Math.sqrt(areaScale(v)/(2*Math.PI)) + 5
     collideRadius = (d) => rScale(d.v) + ($width >= 768 ? 5 : 15)
 
-    forceCollide.radius(collideRadius)
-
+    updateForceCollideRadius()
 
     nodes = $categoriesEnriched.filter(d => d.type === 'industry').map(d => {
       const r = rScale(d.pctNodes)
@@ -123,6 +122,7 @@
 
   $: updateNodes($categoriesEnriched)
   $: $locale && setLabels()
+  $: selected && markActive()
 
   function setLabels() {
     if (!initialized) return
@@ -155,7 +155,7 @@
 
     })
 
-    forceCollide.radius(collideRadius);
+    updateForceCollideRadius()
 
     nodesG
       .data(nodes)
@@ -187,10 +187,16 @@
 
     selected = [...selected]
     
-    nodesG.classed('active', d => selected.includes(d.id))
-    
+    updateForceCollideRadius()
+  }
+
+  function updateForceCollideRadius() {
     forceCollide.radius(collideRadius)
   }
+
+  function markActive() {
+    if (nodesG) nodesG.classed('active', d => selected.includes(d.id))
+  } 
 
   function bringToFront() {
     const parent = this.parentNode
@@ -201,7 +207,7 @@
 </script>
 
 
-<div class="aspect-square md:aspect-[9.1] md:aspect- grid grid-rows-[1fr_min-content]">
+<div class="h-80 md:h-64 grid grid-rows-[1fr_min-content]">
   <div class="w-full h-full" bind:clientWidth={w} bind:clientHeight={h}>
     <svg class="w-full h-full overflow-visible relative" bind:this={svg}>
       <defs>

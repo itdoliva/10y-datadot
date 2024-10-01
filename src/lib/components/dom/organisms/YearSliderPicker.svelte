@@ -87,7 +87,7 @@
   <ul class="labels">
     {#each drag as year}
     {@const x = year2pos(year) + pad.left }
-      <p class="label" style:left="{x}px">
+      <p class="label text-xxs" style:left="{x}px">
         {year}
       </p>
     {/each}
@@ -183,13 +183,12 @@
 
       position: relative;
 
-      font-size: calc(var(--fs-label)*.9);
       font-weight: 600;
 
       .label {
         position: absolute;
         pointer-events: none;
-        transform: translate(-50%, 0);
+        transform: translate(-50%, -10%);
       }
 
     }

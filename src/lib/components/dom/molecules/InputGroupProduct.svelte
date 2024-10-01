@@ -84,7 +84,7 @@
 
           <div class="item__label">
             <input type="checkbox" value={id} {disabled} bind:group={selected}/>
-            <p>{$_("category." + id)}</p>
+            <p class="text-xxs">{$_("category." + id)}</p>
           </div>
 
         </label>
@@ -138,7 +138,6 @@
       &__item {
 
         .item {
-          font-size: var(--fs-label);
           text-transform: lowercase;
 
           display: grid;

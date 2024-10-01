@@ -1,7 +1,8 @@
 {
   "page": {
     "title": "10 anos • datadot design studio",
-    "hero": "10 anos"
+    "hero": "10 anos",
+    "description": "Transformamos nossos projetos dos últimos 10 anos em uma visualização de dados. Esperamos que você aproveite a jornada e explore nossa história."
   },
 
   "techsheet": {
@@ -20,7 +21,7 @@
 
   "onboarding": {
     "desktop": {
-      "1": "Construímos esta peça para contar a nossa história da forma que mais gostamos: através da visualização de dados",
+      "1": "Para comemorar os 10 anos de vida da Datadot, construímos essa plataforma para contar a nossa história da forma que mais gostamos: através da visualização de dados. Esperamos que gostem :)",
       "2": "Cada unidade é uma entrega realizada ao longo da vida da datadot",
       "3": "Você pode interagir com as unidades",
       "4": "Explore as nossas entregas de diferentes formas através dos paineis da <span class='left'>esquerda</span> e do <span class='top'>topo</span>. O botão limpar filtros retorna ao estado inicial",
@@ -28,7 +29,7 @@
       "6": "Conheça nossa história através de outros sentidos"
     },
     "mobile": {
-      "1": "Construímos esta peça para contar a nossa história da forma que mais gostamos: através da visualização de dados",
+      "1": "Para comemorar os 10 anos de vida da Datadot, construímos essa plataforma para contar a nossa história da forma que mais gostamos: através da visualização de dados. Esperamos que gostem :)",
       "2": "Cada unidade é uma entrega realizada ao longo da vida da datadot",
       "3": "Você pode interagir com as unidades",
       "4": "Explore as nossas entregas em diferentes layouts...",
@@ -45,11 +46,11 @@
 
   "category": {
     "channel.digital": "Mídia digital",
-    "channel.impressa": "Mídia impressa",
+    "channel.impresso": "Mídia impressa",
     "channel.consultoria": "Consultoria",
 
     "product.site-editorial": "Site editorial",
-    "product.outras-interfaces": "Outras interfaces digitais",
+    "product.outras-interfaces": "Outras interfaces",
     "product.relatorios": "Relatórios",
     "product.apresentacao": "Apresentação",
     "product.infografico": "Infográfico",
@@ -102,6 +103,7 @@
       "title": "organizar por",
       "values": {
         "year": "data",
+        "dt": "data",
         "industry": "setor"
       }
     },
@@ -109,8 +111,8 @@
       "title": "ativar",
       "values": {
         "complexity": "complexidade",
-        "link-client": "ver conexões por cliente",
-        "link-project": "ver conexões por projeto"
+        "link-client": "conexões por cliente",
+        "link-project": "conexões por projeto"
       }
     },
 

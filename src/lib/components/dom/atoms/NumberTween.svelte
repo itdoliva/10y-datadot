@@ -22,15 +22,8 @@
 
 </script>
 
-<p>
+<p class="text-xxs m-0">
   {isPct 
     ? Math.round($number_t*100) + "%" 
     : Math.round($number_t)}
 </p>
-
-<style>
-  p {
-    margin: 0;
-    text-align: inherit;
-  }
-</style>

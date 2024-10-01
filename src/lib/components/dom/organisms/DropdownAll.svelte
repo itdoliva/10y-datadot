@@ -38,6 +38,7 @@
     <h5>{$_("menu.sort.title")}</h5>
     <InputGroup
       direction="column"
+      i18nPrefix="menu.sort.values."
       categories={sortCategories}
       multiselect={false}
       onDark={true}
@@ -49,6 +50,7 @@
     <h5>{$_("menu.active.title")}</h5>
     <InputGroup
       direction="column"
+      i18nPrefix="menu.active.values."
       categories={featCategories}
       multiselect={true}
       unselectBtn={false}

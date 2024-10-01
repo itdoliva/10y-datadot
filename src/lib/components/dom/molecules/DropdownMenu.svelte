@@ -39,9 +39,9 @@
         <Icon icon='caret' />
       </div>
 
-      <span class="button__label">{title}</span>
+      <span class="button__label text-xxs">{title}</span>
     {:else}
-      <span class="button__label">...</span>
+      <span class="button__label text-xxs">...</span>
     {/if}
   </button>
 
@@ -83,7 +83,6 @@
       }
 
       &__label {
-        font-size: var(--fs-label);
       }
     }
 

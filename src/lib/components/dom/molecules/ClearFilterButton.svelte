@@ -6,36 +6,21 @@
 
   export let onClick
   export let disabled
+  export let uppercase = false
 
 </script>
 
-<Button {onClick} {disabled}
-  colorDefault="var(--clr-accent)"
-  colorActive="var(--clr-accent)"
-  colorHover="var(--clr-accent)"
-  colorDisabled="var(--clr-accent-low)"
+<button 
+  class="clear-filter-button"
+  on:click={onClick}
+  {disabled}
 >
-  <p class:disabled={disabled}>{$_("input.unselect")}</p>
-</Button>
+    <p class="w-full text-left font-inherit text-nowrap text-xxs {uppercase ? "uppercase" : ""}">
+      <slot>
+        <span class="font-inherit underline">
+            {$_("input.unselect")}
+        </span>
+      </slot>
+    </p>
+</button>
 
-<style lang="scss">
-  @import "$lib/scss/breakpoints.scss";
-
-  p {
-    text-decoration: underline;
-
-    &:not(.disabled) {
-      &:hover {
-        font-weight: 700;
-      }
-    }
-
-    &.disabled {
-      opacity: .4;
-
-      @include md {
-        opacity: 1;
-      }
-    }
-  }
-</style>

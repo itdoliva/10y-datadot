@@ -25,14 +25,11 @@ export const nodeSize = derived(([ width ]), ([ $width ]) => {
   if ($width < 768) {
     return 30
   }
-  else if ($width <= 1800) {
-    return 20
-  }
-  return 15 + Math.ceil($width * .01)
+    return Math.round(0.01 * $width + 12.5)
 })
 
 export const lineWidth = derived(([ nodeSize ]), ([ $nodeSize ]) => {
-  return Math.max(1, Math.round($nodeSize / 20))
+  return Math.max(1, Math.round($nodeSize / 25))
 })
 
 export const gap = derived(nodeSize, ($nodeSize) => {

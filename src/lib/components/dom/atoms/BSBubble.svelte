@@ -98,7 +98,6 @@
 
       &__alias {
         text-transform: lowercase;
-        font-size: var(--fs-label);
         font-weight: 500;
 
         @include md {

@@ -12,7 +12,8 @@
 
 </script>
 
-<div class="panel-item-container container {direction} {theme}">
+<div 
+  class="panel-item-container w-full flex container {direction} {theme}">
   <div class="panel-item">
 
     {#if icon}
@@ -21,11 +22,14 @@
       </div>
     {/if}
 
-    <h6 class="panel-item__title">{title}</h6>
+    <h3 class="panel-item__title text-xs">
+      {title}
+    </h3>
 
     <div class="panel-item__body">
       <slot />
     </div>
+
   </div>
 </div>
 
@@ -50,7 +54,6 @@
         align-self: center;
   
         margin: 0;
-        font-size: var(--fs-title);
         font-weight: 500;
       }
 
@@ -81,7 +84,7 @@
       .panel-item {
         width: 100%;
         
-        grid-template-columns: calc(1.8*var(--fs-label)) 1fr;
+        grid-template-columns: 1.375rem minmax(0,1fr);
         grid-template-rows: max-content min-content;
         grid-template-areas: 
           "title title"
@@ -99,7 +102,7 @@
       justify-content: center;
       
       .panel-item {
-        grid-template-columns: calc(1.8*var(--fs-label)) max-content max-content;
+        grid-template-columns: 1.375rem max-content max-content;
         grid-template-areas:
           "title title body";
 
