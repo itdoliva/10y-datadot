@@ -37,7 +37,7 @@
 </script>
 
 <button 
-  class="text-xxs w-full h-full py-0 px-4 grid grid-cols-[1.125rem_min-content_1.125rem] justify-center items-center gap-2.5 italic {playing ? "bg-primary fill-black text-black hover:bg-primary-300" : "bg-black fill-primary text-primary hover:text-secondary hover:fill-secondary"} transition-colors"
+  class="text-xxs w-full h-full py-0 px-4 grid grid-cols-[1.125rem_min-content_1.125rem] justify-center items-center gap-2.5 italic {playing ? "bg-primary fill-black text-black md:hover:bg-primary-300" : "bg-black fill-primary text-primary md:hover:text-secondary md:hover:fill-secondary"} transition-colors"
   on:click={onClick}
 >
   <Icon icon={playing ? "pause" : "play"} />
