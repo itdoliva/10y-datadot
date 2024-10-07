@@ -7,8 +7,7 @@ function set_current_component(component) {
   current_component = component;
 }
 function get_current_component() {
-  if (!current_component)
-    throw new Error("Function called outside component initialization");
+  if (!current_component) throw new Error("Function called outside component initialization");
   return current_component;
 }
 function onDestroy(fn) {
@@ -99,14 +98,11 @@ function spread(args, attrs_to_add) {
   }
   let str = "";
   Object.keys(attributes).forEach((name) => {
-    if (invalid_attribute_name_character.test(name))
-      return;
+    if (invalid_attribute_name_character.test(name)) return;
     const value = attributes[name];
-    if (value === true)
-      str += " " + name;
+    if (value === true) str += " " + name;
     else if (boolean_attributes.has(name.toLowerCase())) {
-      if (value)
-        str += " " + name;
+      if (value) str += " " + name;
     } else if (value != null) {
       str += ` ${name}="${value}"`;
     }
@@ -119,8 +115,7 @@ function merge_ssr_styles(style_attribute, style_directive) {
     const colon_index = individual_style.indexOf(":");
     const name = individual_style.slice(0, colon_index).trim();
     const value = individual_style.slice(colon_index + 1).trim();
-    if (!name)
-      continue;
+    if (!name) continue;
     style_object[name] = value;
   }
   for (const name in style_directive) {
@@ -173,8 +168,7 @@ const missing_component = {
 };
 function validate_component(component, name) {
   if (!component || !component.$$render) {
-    if (name === "svelte:component")
-      name += " this={...}";
+    if (name === "svelte:component") name += " this={...}";
     throw new Error(
       `<${name}> is not a valid SSR component. You may need to review your build config to ensure that dependencies are compiled, rather than imported as pre-compiled modules. Otherwise you may need to fix a <${name}>.`
     );
@@ -219,13 +213,12 @@ function create_ssr_component(fn) {
   };
 }
 function add_attribute(name, value, boolean) {
-  if (value == null || boolean && !value)
-    return "";
+  if (value == null || boolean && !value) return "";
   const assignment = boolean && value === true ? "" : `="${escape(value, true)}"`;
   return ` ${name}${assignment}`;
 }
 function style_object_to_string(style_object) {
-  return Object.keys(style_object).filter((key) => style_object[key] != null && style_object[key] !== "").map((key) => `${key}: ${escape_attribute_value(style_object[key])};`).join(" ");
+  return Object.keys(style_object).filter((key) => style_object[key]).map((key) => `${key}: ${escape_attribute_value(style_object[key])};`).join(" ");
 }
 function add_styles(style_object) {
   const styles = style_object_to_string(style_object);

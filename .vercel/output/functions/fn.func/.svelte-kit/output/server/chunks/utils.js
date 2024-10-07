@@ -2,8 +2,7 @@ function noop() {
 }
 const identity = (x) => x;
 function assign(tar, src) {
-  for (const k in src)
-    tar[k] = src[k];
+  for (const k in src) tar[k] = src[k];
   return (
     /** @type {T & S} */
     tar

@@ -20,13 +20,11 @@ function run_tasks(now2) {
       task.f();
     }
   });
-  if (tasks.size !== 0)
-    raf(run_tasks);
+  if (tasks.size !== 0) raf(run_tasks);
 }
 function loop(callback) {
   let task;
-  if (tasks.size === 0)
-    raf(run_tasks);
+  if (tasks.size === 0) raf(run_tasks);
   return {
     promise: new Promise((fulfill) => {
       tasks.add(task = { c: callback, f: fulfill });
@@ -982,8 +980,7 @@ class Deliverable {
     this.selected = false;
     this.radius = () => this.active ? get_store_value(nodeSize) : 0;
     this.tick = () => {
-      if (this.simulation.onSelectedState && this.selected)
-        ;
+      if (this.simulation.onSelectedState && this.selected) ;
       else if (this.simulation.onSelectedState === true && !this.selected) {
         this.fx = void 0;
         this.fy = void 0;
@@ -1052,8 +1049,7 @@ class TransitionController {
       const prev = this.cur;
       this.cur = transition;
       this.running = !!transition;
-      if (!this.running && prev && prev.type === "exit")
-        return;
+      if (!this.running && prev && prev.type === "exit") return;
       this.simulation.handleTransition(this.running);
       this.simulation.getDeliverableNodes().forEach((node) => node.context.toggleEventMode());
     };
@@ -1346,8 +1342,7 @@ class ZoomController {
       e.preventDefault();
     };
     this.handlePointerUp = (e) => {
-      if (this.dragging)
-        return;
+      if (this.dragging) return;
       const { clientX, clientY } = e;
       d3.select("#canvas").node().dispatchEvent(new PointerEvent("pointerup", { clientX, clientY }));
     };
@@ -1490,16 +1485,14 @@ class SoundController {
     this.attackMin = 5e-3;
     this.snareCounter = 0;
     this.tick = (time) => {
-      if (!this.playing || !_.isNumber(this.stepCounter))
-        return;
+      if (!this.playing || !_.isNumber(this.stepCounter)) return;
       const stepIdx = this.stepCounter % this.simulation.activeCount;
       const patternIdx = Math.floor(stepIdx / this.patternLength);
       const columnIdx = stepIdx % this.patternLength;
       const evenPattern = patternIdx % 2 === 0;
       const node = this.simulation.getDeliverableNodes().find((d) => d.active && d.i === stepIdx);
       const nodesInPattern = this.simulation.getDeliverableNodes().filter((d) => Math.floor(d.i / this.patternLength) === patternIdx);
-      if (!node)
-        return;
+      if (!node) return;
       let shouldAnimate = false;
       const { categories: categories2 } = node;
       if (categories2.includes("product.outras-interfaces")) {
@@ -1592,8 +1585,7 @@ class SoundController {
           this.drumPlayers[playerKey].start(time);
         }
       }
-      if (shouldAnimate)
-        this.animate(node);
+      if (shouldAnimate) this.animate(node);
       this.stepCounter++;
     };
     this.simulation = simulation2;
@@ -1740,8 +1732,7 @@ class LayoutInterface {
     this.queue = [];
     this.pop = (attrId) => {
       const attrIdx = this.queue.findIndex((d) => d.id === attrId);
-      if (attrIdx === -1)
-        return;
+      if (attrIdx === -1) return;
       const attr = this.queue.splice(attrIdx, 1)[0];
       return attr;
     };
@@ -1772,8 +1763,7 @@ class LayoutInterface {
       this.prev = this.cur;
       this.cur = this.pop(attrId);
     }
-    if (!this.cur || type === "exit")
-      return;
+    if (!this.cur || type === "exit") return;
     const { sectorTitleData, minRadius, translate } = this.cur;
     sectorTitleData.forEach((sectorTitleDataPoint, i) => {
       const layoutLabel = new LayoutLabel(this.context, sectorTitleDataPoint, minRadius, translate);
@@ -1782,8 +1772,7 @@ class LayoutInterface {
   }
   updateText() {
     "updateText";
-    if (!this.cur)
-      return;
+    if (!this.cur) return;
     this.nodes.forEach((node) => {
       node.updateText();
     });
@@ -1957,8 +1946,7 @@ class Simulation {
       return { layoutSize: sectorSize, layoutData };
     };
     this.chainNodeAttributes = (transitionType, delay = 0) => {
-      if (!this.initialized)
-        return;
+      if (!this.initialized) return;
       const attrId = ++this.attrId;
       const layoutSettings = this.layout === "block" ? this.chainNodesBlockAttr(attrId) : this.chainNodesRadialAttr(attrId);
       setTimeout(() => {
@@ -1975,15 +1963,13 @@ class Simulation {
       this.chainNodeAttributes("entrance", 250);
     }, 300);
     this.handleFigureResize = (figureWidth2) => {
-      if (!figureWidth2)
-        return;
+      if (!figureWidth2) return;
       if (!this.initialized) {
         this.debounceInitialize();
       }
     };
     this.handleWindowResize = (width2) => {
-      if (!width2)
-        return;
+      if (!width2) return;
       this.zoom.updateScaleExtent(this.layout, width2);
     };
     this.handleLanguageChange = (locale) => {
@@ -2053,11 +2039,9 @@ class Simulation {
       return curNode;
     };
     this.setLayout = (newLayout) => {
-      if (newLayout === this.layout)
-        return;
+      if (newLayout === this.layout) return;
       this.layout = newLayout;
-      if (!this.initialized)
-        return;
+      if (!this.initialized) return;
       this.transition.add({ type: "exit" });
       this.chainNodeAttributes("entrance");
     };
@@ -2072,8 +2056,7 @@ class Simulation {
       this.chainNodeAttributes("sort");
     };
     this.filter = (fyears2, findustries2, fdesigns2, fgoals2, fproducts2) => {
-      if (!this.initialized)
-        return;
+      if (!this.initialized) return;
       this.getDeliverableNodes().forEach((node) => {
         node.setActive(fyears2, findustries2, fdesigns2, fgoals2, fproducts2);
       });
@@ -2255,8 +2238,7 @@ const Icon = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     close: Close,
     closeX: CloseX
   };
-  if ($$props.icon === void 0 && $$bindings.icon && icon !== void 0)
-    $$bindings.icon(icon);
+  if ($$props.icon === void 0 && $$bindings.icon && icon !== void 0) $$bindings.icon(icon);
   return `<div class="w-full h-full">${validate_component(componentMapper[icon] || missing_component, "svelte:component").$$render($$result, {}, {}, {})}</div>`;
 });
 const css$i = {
@@ -2268,12 +2250,9 @@ const PanelItem = create_ssr_component(($$result, $$props, $$bindings, slots) =>
   let { icon = void 0 } = $$props;
   let { direction = "column" } = $$props;
   const { theme } = getContext("item-theme");
-  if ($$props.title === void 0 && $$bindings.title && title !== void 0)
-    $$bindings.title(title);
-  if ($$props.icon === void 0 && $$bindings.icon && icon !== void 0)
-    $$bindings.icon(icon);
-  if ($$props.direction === void 0 && $$bindings.direction && direction !== void 0)
-    $$bindings.direction(direction);
+  if ($$props.title === void 0 && $$bindings.title && title !== void 0) $$bindings.title(title);
+  if ($$props.icon === void 0 && $$bindings.icon && icon !== void 0) $$bindings.icon(icon);
+  if ($$props.direction === void 0 && $$bindings.direction && direction !== void 0) $$bindings.direction(direction);
   $$result.css.add(css$i);
   return `<div class="${"panel-item-container w-full flex container " + escape(direction, true) + " " + escape(theme, true) + " svelte-1m03nv4"}"><div class="panel-item svelte-1m03nv4">${icon ? `<div class="panel-item__icon svelte-1m03nv4">${validate_component(Icon, "Icon").$$render($$result, { icon }, {}, {})}</div>` : ``} <h3 class="panel-item__title text-xs svelte-1m03nv4">${escape(title)}</h3> <div class="panel-item__body svelte-1m03nv4">${slots.default ? slots.default({}) : ``}</div></div> </div>`;
 });
@@ -2286,14 +2265,10 @@ const CheckIcon = create_ssr_component(($$result, $$props, $$bindings, slots) =>
   let { hoveredFilter: hoveredFilter2 = false } = $$props;
   let { onDark = false } = $$props;
   let { backgroundColor = void 0 } = $$props;
-  if ($$props.active === void 0 && $$bindings.active && active !== void 0)
-    $$bindings.active(active);
-  if ($$props.hoveredFilter === void 0 && $$bindings.hoveredFilter && hoveredFilter2 !== void 0)
-    $$bindings.hoveredFilter(hoveredFilter2);
-  if ($$props.onDark === void 0 && $$bindings.onDark && onDark !== void 0)
-    $$bindings.onDark(onDark);
-  if ($$props.backgroundColor === void 0 && $$bindings.backgroundColor && backgroundColor !== void 0)
-    $$bindings.backgroundColor(backgroundColor);
+  if ($$props.active === void 0 && $$bindings.active && active !== void 0) $$bindings.active(active);
+  if ($$props.hoveredFilter === void 0 && $$bindings.hoveredFilter && hoveredFilter2 !== void 0) $$bindings.hoveredFilter(hoveredFilter2);
+  if ($$props.onDark === void 0 && $$bindings.onDark && onDark !== void 0) $$bindings.onDark(onDark);
+  if ($$props.backgroundColor === void 0 && $$bindings.backgroundColor && backgroundColor !== void 0) $$bindings.backgroundColor(backgroundColor);
   $$result.css.add(css$h);
   return `<div class="container check-icon svelte-11shla7">${``} </div>`;
 });
@@ -2308,12 +2283,9 @@ const InputGroupLayout = create_ssr_component(($$result, $$props, $$bindings, sl
   let { disabled = false } = $$props;
   let { direction = "column" } = $$props;
   const categories2 = [{ alias: "Block", id: "block" }, { alias: "Radial", id: "radial" }];
-  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
-    $$bindings.selected(selected2);
-  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0)
-    $$bindings.disabled(disabled);
-  if ($$props.direction === void 0 && $$bindings.direction && direction !== void 0)
-    $$bindings.direction(direction);
+  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0) $$bindings.selected(selected2);
+  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0) $$bindings.disabled(disabled);
+  if ($$props.direction === void 0 && $$bindings.direction && direction !== void 0) $$bindings.direction(direction);
   $$result.css.add(css$g);
   $$unsubscribe_hoveredFilter();
   return `<div class="${"container " + escape(direction, true) + " svelte-1gcwn54"}"><ul class="input-group svelte-1gcwn54">${each(categories2, ({ id, alias }) => {
@@ -2338,18 +2310,13 @@ const InputLayout = create_ssr_component(($$result, $$props, $$bindings, slots) 
   let { direction = "column" } = $$props;
   let { theme = "on-light" } = $$props;
   setContext("item-theme", { theme });
-  if ($$props.layout === void 0 && $$bindings.layout && layout !== void 0)
-    $$bindings.layout(layout);
-  if ($$props.direction === void 0 && $$bindings.direction && direction !== void 0)
-    $$bindings.direction(direction);
-  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0)
-    $$bindings.theme(theme);
+  if ($$props.layout === void 0 && $$bindings.layout && layout !== void 0) $$bindings.layout(layout);
+  if ($$props.direction === void 0 && $$bindings.direction && direction !== void 0) $$bindings.direction(direction);
+  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0) $$bindings.theme(theme);
   let $$settled;
   let $$rendered;
-  let previous_head = $$result.head;
   do {
     $$settled = true;
-    $$result.head = previous_head;
     $$rendered = `${validate_component(PanelItem, "PanelItem").$$render(
       $$result,
       {
@@ -2394,18 +2361,12 @@ const Button = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let { colorActive = "var(--clr-white)" } = $$props;
   let { colorHover = "var(--clr-white)" } = $$props;
   let { colorDisabled = "var(--clr-gray)" } = $$props;
-  if ($$props.onClick === void 0 && $$bindings.onClick && onClick !== void 0)
-    $$bindings.onClick(onClick);
-  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0)
-    $$bindings.disabled(disabled);
-  if ($$props.colorDefault === void 0 && $$bindings.colorDefault && colorDefault !== void 0)
-    $$bindings.colorDefault(colorDefault);
-  if ($$props.colorActive === void 0 && $$bindings.colorActive && colorActive !== void 0)
-    $$bindings.colorActive(colorActive);
-  if ($$props.colorHover === void 0 && $$bindings.colorHover && colorHover !== void 0)
-    $$bindings.colorHover(colorHover);
-  if ($$props.colorDisabled === void 0 && $$bindings.colorDisabled && colorDisabled !== void 0)
-    $$bindings.colorDisabled(colorDisabled);
+  if ($$props.onClick === void 0 && $$bindings.onClick && onClick !== void 0) $$bindings.onClick(onClick);
+  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0) $$bindings.disabled(disabled);
+  if ($$props.colorDefault === void 0 && $$bindings.colorDefault && colorDefault !== void 0) $$bindings.colorDefault(colorDefault);
+  if ($$props.colorActive === void 0 && $$bindings.colorActive && colorActive !== void 0) $$bindings.colorActive(colorActive);
+  if ($$props.colorHover === void 0 && $$bindings.colorHover && colorHover !== void 0) $$bindings.colorHover(colorHover);
+  if ($$props.colorDisabled === void 0 && $$bindings.colorDisabled && colorDisabled !== void 0) $$bindings.colorDisabled(colorDisabled);
   $$result.css.add(css$f);
   return `<button class="clean-btn svelte-2whk0p" ${disabled ? "disabled" : ""}${add_styles({
     "--clr-default": colorDefault,
@@ -2420,12 +2381,9 @@ const ClearFilterButton = create_ssr_component(($$result, $$props, $$bindings, s
   let { onClick } = $$props;
   let { disabled } = $$props;
   let { uppercase = false } = $$props;
-  if ($$props.onClick === void 0 && $$bindings.onClick && onClick !== void 0)
-    $$bindings.onClick(onClick);
-  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0)
-    $$bindings.disabled(disabled);
-  if ($$props.uppercase === void 0 && $$bindings.uppercase && uppercase !== void 0)
-    $$bindings.uppercase(uppercase);
+  if ($$props.onClick === void 0 && $$bindings.onClick && onClick !== void 0) $$bindings.onClick(onClick);
+  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0) $$bindings.disabled(disabled);
+  if ($$props.uppercase === void 0 && $$bindings.uppercase && uppercase !== void 0) $$bindings.uppercase(uppercase);
   $$unsubscribe__();
   return `<button class="clear-filter-button" ${disabled ? "disabled" : ""}><p class="${"w-full text-left font-inherit text-nowrap text-xxs " + escape(uppercase ? "uppercase" : "", true)}">${slots.default ? slots.default({}) : ` <span class="font-inherit underline">${escape($_("input.unselect"))}</span> `}</p></button>`;
 });
@@ -2433,8 +2391,7 @@ function is_date(obj) {
   return Object.prototype.toString.call(obj) === "[object Date]";
 }
 function get_interpolator(a, b) {
-  if (a === b || a !== a)
-    return () => a;
+  if (a === b || a !== a) return () => a;
   const type = typeof a;
   if (type !== typeof b || Array.isArray(a) !== Array.isArray(b)) {
     throw new Error("Cannot interpolate values of different type");
@@ -2446,8 +2403,7 @@ function get_interpolator(a, b) {
     return (t) => arr.map((fn) => fn(t));
   }
   if (type === "object") {
-    if (!a || !b)
-      throw new Error("Object cannot be null");
+    if (!a || !b) throw new Error("Object cannot be null");
     if (is_date(a) && is_date(b)) {
       a = a.getTime();
       b = b.getTime();
@@ -2502,12 +2458,10 @@ function tweened(value, defaults = {}) {
     const start = now() + delay;
     let fn;
     task = loop((now2) => {
-      if (now2 < start)
-        return true;
+      if (now2 < start) return true;
       if (!started) {
         fn = interpolate(value, new_value);
-        if (typeof duration === "function")
-          duration = duration(value, new_value);
+        if (typeof duration === "function") duration = duration(value, new_value);
         started = true;
       }
       if (previous_task) {
@@ -2542,8 +2496,8 @@ const BarTween = create_ssr_component(($$result, $$props, $$bindings, slots) => 
   let { number } = $$props;
   let { domain = [0, 1] } = $$props;
   let { options = {} } = $$props;
-  let w2 = 0;
-  let h2 = 0;
+  let w = 0;
+  let h = 0;
   const defaultOptions = {
     duration: 1e3,
     delay: i * 0.05 * 1e3,
@@ -2552,19 +2506,15 @@ const BarTween = create_ssr_component(($$result, $$props, $$bindings, slots) => 
   const tweenOptions = { ...defaultOptions, ...options };
   const bw = tweened(0, tweenOptions);
   $$unsubscribe_bw = subscribe(bw, (value) => $bw = value);
-  if ($$props.i === void 0 && $$bindings.i && i !== void 0)
-    $$bindings.i(i);
-  if ($$props.number === void 0 && $$bindings.number && number !== void 0)
-    $$bindings.number(number);
-  if ($$props.domain === void 0 && $$bindings.domain && domain !== void 0)
-    $$bindings.domain(domain);
-  if ($$props.options === void 0 && $$bindings.options && options !== void 0)
-    $$bindings.options(options);
+  if ($$props.i === void 0 && $$bindings.i && i !== void 0) $$bindings.i(i);
+  if ($$props.number === void 0 && $$bindings.number && number !== void 0) $$bindings.number(number);
+  if ($$props.domain === void 0 && $$bindings.domain && domain !== void 0) $$bindings.domain(domain);
+  if ($$props.options === void 0 && $$bindings.options && options !== void 0) $$bindings.options(options);
   $$result.css.add(css$e);
-  xScale = d3.scaleLinear().domain(domain).range([0, w2]);
+  xScale = d3.scaleLinear().domain(domain).range([0, w]);
   set_store_value(bw, $bw = xScale(number), $bw);
   $$unsubscribe_bw();
-  return `<div class="bar-container svelte-1xji6c4"><svg class="svelte-1xji6c4"><line x1="0"${add_attribute("x2", w2, 0)}${add_attribute("y1", h2 / 2, 0)}${add_attribute("y2", h2 / 2, 0)} stroke="black" stroke-dasharray="1 3"></line><line x1="0"${add_attribute("x2", $bw, 0)}${add_attribute("y1", h2 / 2, 0)}${add_attribute("y2", h2 / 2, 0)} stroke="var(--clr-accent)" stroke-width="2"></line></svg> </div>`;
+  return `<div class="bar-container svelte-1xji6c4"><svg class="svelte-1xji6c4"><line x1="0"${add_attribute("x2", w, 0)}${add_attribute("y1", h / 2, 0)}${add_attribute("y2", h / 2, 0)} stroke="black" stroke-dasharray="1 3"></line><line x1="0"${add_attribute("x2", $bw, 0)}${add_attribute("y1", h / 2, 0)}${add_attribute("y2", h / 2, 0)} stroke="var(--clr-accent)" stroke-width="2"></line></svg> </div>`;
 });
 const NumberTween = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $number_t, $$unsubscribe_number_t;
@@ -2575,12 +2525,9 @@ const NumberTween = create_ssr_component(($$result, $$props, $$bindings, slots) 
   const tweenOptions = { ...defaultOptions, ...options };
   const number_t = tweened(0, tweenOptions);
   $$unsubscribe_number_t = subscribe(number_t, (value) => $number_t = value);
-  if ($$props.number === void 0 && $$bindings.number && number !== void 0)
-    $$bindings.number(number);
-  if ($$props.isPct === void 0 && $$bindings.isPct && isPct !== void 0)
-    $$bindings.isPct(isPct);
-  if ($$props.options === void 0 && $$bindings.options && options !== void 0)
-    $$bindings.options(options);
+  if ($$props.number === void 0 && $$bindings.number && number !== void 0) $$bindings.number(number);
+  if ($$props.isPct === void 0 && $$bindings.isPct && isPct !== void 0) $$bindings.isPct(isPct);
+  if ($$props.options === void 0 && $$bindings.options && options !== void 0) $$bindings.options(options);
   set_store_value(number_t, $number_t = number, $number_t);
   $$unsubscribe_number_t();
   return `<p class="text-xxs m-0">${escape(isPct ? Math.round($number_t * 100) + "%" : Math.round($number_t))}</p>`;
@@ -2604,24 +2551,15 @@ const InputGroup = create_ssr_component(($$result, $$props, $$bindings, slots) =
   let { gridlayout = "simple" } = $$props;
   let { direction = "row" } = $$props;
   const { theme } = getContext("item-theme");
-  if ($$props.categories === void 0 && $$bindings.categories && categories2 !== void 0)
-    $$bindings.categories(categories2);
-  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
-    $$bindings.selected(selected2);
-  if ($$props.multiselect === void 0 && $$bindings.multiselect && multiselect !== void 0)
-    $$bindings.multiselect(multiselect);
-  if ($$props.unselectBtn === void 0 && $$bindings.unselectBtn && unselectBtn !== void 0)
-    $$bindings.unselectBtn(unselectBtn);
-  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0)
-    $$bindings.disabled(disabled);
-  if ($$props.onDark === void 0 && $$bindings.onDark && onDark !== void 0)
-    $$bindings.onDark(onDark);
-  if ($$props.i18nPrefix === void 0 && $$bindings.i18nPrefix && i18nPrefix !== void 0)
-    $$bindings.i18nPrefix(i18nPrefix);
-  if ($$props.gridlayout === void 0 && $$bindings.gridlayout && gridlayout !== void 0)
-    $$bindings.gridlayout(gridlayout);
-  if ($$props.direction === void 0 && $$bindings.direction && direction !== void 0)
-    $$bindings.direction(direction);
+  if ($$props.categories === void 0 && $$bindings.categories && categories2 !== void 0) $$bindings.categories(categories2);
+  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0) $$bindings.selected(selected2);
+  if ($$props.multiselect === void 0 && $$bindings.multiselect && multiselect !== void 0) $$bindings.multiselect(multiselect);
+  if ($$props.unselectBtn === void 0 && $$bindings.unselectBtn && unselectBtn !== void 0) $$bindings.unselectBtn(unselectBtn);
+  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0) $$bindings.disabled(disabled);
+  if ($$props.onDark === void 0 && $$bindings.onDark && onDark !== void 0) $$bindings.onDark(onDark);
+  if ($$props.i18nPrefix === void 0 && $$bindings.i18nPrefix && i18nPrefix !== void 0) $$bindings.i18nPrefix(i18nPrefix);
+  if ($$props.gridlayout === void 0 && $$bindings.gridlayout && gridlayout !== void 0) $$bindings.gridlayout(gridlayout);
+  if ($$props.direction === void 0 && $$bindings.direction && direction !== void 0) $$bindings.direction(direction);
   $$result.css.add(css$d);
   $$unsubscribe_hoveredFilter();
   $$unsubscribe__();
@@ -2658,14 +2596,11 @@ const InputDesign = create_ssr_component(($$result, $$props, $$bindings, slots) 
   $$unsubscribe_fdesigns = subscribe(fdesigns, (value) => $fdesigns = value);
   let { theme = "on-light" } = $$props;
   setContext("item-theme", { theme });
-  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0)
-    $$bindings.theme(theme);
+  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0) $$bindings.theme(theme);
   let $$settled;
   let $$rendered;
-  let previous_head = $$result.head;
   do {
     $$settled = true;
-    $$result.head = previous_head;
     $$rendered = `${validate_component(PanelItem, "PanelItem").$$render(
       $$result,
       {
@@ -2719,23 +2654,18 @@ const YearSliderPicker = create_ssr_component(($$result, $$props, $$bindings, sl
   const drag = [min, max];
   const { theme } = getContext("item-theme");
   let svg;
-  let w2 = 100;
-  let h2 = 100;
+  let w = 100;
+  let h = 100;
   const pad = { left: 8, right: 8 };
   const years = d3.range(min, max + step, step);
-  if ($$props.min === void 0 && $$bindings.min && min !== void 0)
-    $$bindings.min(min);
-  if ($$props.max === void 0 && $$bindings.max && max !== void 0)
-    $$bindings.max(max);
-  if ($$props.step === void 0 && $$bindings.step && step !== void 0)
-    $$bindings.step(step);
-  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
-    $$bindings.selected(selected2);
-  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0)
-    $$bindings.disabled(disabled);
+  if ($$props.min === void 0 && $$bindings.min && min !== void 0) $$bindings.min(min);
+  if ($$props.max === void 0 && $$bindings.max && max !== void 0) $$bindings.max(max);
+  if ($$props.step === void 0 && $$bindings.step && step !== void 0) $$bindings.step(step);
+  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0) $$bindings.selected(selected2);
+  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0) $$bindings.disabled(disabled);
   $$result.css.add(css$c);
-  rCircle = h2 / 4;
-  innerW = w2 - (pad.left + pad.right);
+  rCircle = h / 4;
+  innerW = w - (pad.left + pad.right);
   year2pos = d3.scalePoint().domain(years).range([0, innerW]);
   d3.scaleQuantize().domain([0, innerW]).range(years);
   {
@@ -2747,9 +2677,9 @@ const YearSliderPicker = create_ssr_component(($$result, $$props, $$bindings, sl
   return `<div class="${"container " + escape(theme, true) + " svelte-u3fm5r"}"><ul class="labels svelte-u3fm5r">${each(drag, (year) => {
     let x = year2pos(year) + pad.left;
     return ` <p class="label text-xxs svelte-u3fm5r"${add_styles({ "left": `${x}px` })}>${escape(year)} </p>`;
-  })}</ul>  <div class="slider-container svelte-u3fm5r"><svg class="slider svelte-u3fm5r"${add_attribute("this", svg, 0)}><g transform="${"translate(" + escape(pad.left, true) + ", " + escape(h2 / 2, true) + ")"}"><g class="slider__lines svelte-u3fm5r"><line class="line-back svelte-u3fm5r" x1="0"${add_attribute("x2", innerW, 0)}></line><line class="line-front svelte-u3fm5r"${add_attribute("x1", year2pos(drag[0]), 0)}${add_attribute("x2", year2pos(drag[1]), 0)}></line></g><g class="slider__handlers">${each(drag, (year, i) => {
+  })}</ul>  <div class="slider-container svelte-u3fm5r"><svg class="slider svelte-u3fm5r"${add_attribute("this", svg, 0)}><g transform="${"translate(" + escape(pad.left, true) + ", " + escape(h / 2, true) + ")"}"><g class="slider__lines svelte-u3fm5r"><line class="line-back svelte-u3fm5r" x1="0"${add_attribute("x2", innerW, 0)}></line><line class="line-front svelte-u3fm5r"${add_attribute("x1", year2pos(drag[0]), 0)}${add_attribute("x2", year2pos(drag[1]), 0)}></line></g><g class="slider__handlers">${each(drag, (year, i) => {
     let x = year2pos(year), unclickable = i === 1 && drag[0] === max;
-    return `   <g class="${["handler svelte-u3fm5r", unclickable ? "unclickable" : ""].join(" ").trim()}" transform="${"translate(" + escape(x, true) + ", 0)"}"${add_attribute("data-index", i, 0)}${add_styles({ "cursor": `pointer` })}><circle class="outer-circle svelte-u3fm5r"${add_attribute("r", rCircle, 0)}></circle><circle class="inner-circle svelte-u3fm5r"${add_attribute("r", rCircle / 4, 0)}></circle><rect class="hover-box svelte-u3fm5r"${add_attribute("x", -year2pos.step() / 2, 0)}${add_attribute("y", -h2 / 2, 0)}${add_attribute("width", year2pos.step(), 0)}${add_attribute("height", h2, 0)}></rect></g>`;
+    return `   <g class="${["handler svelte-u3fm5r", unclickable ? "unclickable" : ""].join(" ").trim()}" transform="${"translate(" + escape(x, true) + ", 0)"}"${add_attribute("data-index", i, 0)}${add_styles({ "cursor": `pointer` })}><circle class="outer-circle svelte-u3fm5r"${add_attribute("r", rCircle, 0)}></circle><circle class="inner-circle svelte-u3fm5r"${add_attribute("r", rCircle / 4, 0)}></circle><rect class="hover-box svelte-u3fm5r"${add_attribute("x", -year2pos.step() / 2, 0)}${add_attribute("y", -h / 2, 0)}${add_attribute("width", year2pos.step(), 0)}${add_attribute("height", h, 0)}></rect></g>`;
   })}</g></g></svg></div> </div>`;
 });
 const InputPeriod = create_ssr_component(($$result, $$props, $$bindings, slots) => {
@@ -2761,14 +2691,11 @@ const InputPeriod = create_ssr_component(($$result, $$props, $$bindings, slots) 
   $$unsubscribe_fyears = subscribe(fyears, (value) => $fyears = value);
   let { theme = "on-light" } = $$props;
   setContext("item-theme", { theme });
-  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0)
-    $$bindings.theme(theme);
+  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0) $$bindings.theme(theme);
   let $$settled;
   let $$rendered;
-  let previous_head = $$result.head;
   do {
     $$settled = true;
-    $$result.head = previous_head;
     $$rendered = `${validate_component(PanelItem, "PanelItem").$$render(
       $$result,
       {
@@ -2818,14 +2745,10 @@ const InputGroupGoal = create_ssr_component(($$result, $$props, $$bindings, slot
   let { disabled = false } = $$props;
   let { nColumns = 1 } = $$props;
   const { theme } = getContext("item-theme");
-  if ($$props.categories === void 0 && $$bindings.categories && categories2 !== void 0)
-    $$bindings.categories(categories2);
-  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
-    $$bindings.selected(selected2);
-  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0)
-    $$bindings.disabled(disabled);
-  if ($$props.nColumns === void 0 && $$bindings.nColumns && nColumns !== void 0)
-    $$bindings.nColumns(nColumns);
+  if ($$props.categories === void 0 && $$bindings.categories && categories2 !== void 0) $$bindings.categories(categories2);
+  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0) $$bindings.selected(selected2);
+  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0) $$bindings.disabled(disabled);
+  if ($$props.nColumns === void 0 && $$bindings.nColumns && nColumns !== void 0) $$bindings.nColumns(nColumns);
   $$result.css.add(css$b);
   itemsByColumn = Math.ceil((categories2.length + 1) / nColumns);
   $$unsubscribe_hoveredFilter();
@@ -2867,16 +2790,12 @@ const InputGoal = create_ssr_component(($$result, $$props, $$bindings, slots) =>
   let { nColumns = 1 } = $$props;
   let { theme = "on-light" } = $$props;
   setContext("item-theme", { theme });
-  if ($$props.nColumns === void 0 && $$bindings.nColumns && nColumns !== void 0)
-    $$bindings.nColumns(nColumns);
-  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0)
-    $$bindings.theme(theme);
+  if ($$props.nColumns === void 0 && $$bindings.nColumns && nColumns !== void 0) $$bindings.nColumns(nColumns);
+  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0) $$bindings.theme(theme);
   let $$settled;
   let $$rendered;
-  let previous_head = $$result.head;
   do {
     $$settled = true;
-    $$result.head = previous_head;
     $$rendered = `${validate_component(PanelItem, "PanelItem").$$render($$result, { icon: "goals", title: $_("input.goal") }, {}, {
       default: () => {
         return `${validate_component(InputGroupGoal, "InputGroupGoal").$$render(
@@ -2917,14 +2836,10 @@ const Graphics = create_ssr_component(($$result, $$props, $$bindings, slots) => 
   }
   context.addChild(graphics);
   setContext("graphics", graphics);
-  if ($$props.context === void 0 && $$bindings.context && context !== void 0)
-    $$bindings.context(context);
-  if ($$props.drawFunc === void 0 && $$bindings.drawFunc && drawFunc !== void 0)
-    $$bindings.drawFunc(drawFunc);
-  if ($$props.alpha === void 0 && $$bindings.alpha && alpha !== void 0)
-    $$bindings.alpha(alpha);
-  if ($$props.blendmode === void 0 && $$bindings.blendmode && blendmode !== void 0)
-    $$bindings.blendmode(blendmode);
+  if ($$props.context === void 0 && $$bindings.context && context !== void 0) $$bindings.context(context);
+  if ($$props.drawFunc === void 0 && $$bindings.drawFunc && drawFunc !== void 0) $$bindings.drawFunc(drawFunc);
+  if ($$props.alpha === void 0 && $$bindings.alpha && alpha !== void 0) $$bindings.alpha(alpha);
+  if ($$props.blendmode === void 0 && $$bindings.blendmode && blendmode !== void 0) $$bindings.blendmode(blendmode);
   return `${slots.default ? slots.default({}) : ``}`;
 });
 const Bubble = create_ssr_component(($$result, $$props, $$bindings, slots) => {
@@ -2949,10 +2864,8 @@ const Bubble = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   onDestroy(() => {
     ticker.remove(ticked);
   });
-  if ($$props.i === void 0 && $$bindings.i && i !== void 0)
-    $$bindings.i(i);
-  if ($$props.r === void 0 && $$bindings.r && r !== void 0)
-    $$bindings.r(r);
+  if ($$props.i === void 0 && $$bindings.i && i !== void 0) $$bindings.i(i);
+  if ($$props.r === void 0 && $$bindings.r && r !== void 0) $$bindings.r(r);
   {
     gsap.to(bubble, { r, ...tweenOptions });
   }
@@ -2977,16 +2890,11 @@ const InputGroupProduct = create_ssr_component(($$result, $$props, $$bindings, s
   let { disabled = false } = $$props;
   let { nColumns = 1 } = $$props;
   let { parent = void 0 } = $$props;
-  if ($$props.categories === void 0 && $$bindings.categories && categories2 !== void 0)
-    $$bindings.categories(categories2);
-  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
-    $$bindings.selected(selected2);
-  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0)
-    $$bindings.disabled(disabled);
-  if ($$props.nColumns === void 0 && $$bindings.nColumns && nColumns !== void 0)
-    $$bindings.nColumns(nColumns);
-  if ($$props.parent === void 0 && $$bindings.parent && parent !== void 0)
-    $$bindings.parent(parent);
+  if ($$props.categories === void 0 && $$bindings.categories && categories2 !== void 0) $$bindings.categories(categories2);
+  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0) $$bindings.selected(selected2);
+  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0) $$bindings.disabled(disabled);
+  if ($$props.nColumns === void 0 && $$bindings.nColumns && nColumns !== void 0) $$bindings.nColumns(nColumns);
+  if ($$props.parent === void 0 && $$bindings.parent && parent !== void 0) $$bindings.parent(parent);
   $$result.css.add(css$a);
   itemsByColumn = Math.ceil((categories2.length + 1) / nColumns);
   $$unsubscribe_hoveredFilter();
@@ -3049,18 +2957,13 @@ const InputProduct = create_ssr_component(($$result, $$props, $$bindings, slots)
   let { nColumns = 1 } = $$props;
   let { theme = "on-light" } = $$props;
   setContext("item-theme", { theme });
-  if ($$props.parent === void 0 && $$bindings.parent && parent !== void 0)
-    $$bindings.parent(parent);
-  if ($$props.nColumns === void 0 && $$bindings.nColumns && nColumns !== void 0)
-    $$bindings.nColumns(nColumns);
-  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0)
-    $$bindings.theme(theme);
+  if ($$props.parent === void 0 && $$bindings.parent && parent !== void 0) $$bindings.parent(parent);
+  if ($$props.nColumns === void 0 && $$bindings.nColumns && nColumns !== void 0) $$bindings.nColumns(nColumns);
+  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0) $$bindings.theme(theme);
   let $$settled;
   let $$rendered;
-  let previous_head = $$result.head;
   do {
     $$settled = true;
-    $$result.head = previous_head;
     $$rendered = `${validate_component(PanelItem, "PanelItem").$$render(
       $$result,
       {
@@ -3119,10 +3022,8 @@ const BeeswarmAlt = create_ssr_component(($$result, $$props, $$bindings, slots) 
   function tick() {
     return;
   }
-  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0)
-    $$bindings.selected(selected2);
-  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0)
-    $$bindings.disabled(disabled);
+  if ($$props.selected === void 0 && $$bindings.selected && selected2 !== void 0) $$bindings.selected(selected2);
+  if ($$props.disabled === void 0 && $$bindings.disabled && disabled !== void 0) $$bindings.disabled(disabled);
   $$unsubscribe__();
   $$unsubscribe_locale();
   $$unsubscribe_categoriesEnriched();
@@ -3148,14 +3049,11 @@ const InputIndustry = create_ssr_component(($$result, $$props, $$bindings, slots
   $$unsubscribe_findustries = subscribe(findustries, (value) => $findustries = value);
   let { theme = "on-light" } = $$props;
   setContext("item-theme", { theme });
-  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0)
-    $$bindings.theme(theme);
+  if ($$props.theme === void 0 && $$bindings.theme && theme !== void 0) $$bindings.theme(theme);
   let $$settled;
   let $$rendered;
-  let previous_head = $$result.head;
   do {
     $$settled = true;
-    $$result.head = previous_head;
     $$rendered = `${validate_component(PanelItem, "PanelItem").$$render(
       $$result,
       {
@@ -3355,10 +3253,8 @@ const FileTrace = create_ssr_component(($$result, $$props, $$bindings, slots) =>
     ticker.remove(tick);
     tweens.forEach((tween) => tween.kill());
   });
-  if ($$props.id === void 0 && $$bindings.id && id !== void 0)
-    $$bindings.id(id);
-  if ($$props.context === void 0 && $$bindings.context && context !== void 0)
-    $$bindings.context(context);
+  if ($$props.id === void 0 && $$bindings.id && id !== void 0) $$bindings.id(id);
+  if ($$props.context === void 0 && $$bindings.context && context !== void 0) $$bindings.context(context);
   $$unsubscribe_app();
   return ``;
 });
@@ -3399,10 +3295,8 @@ const File = create_ssr_component(($$result, $$props, $$bindings, slots) => {
       return;
     }
   }
-  if ($$props.nColumns === void 0 && $$bindings.nColumns && nColumns !== void 0)
-    $$bindings.nColumns(nColumns);
-  if ($$props.outerClose === void 0 && $$bindings.outerClose && outerClose !== void 0)
-    $$bindings.outerClose(outerClose);
+  if ($$props.nColumns === void 0 && $$bindings.nColumns && nColumns !== void 0) $$bindings.nColumns(nColumns);
+  if ($$props.outerClose === void 0 && $$bindings.outerClose && outerClose !== void 0) $$bindings.outerClose(outerClose);
   {
     update($selected);
   }
@@ -3433,14 +3327,11 @@ const MobileFrame = create_ssr_component(($$result, $$props, $$bindings, slots) 
   function openSheet() {
     isSheetOpen.set(true);
   }
-  if ($$props.layout === void 0 && $$bindings.layout && layout !== void 0)
-    $$bindings.layout(layout);
+  if ($$props.layout === void 0 && $$bindings.layout && layout !== void 0) $$bindings.layout(layout);
   let $$settled;
   let $$rendered;
-  let previous_head = $$result.head;
   do {
     $$settled = true;
-    $$result.head = previous_head;
     $$rendered = `<div id="root" class="w-full h-full overflow-hidden grid grid-rows-[max-content_minmax(0,1fr)_max-content_max-content]"> <section id="mobile-header" class="row-start-1 z-10 px-6 pt-7 pb-3.5 flex justify-between items-end border-b border-b-black border-opacity-50"><div class="logo-container">${validate_component(ProjectLogo, "ProjectLogo").$$render($$result, {}, {}, {})}</div> <div class="options-wrapper flex flex-col justify-between items-end">${validate_component(LanguageChange, "LanguageChange").$$render($$result, {}, {}, {})}</div></section> <section class="row-start-2 z-20 w-full flex relative"><article id="vis-container" class="w-full">${validate_component(Signals, "Signals").$$render($$result, {}, {}, {})} ${validate_component(Visualization, "Visualization").$$render($$result, {}, {}, {})} ${validate_component(File, "File").$$render($$result, { nColumns: "2", outerClose: true }, {}, {})}</article> <article id="filter-container" class="absolute overflow-hidden top-0 left-0 w-full h-[110%] pointer-events-none"><button class="${"bg-black text-white absolute top-4 right-0 border-none rounded-tl-[1rem] rounded-bl-[1rem] p-3 transition-transform ease-in-out " + escape(
       $isToggleHidden ? "translate-x-full duration-200 pointer-events-none" : "duration-[750ms] delay-500 pointer-events-auto",
       true
@@ -3473,8 +3364,7 @@ const css$8 = {
 const DropdownMenu = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let { title } = $$props;
   setContext("item-theme", { theme: "on-dark" });
-  if ($$props.title === void 0 && $$bindings.title && title !== void 0)
-    $$bindings.title(title);
+  if ($$props.title === void 0 && $$bindings.title && title !== void 0) $$bindings.title(title);
   $$result.css.add(css$8);
   return `<div class="${["dropdown svelte-l3v3h3", ""].join(" ").trim()}"><button class="button svelte-l3v3h3">${title ? `<div class="button__icon svelte-l3v3h3">${validate_component(Icon, "Icon").$$render($$result, { icon: "caret" }, {}, {})}</div> <span class="button__label text-xxs">${escape(title)}</span>` : `<span class="button__label text-xxs" data-svelte-h="svelte-gxj7xe">...</span>`}</button> <div class="content svelte-l3v3h3">${slots.default ? slots.default({}) : ``}</div> </div>`;
 });
@@ -3486,10 +3376,8 @@ const DropdownActivate = create_ssr_component(($$result, $$props, $$bindings, sl
   const featIds = ["complexity", "link-project", "link-client"];
   let $$settled;
   let $$rendered;
-  let previous_head = $$result.head;
   do {
     $$settled = true;
-    $$result.head = previous_head;
     featCategories = featIds.map((id) => ({
       id,
       alias: $_(`menu.active.values.${id}`)
@@ -3539,10 +3427,8 @@ const DropdownSortBy = create_ssr_component(($$result, $$props, $$bindings, slot
   const sortIds = ["dt", "industry"];
   let $$settled;
   let $$rendered;
-  let previous_head = $$result.head;
   do {
     $$settled = true;
-    $$result.head = previous_head;
     sortCategories = sortIds.map((id) => ({ id, alias: $_(`menu.sort.values.${id}`) }));
     $$rendered = `${validate_component(DropdownMenu, "DropdownMenu").$$render($$result, { title: $_("menu.sort.title") }, {}, {
       default: () => {
@@ -3588,10 +3474,8 @@ const DropdownAll = create_ssr_component(($$result, $$props, $$bindings, slots) 
   $$result.css.add(css$7);
   let $$settled;
   let $$rendered;
-  let previous_head = $$result.head;
   do {
     $$settled = true;
-    $$result.head = previous_head;
     sortCategories = sortIds.map((id) => ({ id, alias: $_(`menu.sort.values.${id}`) }));
     featCategories = featIds.map((id) => ({
       id,
@@ -3663,14 +3547,11 @@ const DesktopFrame = create_ssr_component(($$result, $$props, $$bindings, slots)
     isShrinked = !isShrinked;
     return;
   }
-  if ($$props.layout === void 0 && $$bindings.layout && layout !== void 0)
-    $$bindings.layout(layout);
+  if ($$props.layout === void 0 && $$bindings.layout && layout !== void 0) $$bindings.layout(layout);
   let $$settled;
   let $$rendered;
-  let previous_head = $$result.head;
   do {
     $$settled = true;
-    $$result.head = previous_head;
     $$rendered = `<div id="root" class="w-full h-full relative overflow-hidden grid md:grid-rows-[auto_1fr] md:grid-cols-[240px_repeat(4,minmax(0,1fr))] xl:grid-cols-5"><section id="top-panel" class="col-start-2 col-span-full row-start-1 row-span-1 z-20"><article id="shrink-panel" class="relative overflow-hidden transition-all duration-300 ease-in-out"${add_styles({
       "transform": `translate(0, ${isShrinked ? -1 * shrinkHeight : 0}px)`,
       "max-height": `${isShrinked ? 0 : shrinkHeight}px`
@@ -3709,7 +3590,7 @@ const DesktopFrame = create_ssr_component(($$result, $$props, $$bindings, slots)
 });
 const css$6 = {
   code: ".techsheet.svelte-1lw7ke.svelte-1lw7ke{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;display:none}.techsheet.svelte-1lw7ke.svelte-1lw7ke.open{display:block}.techsheet.svelte-1lw7ke .techsheet-panel-wrapper.svelte-1lw7ke{position:absolute;top:50%;left:50%;transform:translate(-50%, -50%)}.techsheet.svelte-1lw7ke .techsheet-panel-wrapper .techsheet-panel.svelte-1lw7ke{display:flex;flex-direction:column;width:90vw;max-height:80vh}@media(min-width: 768px){.techsheet.svelte-1lw7ke .techsheet-panel-wrapper .techsheet-panel.svelte-1lw7ke{width:auto;max-width:calc(48 * var(--fs-label))}}.techsheet.svelte-1lw7ke .techsheet-panel-wrapper .techsheet-panel .close-wrapper.svelte-1lw7ke{width:calc(3.2 * var(--fs-label));height:calc(3.2 * var(--fs-label));margin-left:auto;position:fixed;bottom:0;right:0;transform:translate(-30%, 50%)}@media(min-width: 768px){.techsheet.svelte-1lw7ke .techsheet-panel-wrapper .techsheet-panel .close-wrapper.svelte-1lw7ke{width:calc(2.4 * var(--fs-label));height:calc(2.4 * var(--fs-label));bottom:auto;top:0;transform:translate(-50%, -50%)}}.techsheet.svelte-1lw7ke .techsheet-panel-wrapper .techsheet-panel .close-wrapper button.svelte-1lw7ke{padding:0;width:100%;height:100%;background:var(--clr-black);border-radius:99rem;color:var(--clr-accent);cursor:pointer}.techsheet.svelte-1lw7ke .techsheet-panel-wrapper .techsheet-panel .close-wrapper button.svelte-1lw7ke:hover{color:var(--clr-accent-hover)}.techsheet.svelte-1lw7ke .techsheet-panel-wrapper .techsheet-panel .content.svelte-1lw7ke{flex:1;border:2px solid var(--clr-black);background:var(--clr-white);overflow:hidden;display:flex}.techsheet.svelte-1lw7ke .techsheet-panel-wrapper .techsheet-panel .content__body.svelte-1lw7ke{padding:calc(2.4 * var(--fs-label));overflow-y:auto;max-height:100%;flex:1;display:grid;grid-auto-flow:row;gap:calc(1.4 * var(--fs-label))}@media(min-width: 768px){.techsheet.svelte-1lw7ke .techsheet-panel-wrapper .techsheet-panel .content__body.svelte-1lw7ke{padding:calc(3.6 * var(--fs-label))}}.techsheet.svelte-1lw7ke .techsheet-panel-wrapper .techsheet-panel .content__body p.svelte-1lw7ke{margin:var(--fs-label) 0}.techsheet.svelte-1lw7ke .techsheet-panel-wrapper .techsheet-panel .content__body h5.svelte-1lw7ke{margin-bottom:var(--fs-label)}.techsheet.svelte-1lw7ke .techsheet-backdrop.svelte-1lw7ke{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255, 255, 255, 0.8)}",
-  map: '{"version":3,"file":"TechSheet.svelte","sources":["TechSheet.svelte"],"sourcesContent":["<script lang=\\"ts\\">import { _ } from \\"svelte-i18n\\";\\nimport { gsap } from \\"gsap\\";\\nimport { isSheetOpen } from \\"../../../stores/techsheet\\";\\nimport Icon from \\"../atoms/Icon.svelte\\";\\nlet wrapper;\\n$:\\n  if (wrapper && $isSheetOpen) {\\n    const tl = gsap.timeline({\\n      overwrite: true,\\n      onStart: addOpenClass\\n    });\\n    tl.fromTo(\\".techsheet-backdrop\\", { opacity: 0 }, { opacity: 1, duration: 0.15 }).fromTo(\\".techsheet-panel\\", { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3 }, \\"<\\");\\n  } else if (wrapper && !$isSheetOpen) {\\n    const tl = gsap.timeline({\\n      overwrite: true,\\n      onComplete: removeOpenClass,\\n      onInterrupt: removeOpenClass\\n    });\\n    tl.to(\\".techsheet-backdrop\\", { opacity: 0, duration: 0.5 }).to(\\".techsheet-panel\\", { y: -12, opacity: 0, duration: 0.3 }, \\"<\\");\\n  }\\nfunction handleClose() {\\n  isSheetOpen.set(false);\\n}\\nfunction addOpenClass() {\\n  if (!wrapper)\\n    return;\\n  wrapper.classList.add(\\"open\\");\\n}\\nfunction removeOpenClass() {\\n  if (!wrapper)\\n    return;\\n  wrapper.classList.remove(\\"open\\");\\n}\\n<\/script>\\n\\n<div bind:this={wrapper} class=\\"techsheet\\">\\n  \\n  <div class=\\"techsheet-backdrop\\" />\\n\\n  <div class=\\"techsheet-panel-wrapper\\">\\n\\n    <!-- Adding the extra div below allows us to add some transform transition -->\\n    <div class=\\"techsheet-panel\\">\\n\\n      <div class=\\"close-wrapper\\">\\n        <button class=\\"clean-btn\\" on:click={handleClose}>\\n          <Icon icon=\\"closeX\\"/>\\n        </button>\\n      </div>\\n\\n      <div class=\\"content\\">\\n\\n        <div class=\\"content__body\\">\\n          <h3 class=\\"text-lg\\">datadot {$_(\\"page.hero\\")}</h3>\\n    \\n          <div>\\n            <p class=\\"text-xs\\">{$_(\\"techsheet.main\\")}</p>\\n            <p class=\\"text-xs\\"><span class=\\"font-medium\\">{$_(\\"techsheet.encourage\\")}</span></p>\\n          </div>\\n    \\n          <div>\\n            <h5>{$_(\\"techsheet.made-by\\")}</h5>  \\n            <ul class=\\"text-xs\\">\\n              <li><span class=\\"font-medium\\">Flávia Marinho</span> ({($_(\\"techsheet.roles.flavia\\"))})</li>\\n              <li><span class=\\"font-medium\\">Otávio Burin</span> ({($_(\\"techsheet.roles.otavio\\"))})</li>\\n              <li><span class=\\"font-medium\\">Italo Oliveira</span> ({($_(\\"techsheet.roles.italo\\"))})</li>\\n              <li><span class=\\"font-medium\\">Quintino Andrade</span> ({($_(\\"techsheet.roles.quintino\\"))})</li>\\n              <li><span class=\\"font-medium\\">Ludmila Souza</span> ({($_(\\"techsheet.roles.ludmila\\"))})</li>\\n              <li><span class=\\"font-medium\\">Gabriel Maciel</span> ({($_(\\"techsheet.roles.gabriel\\"))})</li>\\n            </ul>\\n          </div>\\n    \\n          <div>\\n            <a href=\\"https://datadotestudio.com/\\" target=\\"_blank\\">datadot.com.br</a>\\n          </div>\\n        </div>\\n\\n      </div>\\n\\n    </div>\\n\\n  </div>\\n\\n</div>\\n\\n<style lang=\\"scss\\">.techsheet {\\n  position: fixed;\\n  top: 0;\\n  left: 0;\\n  right: 0;\\n  bottom: 0;\\n  z-index: 9999;\\n  display: none;\\n}\\n.techsheet:global(.open) {\\n  display: block;\\n}\\n.techsheet .techsheet-panel-wrapper {\\n  position: absolute;\\n  top: 50%;\\n  left: 50%;\\n  transform: translate(-50%, -50%);\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel {\\n  display: flex;\\n  flex-direction: column;\\n  width: 90vw;\\n  max-height: 80vh;\\n}\\n@media (min-width: 768px) {\\n  .techsheet .techsheet-panel-wrapper .techsheet-panel {\\n    width: auto;\\n    max-width: calc(48 * var(--fs-label));\\n  }\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .close-wrapper {\\n  width: calc(3.2 * var(--fs-label));\\n  height: calc(3.2 * var(--fs-label));\\n  margin-left: auto;\\n  position: fixed;\\n  bottom: 0;\\n  right: 0;\\n  transform: translate(-30%, 50%);\\n}\\n@media (min-width: 768px) {\\n  .techsheet .techsheet-panel-wrapper .techsheet-panel .close-wrapper {\\n    width: calc(2.4 * var(--fs-label));\\n    height: calc(2.4 * var(--fs-label));\\n    bottom: auto;\\n    top: 0;\\n    transform: translate(-50%, -50%);\\n  }\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .close-wrapper button {\\n  padding: 0;\\n  width: 100%;\\n  height: 100%;\\n  background: var(--clr-black);\\n  border-radius: 99rem;\\n  color: var(--clr-accent);\\n  cursor: pointer;\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .close-wrapper button:hover {\\n  color: var(--clr-accent-hover);\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .content {\\n  flex: 1;\\n  border: 2px solid var(--clr-black);\\n  background: var(--clr-white);\\n  overflow: hidden;\\n  display: flex;\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .content__body {\\n  padding: calc(2.4 * var(--fs-label));\\n  overflow-y: auto;\\n  max-height: 100%;\\n  flex: 1;\\n  display: grid;\\n  grid-auto-flow: row;\\n  gap: calc(1.4 * var(--fs-label));\\n}\\n@media (min-width: 768px) {\\n  .techsheet .techsheet-panel-wrapper .techsheet-panel .content__body {\\n    padding: calc(3.6 * var(--fs-label));\\n  }\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .content__body p {\\n  margin: var(--fs-label) 0;\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .content__body h5 {\\n  margin-bottom: var(--fs-label);\\n}\\n.techsheet .techsheet-backdrop {\\n  position: absolute;\\n  top: 0;\\n  left: 0;\\n  right: 0;\\n  bottom: 0;\\n  background: rgba(255, 255, 255, 0.8);\\n}</style>"],"names":[],"mappings":"AAqFmB,sCAAW,CAC5B,QAAQ,CAAE,KAAK,CACf,GAAG,CAAE,CAAC,CACN,IAAI,CAAE,CAAC,CACP,KAAK,CAAE,CAAC,CACR,MAAM,CAAE,CAAC,CACT,OAAO,CAAE,IAAI,CACb,OAAO,CAAE,IACX,CACA,sCAAkB,KAAO,CACvB,OAAO,CAAE,KACX,CACA,wBAAU,CAAC,sCAAyB,CAClC,QAAQ,CAAE,QAAQ,CAClB,GAAG,CAAE,GAAG,CACR,IAAI,CAAE,GAAG,CACT,SAAS,CAAE,UAAU,IAAI,CAAC,CAAC,IAAI,CACjC,CACA,wBAAU,CAAC,wBAAwB,CAAC,8BAAiB,CACnD,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,MAAM,CACtB,KAAK,CAAE,IAAI,CACX,UAAU,CAAE,IACd,CACA,MAAO,YAAY,KAAK,CAAE,CACxB,wBAAU,CAAC,wBAAwB,CAAC,8BAAiB,CACnD,KAAK,CAAE,IAAI,CACX,SAAS,CAAE,KAAK,EAAE,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CACtC,CACF,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,4BAAe,CAClE,KAAK,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CAAC,CAClC,MAAM,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CAAC,CACnC,WAAW,CAAE,IAAI,CACjB,QAAQ,CAAE,KAAK,CACf,MAAM,CAAE,CAAC,CACT,KAAK,CAAE,CAAC,CACR,SAAS,CAAE,UAAU,IAAI,CAAC,CAAC,GAAG,CAChC,CACA,MAAO,YAAY,KAAK,CAAE,CACxB,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,4BAAe,CAClE,KAAK,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CAAC,CAClC,MAAM,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CAAC,CACnC,MAAM,CAAE,IAAI,CACZ,GAAG,CAAE,CAAC,CACN,SAAS,CAAE,UAAU,IAAI,CAAC,CAAC,IAAI,CACjC,CACF,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,cAAc,CAAC,oBAAO,CACzE,OAAO,CAAE,CAAC,CACV,KAAK,CAAE,IAAI,CACX,MAAM,CAAE,IAAI,CACZ,UAAU,CAAE,IAAI,WAAW,CAAC,CAC5B,aAAa,CAAE,KAAK,CACpB,KAAK,CAAE,IAAI,YAAY,CAAC,CACxB,MAAM,CAAE,OACV,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,cAAc,CAAC,oBAAM,MAAO,CAC/E,KAAK,CAAE,IAAI,kBAAkB,CAC/B,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,sBAAS,CAC5D,IAAI,CAAE,CAAC,CACP,MAAM,CAAE,GAAG,CAAC,KAAK,CAAC,IAAI,WAAW,CAAC,CAClC,UAAU,CAAE,IAAI,WAAW,CAAC,CAC5B,QAAQ,CAAE,MAAM,CAChB,OAAO,CAAE,IACX,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,4BAAe,CAClE,OAAO,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CAAC,CACpC,UAAU,CAAE,IAAI,CAChB,UAAU,CAAE,IAAI,CAChB,IAAI,CAAE,CAAC,CACP,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,GAAG,CACnB,GAAG,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CACjC,CACA,MAAO,YAAY,KAAK,CAAE,CACxB,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,4BAAe,CAClE,OAAO,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CACrC,CACF,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,cAAc,CAAC,eAAE,CACpE,MAAM,CAAE,IAAI,UAAU,CAAC,CAAC,CAC1B,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,cAAc,CAAC,gBAAG,CACrE,aAAa,CAAE,IAAI,UAAU,CAC/B,CACA,wBAAU,CAAC,iCAAoB,CAC7B,QAAQ,CAAE,QAAQ,CAClB,GAAG,CAAE,CAAC,CACN,IAAI,CAAE,CAAC,CACP,KAAK,CAAE,CAAC,CACR,MAAM,CAAE,CAAC,CACT,UAAU,CAAE,KAAK,GAAG,CAAC,CAAC,GAAG,CAAC,CAAC,GAAG,CAAC,CAAC,GAAG,CACrC"}'
+  map: '{"version":3,"file":"TechSheet.svelte","sources":["TechSheet.svelte"],"sourcesContent":["<script lang=\\"ts\\">import { _ } from \\"svelte-i18n\\";\\nimport { gsap } from \\"gsap\\";\\nimport { isSheetOpen } from \\"../../../stores/techsheet\\";\\nimport Icon from \\"../atoms/Icon.svelte\\";\\nlet wrapper;\\n$: if (wrapper && $isSheetOpen) {\\n  const tl = gsap.timeline({\\n    overwrite: true,\\n    onStart: addOpenClass\\n  });\\n  tl.fromTo(\\".techsheet-backdrop\\", { opacity: 0 }, { opacity: 1, duration: 0.15 }).fromTo(\\".techsheet-panel\\", { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3 }, \\"<\\");\\n} else if (wrapper && !$isSheetOpen) {\\n  const tl = gsap.timeline({\\n    overwrite: true,\\n    onComplete: removeOpenClass,\\n    onInterrupt: removeOpenClass\\n  });\\n  tl.to(\\".techsheet-backdrop\\", { opacity: 0, duration: 0.5 }).to(\\".techsheet-panel\\", { y: -12, opacity: 0, duration: 0.3 }, \\"<\\");\\n}\\nfunction handleClose() {\\n  isSheetOpen.set(false);\\n}\\nfunction addOpenClass() {\\n  if (!wrapper) return;\\n  wrapper.classList.add(\\"open\\");\\n}\\nfunction removeOpenClass() {\\n  if (!wrapper) return;\\n  wrapper.classList.remove(\\"open\\");\\n}\\n<\/script>\\n\\n<div bind:this={wrapper} class=\\"techsheet\\">\\n  \\n  <div class=\\"techsheet-backdrop\\" />\\n\\n  <div class=\\"techsheet-panel-wrapper\\">\\n\\n    <!-- Adding the extra div below allows us to add some transform transition -->\\n    <div class=\\"techsheet-panel\\">\\n\\n      <div class=\\"close-wrapper\\">\\n        <button class=\\"clean-btn\\" on:click={handleClose}>\\n          <Icon icon=\\"closeX\\"/>\\n        </button>\\n      </div>\\n\\n      <div class=\\"content\\">\\n\\n        <div class=\\"content__body\\">\\n          <h3 class=\\"text-lg\\">datadot {$_(\\"page.hero\\")}</h3>\\n    \\n          <div>\\n            <p class=\\"text-xs\\">{$_(\\"techsheet.main\\")}</p>\\n            <p class=\\"text-xs\\"><span class=\\"font-medium\\">{$_(\\"techsheet.encourage\\")}</span></p>\\n          </div>\\n    \\n          <div>\\n            <h5>{$_(\\"techsheet.made-by\\")}</h5>  \\n            <ul class=\\"text-xs\\">\\n              <li><span class=\\"font-medium\\">Flávia Marinho</span> ({($_(\\"techsheet.roles.flavia\\"))})</li>\\n              <li><span class=\\"font-medium\\">Otávio Burin</span> ({($_(\\"techsheet.roles.otavio\\"))})</li>\\n              <li><span class=\\"font-medium\\">Italo Oliveira</span> ({($_(\\"techsheet.roles.italo\\"))})</li>\\n              <li><span class=\\"font-medium\\">Quintino Andrade</span> ({($_(\\"techsheet.roles.quintino\\"))})</li>\\n              <li><span class=\\"font-medium\\">Ludmila Souza</span> ({($_(\\"techsheet.roles.ludmila\\"))})</li>\\n              <li><span class=\\"font-medium\\">Gabriel Maciel</span> ({($_(\\"techsheet.roles.gabriel\\"))})</li>\\n            </ul>\\n          </div>\\n    \\n          <div>\\n            <a href=\\"https://datadotestudio.com/\\" target=\\"_blank\\">datadot.com.br</a>\\n          </div>\\n        </div>\\n\\n      </div>\\n\\n    </div>\\n\\n  </div>\\n\\n</div>\\n\\n<style lang=\\"scss\\">.techsheet {\\n  position: fixed;\\n  top: 0;\\n  left: 0;\\n  right: 0;\\n  bottom: 0;\\n  z-index: 9999;\\n  display: none;\\n}\\n.techsheet:global(.open) {\\n  display: block;\\n}\\n.techsheet .techsheet-panel-wrapper {\\n  position: absolute;\\n  top: 50%;\\n  left: 50%;\\n  transform: translate(-50%, -50%);\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel {\\n  display: flex;\\n  flex-direction: column;\\n  width: 90vw;\\n  max-height: 80vh;\\n}\\n@media (min-width: 768px) {\\n  .techsheet .techsheet-panel-wrapper .techsheet-panel {\\n    width: auto;\\n    max-width: calc(48 * var(--fs-label));\\n  }\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .close-wrapper {\\n  width: calc(3.2 * var(--fs-label));\\n  height: calc(3.2 * var(--fs-label));\\n  margin-left: auto;\\n  position: fixed;\\n  bottom: 0;\\n  right: 0;\\n  transform: translate(-30%, 50%);\\n}\\n@media (min-width: 768px) {\\n  .techsheet .techsheet-panel-wrapper .techsheet-panel .close-wrapper {\\n    width: calc(2.4 * var(--fs-label));\\n    height: calc(2.4 * var(--fs-label));\\n    bottom: auto;\\n    top: 0;\\n    transform: translate(-50%, -50%);\\n  }\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .close-wrapper button {\\n  padding: 0;\\n  width: 100%;\\n  height: 100%;\\n  background: var(--clr-black);\\n  border-radius: 99rem;\\n  color: var(--clr-accent);\\n  cursor: pointer;\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .close-wrapper button:hover {\\n  color: var(--clr-accent-hover);\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .content {\\n  flex: 1;\\n  border: 2px solid var(--clr-black);\\n  background: var(--clr-white);\\n  overflow: hidden;\\n  display: flex;\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .content__body {\\n  padding: calc(2.4 * var(--fs-label));\\n  overflow-y: auto;\\n  max-height: 100%;\\n  flex: 1;\\n  display: grid;\\n  grid-auto-flow: row;\\n  gap: calc(1.4 * var(--fs-label));\\n}\\n@media (min-width: 768px) {\\n  .techsheet .techsheet-panel-wrapper .techsheet-panel .content__body {\\n    padding: calc(3.6 * var(--fs-label));\\n  }\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .content__body p {\\n  margin: var(--fs-label) 0;\\n}\\n.techsheet .techsheet-panel-wrapper .techsheet-panel .content__body h5 {\\n  margin-bottom: var(--fs-label);\\n}\\n.techsheet .techsheet-backdrop {\\n  position: absolute;\\n  top: 0;\\n  left: 0;\\n  right: 0;\\n  bottom: 0;\\n  background: rgba(255, 255, 255, 0.8);\\n}</style>"],"names":[],"mappings":"AAkFmB,sCAAW,CAC5B,QAAQ,CAAE,KAAK,CACf,GAAG,CAAE,CAAC,CACN,IAAI,CAAE,CAAC,CACP,KAAK,CAAE,CAAC,CACR,MAAM,CAAE,CAAC,CACT,OAAO,CAAE,IAAI,CACb,OAAO,CAAE,IACX,CACA,sCAAkB,KAAO,CACvB,OAAO,CAAE,KACX,CACA,wBAAU,CAAC,sCAAyB,CAClC,QAAQ,CAAE,QAAQ,CAClB,GAAG,CAAE,GAAG,CACR,IAAI,CAAE,GAAG,CACT,SAAS,CAAE,UAAU,IAAI,CAAC,CAAC,IAAI,CACjC,CACA,wBAAU,CAAC,wBAAwB,CAAC,8BAAiB,CACnD,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,MAAM,CACtB,KAAK,CAAE,IAAI,CACX,UAAU,CAAE,IACd,CACA,MAAO,YAAY,KAAK,CAAE,CACxB,wBAAU,CAAC,wBAAwB,CAAC,8BAAiB,CACnD,KAAK,CAAE,IAAI,CACX,SAAS,CAAE,KAAK,EAAE,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CACtC,CACF,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,4BAAe,CAClE,KAAK,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CAAC,CAClC,MAAM,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CAAC,CACnC,WAAW,CAAE,IAAI,CACjB,QAAQ,CAAE,KAAK,CACf,MAAM,CAAE,CAAC,CACT,KAAK,CAAE,CAAC,CACR,SAAS,CAAE,UAAU,IAAI,CAAC,CAAC,GAAG,CAChC,CACA,MAAO,YAAY,KAAK,CAAE,CACxB,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,4BAAe,CAClE,KAAK,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CAAC,CAClC,MAAM,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CAAC,CACnC,MAAM,CAAE,IAAI,CACZ,GAAG,CAAE,CAAC,CACN,SAAS,CAAE,UAAU,IAAI,CAAC,CAAC,IAAI,CACjC,CACF,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,cAAc,CAAC,oBAAO,CACzE,OAAO,CAAE,CAAC,CACV,KAAK,CAAE,IAAI,CACX,MAAM,CAAE,IAAI,CACZ,UAAU,CAAE,IAAI,WAAW,CAAC,CAC5B,aAAa,CAAE,KAAK,CACpB,KAAK,CAAE,IAAI,YAAY,CAAC,CACxB,MAAM,CAAE,OACV,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,cAAc,CAAC,oBAAM,MAAO,CAC/E,KAAK,CAAE,IAAI,kBAAkB,CAC/B,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,sBAAS,CAC5D,IAAI,CAAE,CAAC,CACP,MAAM,CAAE,GAAG,CAAC,KAAK,CAAC,IAAI,WAAW,CAAC,CAClC,UAAU,CAAE,IAAI,WAAW,CAAC,CAC5B,QAAQ,CAAE,MAAM,CAChB,OAAO,CAAE,IACX,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,4BAAe,CAClE,OAAO,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CAAC,CACpC,UAAU,CAAE,IAAI,CAChB,UAAU,CAAE,IAAI,CAChB,IAAI,CAAE,CAAC,CACP,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,GAAG,CACnB,GAAG,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CACjC,CACA,MAAO,YAAY,KAAK,CAAE,CACxB,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,4BAAe,CAClE,OAAO,CAAE,KAAK,GAAG,CAAC,CAAC,CAAC,IAAI,UAAU,CAAC,CACrC,CACF,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,cAAc,CAAC,eAAE,CACpE,MAAM,CAAE,IAAI,UAAU,CAAC,CAAC,CAC1B,CACA,wBAAU,CAAC,wBAAwB,CAAC,gBAAgB,CAAC,cAAc,CAAC,gBAAG,CACrE,aAAa,CAAE,IAAI,UAAU,CAC/B,CACA,wBAAU,CAAC,iCAAoB,CAC7B,QAAQ,CAAE,QAAQ,CAClB,GAAG,CAAE,CAAC,CACN,IAAI,CAAE,CAAC,CACP,KAAK,CAAE,CAAC,CACR,MAAM,CAAE,CAAC,CACT,UAAU,CAAE,KAAK,GAAG,CAAC,CAAC,GAAG,CAAC,CAAC,GAAG,CAAC,CAAC,GAAG,CACrC"}'
 };
 const TechSheet = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let $$unsubscribe_isSheetOpen;
@@ -3753,14 +3634,12 @@ const Onboarding = create_ssr_component(($$result, $$props, $$bindings, slots) =
       position: void 0,
       settings: curSettings
     } : void 0;
-    if (curStep)
-      triggerFadeOut();
+    if (curStep) triggerFadeOut();
   }
   function triggerFadeOut() {
     const toFadeOut = el.filter((d) => d !== curStep.settings.highlight).join(", ");
     applyFadeOutAnimation(toFadeOut);
-    if (prvStep)
-      applyPreviousStepFadeOut(prvStep);
+    if (prvStep) applyPreviousStepFadeOut(prvStep);
     tl.call(() => contentKeyIdx.set(index));
   }
   function applyFadeOutAnimation(toFadeOut) {
@@ -3856,8 +3735,7 @@ const ColorPicker = create_ssr_component(($$result, $$props, $$bindings, slots) 
       blue = colorComponents[2];
     }
   };
-  if ($$props.color === void 0 && $$bindings.color && color !== void 0)
-    $$bindings.color(color);
+  if ($$props.color === void 0 && $$bindings.color && color !== void 0) $$bindings.color(color);
   $$result.css.add(css$5);
   {
     parseColor(color);
@@ -3888,8 +3766,7 @@ const Info = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let themeColor;
   let version;
   let hasMeta = false;
-  if ($$props.animationData === void 0 && $$bindings.animationData && animationData !== void 0)
-    $$bindings.animationData(animationData);
+  if ($$props.animationData === void 0 && $$bindings.animationData && animationData !== void 0) $$bindings.animationData(animationData);
   $$result.css.add(css$4);
   {
     {
@@ -3920,8 +3797,7 @@ const Popover = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let { color = "transparent" } = $$props;
   let _triggerRef;
   let _contentRef;
-  if ($$props.color === void 0 && $$bindings.color && color !== void 0)
-    $$bindings.color(color);
+  if ($$props.color === void 0 && $$bindings.color && color !== void 0) $$bindings.color(color);
   $$result.css.add(css$3);
   return `<div class="popover svelte-cq7jp3"><div${add_attribute("this", _triggerRef, 0)}>${slots.target ? slots.target({}) : ``}</div> <div class="${[
     "popover-content svelte-cq7jp3",
@@ -3998,40 +3874,23 @@ const Controls = create_ssr_component(($$result, $$props, $$bindings, slots) => 
   let { toggleLooping } = $$props;
   let { togglePlay } = $$props;
   let { totalFrames = 0 } = $$props;
-  if ($$props.animationData === void 0 && $$bindings.animationData && animationData !== void 0)
-    $$bindings.animationData(animationData);
-  if ($$props.background === void 0 && $$bindings.background && background !== void 0)
-    $$bindings.background(background);
-  if ($$props.currentState === void 0 && $$bindings.currentState && currentState !== void 0)
-    $$bindings.currentState(currentState);
-  if ($$props.frame === void 0 && $$bindings.frame && frame !== void 0)
-    $$bindings.frame(frame);
-  if ($$props.freeze === void 0 && $$bindings.freeze && freeze !== void 0)
-    $$bindings.freeze(freeze);
-  if ($$props.instance === void 0 && $$bindings.instance && instance !== void 0)
-    $$bindings.instance(instance);
-  if ($$props.layout === void 0 && $$bindings.layout && layout !== void 0)
-    $$bindings.layout(layout);
-  if ($$props.loop === void 0 && $$bindings.loop && loop2 !== void 0)
-    $$bindings.loop(loop2);
-  if ($$props.play === void 0 && $$bindings.play && play !== void 0)
-    $$bindings.play(play);
-  if ($$props.progress === void 0 && $$bindings.progress && progress !== void 0)
-    $$bindings.progress(progress);
-  if ($$props.seek === void 0 && $$bindings.seek && seek !== void 0)
-    $$bindings.seek(seek);
-  if ($$props.snapshot === void 0 && $$bindings.snapshot && snapshot !== void 0)
-    $$bindings.snapshot(snapshot);
-  if ($$props.stop === void 0 && $$bindings.stop && stop !== void 0)
-    $$bindings.stop(stop);
-  if ($$props.toggleZoom === void 0 && $$bindings.toggleZoom && toggleZoom !== void 0)
-    $$bindings.toggleZoom(toggleZoom);
-  if ($$props.toggleLooping === void 0 && $$bindings.toggleLooping && toggleLooping !== void 0)
-    $$bindings.toggleLooping(toggleLooping);
-  if ($$props.togglePlay === void 0 && $$bindings.togglePlay && togglePlay !== void 0)
-    $$bindings.togglePlay(togglePlay);
-  if ($$props.totalFrames === void 0 && $$bindings.totalFrames && totalFrames !== void 0)
-    $$bindings.totalFrames(totalFrames);
+  if ($$props.animationData === void 0 && $$bindings.animationData && animationData !== void 0) $$bindings.animationData(animationData);
+  if ($$props.background === void 0 && $$bindings.background && background !== void 0) $$bindings.background(background);
+  if ($$props.currentState === void 0 && $$bindings.currentState && currentState !== void 0) $$bindings.currentState(currentState);
+  if ($$props.frame === void 0 && $$bindings.frame && frame !== void 0) $$bindings.frame(frame);
+  if ($$props.freeze === void 0 && $$bindings.freeze && freeze !== void 0) $$bindings.freeze(freeze);
+  if ($$props.instance === void 0 && $$bindings.instance && instance !== void 0) $$bindings.instance(instance);
+  if ($$props.layout === void 0 && $$bindings.layout && layout !== void 0) $$bindings.layout(layout);
+  if ($$props.loop === void 0 && $$bindings.loop && loop2 !== void 0) $$bindings.loop(loop2);
+  if ($$props.play === void 0 && $$bindings.play && play !== void 0) $$bindings.play(play);
+  if ($$props.progress === void 0 && $$bindings.progress && progress !== void 0) $$bindings.progress(progress);
+  if ($$props.seek === void 0 && $$bindings.seek && seek !== void 0) $$bindings.seek(seek);
+  if ($$props.snapshot === void 0 && $$bindings.snapshot && snapshot !== void 0) $$bindings.snapshot(snapshot);
+  if ($$props.stop === void 0 && $$bindings.stop && stop !== void 0) $$bindings.stop(stop);
+  if ($$props.toggleZoom === void 0 && $$bindings.toggleZoom && toggleZoom !== void 0) $$bindings.toggleZoom(toggleZoom);
+  if ($$props.toggleLooping === void 0 && $$bindings.toggleLooping && toggleLooping !== void 0) $$bindings.toggleLooping(toggleLooping);
+  if ($$props.togglePlay === void 0 && $$bindings.togglePlay && togglePlay !== void 0) $$bindings.togglePlay(togglePlay);
+  if ($$props.totalFrames === void 0 && $$bindings.totalFrames && totalFrames !== void 0) $$bindings.totalFrames(totalFrames);
   $$result.css.add(css$2);
   isPlaying = currentState === PlayerState.Playing;
   isPaused = currentState === PlayerState.Paused;
@@ -4230,74 +4089,40 @@ const LottiePlayer = create_ssr_component(($$result, $$props, $$bindings, slots)
     isZoomed = !isZoomed;
     setTimeout(() => resize(), 100);
   };
-  if ($$props.autoplay === void 0 && $$bindings.autoplay && autoplay !== void 0)
-    $$bindings.autoplay(autoplay);
-  if ($$props.background === void 0 && $$bindings.background && background !== void 0)
-    $$bindings.background(background);
-  if ($$props.controls === void 0 && $$bindings.controls && controls !== void 0)
-    $$bindings.controls(controls);
-  if ($$props.controlsLayout === void 0 && $$bindings.controlsLayout && controlsLayout !== void 0)
-    $$bindings.controlsLayout(controlsLayout);
-  if ($$props.count === void 0 && $$bindings.count && count !== void 0)
-    $$bindings.count(count);
-  if ($$props.defaultFrame === void 0 && $$bindings.defaultFrame && defaultFrame !== void 0)
-    $$bindings.defaultFrame(defaultFrame);
-  if ($$props.direction === void 0 && $$bindings.direction && direction !== void 0)
-    $$bindings.direction(direction);
-  if ($$props.height === void 0 && $$bindings.height && height2 !== void 0)
-    $$bindings.height(height2);
-  if ($$props.hover === void 0 && $$bindings.hover && hover !== void 0)
-    $$bindings.hover(hover);
-  if ($$props.loop === void 0 && $$bindings.loop && loop2 !== void 0)
-    $$bindings.loop(loop2);
-  if ($$props.mode === void 0 && $$bindings.mode && mode !== void 0)
-    $$bindings.mode(mode);
-  if ($$props.onToggleZoom === void 0 && $$bindings.onToggleZoom && onToggleZoom !== void 0)
-    $$bindings.onToggleZoom(onToggleZoom);
-  if ($$props.renderer === void 0 && $$bindings.renderer && renderer !== void 0)
-    $$bindings.renderer(renderer);
-  if ($$props.speed === void 0 && $$bindings.speed && speed !== void 0)
-    $$bindings.speed(speed);
-  if ($$props.src === void 0 && $$bindings.src && src !== void 0)
-    $$bindings.src(src);
-  if ($$props.style === void 0 && $$bindings.style && style !== void 0)
-    $$bindings.style(style);
-  if ($$props.width === void 0 && $$bindings.width && width2 !== void 0)
-    $$bindings.width(width2);
-  if ($$props.load === void 0 && $$bindings.load && load !== void 0)
-    $$bindings.load(load);
-  if ($$props.getLottie === void 0 && $$bindings.getLottie && getLottie !== void 0)
-    $$bindings.getLottie(getLottie);
-  if ($$props.play === void 0 && $$bindings.play && play !== void 0)
-    $$bindings.play(play);
-  if ($$props.getVersions === void 0 && $$bindings.getVersions && getVersions !== void 0)
-    $$bindings.getVersions(getVersions);
-  if ($$props.pause === void 0 && $$bindings.pause && pause !== void 0)
-    $$bindings.pause(pause);
-  if ($$props.stop === void 0 && $$bindings.stop && stop !== void 0)
-    $$bindings.stop(stop);
-  if ($$props.freeze === void 0 && $$bindings.freeze && freeze !== void 0)
-    $$bindings.freeze(freeze);
-  if ($$props.resize === void 0 && $$bindings.resize && resize !== void 0)
-    $$bindings.resize(resize);
-  if ($$props.seek === void 0 && $$bindings.seek && seek !== void 0)
-    $$bindings.seek(seek);
-  if ($$props.snapshot === void 0 && $$bindings.snapshot && snapshot !== void 0)
-    $$bindings.snapshot(snapshot);
-  if ($$props.setLooping === void 0 && $$bindings.setLooping && setLooping !== void 0)
-    $$bindings.setLooping(setLooping);
-  if ($$props.setSpeed === void 0 && $$bindings.setSpeed && setSpeed !== void 0)
-    $$bindings.setSpeed(setSpeed);
-  if ($$props.setDirection === void 0 && $$bindings.setDirection && setDirection !== void 0)
-    $$bindings.setDirection(setDirection);
-  if ($$props.togglePlay === void 0 && $$bindings.togglePlay && togglePlay !== void 0)
-    $$bindings.togglePlay(togglePlay);
-  if ($$props.toggleLooping === void 0 && $$bindings.toggleLooping && toggleLooping !== void 0)
-    $$bindings.toggleLooping(toggleLooping);
-  if ($$props.setBackground === void 0 && $$bindings.setBackground && setBackground !== void 0)
-    $$bindings.setBackground(setBackground);
-  if ($$props.toggleZoom === void 0 && $$bindings.toggleZoom && toggleZoom !== void 0)
-    $$bindings.toggleZoom(toggleZoom);
+  if ($$props.autoplay === void 0 && $$bindings.autoplay && autoplay !== void 0) $$bindings.autoplay(autoplay);
+  if ($$props.background === void 0 && $$bindings.background && background !== void 0) $$bindings.background(background);
+  if ($$props.controls === void 0 && $$bindings.controls && controls !== void 0) $$bindings.controls(controls);
+  if ($$props.controlsLayout === void 0 && $$bindings.controlsLayout && controlsLayout !== void 0) $$bindings.controlsLayout(controlsLayout);
+  if ($$props.count === void 0 && $$bindings.count && count !== void 0) $$bindings.count(count);
+  if ($$props.defaultFrame === void 0 && $$bindings.defaultFrame && defaultFrame !== void 0) $$bindings.defaultFrame(defaultFrame);
+  if ($$props.direction === void 0 && $$bindings.direction && direction !== void 0) $$bindings.direction(direction);
+  if ($$props.height === void 0 && $$bindings.height && height2 !== void 0) $$bindings.height(height2);
+  if ($$props.hover === void 0 && $$bindings.hover && hover !== void 0) $$bindings.hover(hover);
+  if ($$props.loop === void 0 && $$bindings.loop && loop2 !== void 0) $$bindings.loop(loop2);
+  if ($$props.mode === void 0 && $$bindings.mode && mode !== void 0) $$bindings.mode(mode);
+  if ($$props.onToggleZoom === void 0 && $$bindings.onToggleZoom && onToggleZoom !== void 0) $$bindings.onToggleZoom(onToggleZoom);
+  if ($$props.renderer === void 0 && $$bindings.renderer && renderer !== void 0) $$bindings.renderer(renderer);
+  if ($$props.speed === void 0 && $$bindings.speed && speed !== void 0) $$bindings.speed(speed);
+  if ($$props.src === void 0 && $$bindings.src && src !== void 0) $$bindings.src(src);
+  if ($$props.style === void 0 && $$bindings.style && style !== void 0) $$bindings.style(style);
+  if ($$props.width === void 0 && $$bindings.width && width2 !== void 0) $$bindings.width(width2);
+  if ($$props.load === void 0 && $$bindings.load && load !== void 0) $$bindings.load(load);
+  if ($$props.getLottie === void 0 && $$bindings.getLottie && getLottie !== void 0) $$bindings.getLottie(getLottie);
+  if ($$props.play === void 0 && $$bindings.play && play !== void 0) $$bindings.play(play);
+  if ($$props.getVersions === void 0 && $$bindings.getVersions && getVersions !== void 0) $$bindings.getVersions(getVersions);
+  if ($$props.pause === void 0 && $$bindings.pause && pause !== void 0) $$bindings.pause(pause);
+  if ($$props.stop === void 0 && $$bindings.stop && stop !== void 0) $$bindings.stop(stop);
+  if ($$props.freeze === void 0 && $$bindings.freeze && freeze !== void 0) $$bindings.freeze(freeze);
+  if ($$props.resize === void 0 && $$bindings.resize && resize !== void 0) $$bindings.resize(resize);
+  if ($$props.seek === void 0 && $$bindings.seek && seek !== void 0) $$bindings.seek(seek);
+  if ($$props.snapshot === void 0 && $$bindings.snapshot && snapshot !== void 0) $$bindings.snapshot(snapshot);
+  if ($$props.setLooping === void 0 && $$bindings.setLooping && setLooping !== void 0) $$bindings.setLooping(setLooping);
+  if ($$props.setSpeed === void 0 && $$bindings.setSpeed && setSpeed !== void 0) $$bindings.setSpeed(setSpeed);
+  if ($$props.setDirection === void 0 && $$bindings.setDirection && setDirection !== void 0) $$bindings.setDirection(setDirection);
+  if ($$props.togglePlay === void 0 && $$bindings.togglePlay && togglePlay !== void 0) $$bindings.togglePlay(togglePlay);
+  if ($$props.toggleLooping === void 0 && $$bindings.toggleLooping && toggleLooping !== void 0) $$bindings.toggleLooping(toggleLooping);
+  if ($$props.setBackground === void 0 && $$bindings.setBackground && setBackground !== void 0) $$bindings.setBackground(setBackground);
+  if ($$props.toggleZoom === void 0 && $$bindings.toggleZoom && toggleZoom !== void 0) $$bindings.toggleZoom(toggleZoom);
   $$result.css.add(css$1);
   return `<div style="${escape(width2 ? `width:${width2}px;` : "", true) + escape(height2 ? `height:${height2}px;` : "", true) + escape(style, true)}"${add_attribute("this", wrapperRef, 0)}><div class="${[
     "lottie-player svelte-1aiskgp",
@@ -4334,5271 +4159,9 @@ const LottiePlayer = create_ssr_component(($$result, $$props, $$bindings, slots)
     {}
   )}` : ``}</div></div>`;
 });
-const v = "5.9.0";
-const fr = 29.9700012207031;
-const ip = 0;
-const op = 212.000008634937;
-const w = 176;
-const h = 172;
-const nm = "anima loader";
-const ddd = 0;
-const assets = [];
-const layers = [
-  {
-    ddd: 0,
-    ind: 1,
-    ty: 3,
-    nm: "Null 1",
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 0,
-        ix: 11
-      },
-      r: {
-        a: 1,
-        k: [
-          {
-            i: {
-              x: [
-                0.01
-              ],
-              y: [
-                1
-              ]
-            },
-            o: {
-              x: [
-                0.167
-              ],
-              y: [
-                0.167
-              ]
-            },
-            t: 50,
-            s: [
-              0
-            ]
-          },
-          {
-            t: 75.0000030548126,
-            s: [
-              90
-            ]
-          }
-        ],
-        ix: 10
-      },
-      p: {
-        a: 0,
-        k: [
-          88,
-          86,
-          0
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          0,
-          0,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    ip: 0,
-    op: 212.000008634937,
-    st: 0,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 2,
-    ty: 4,
-    nm: "Layer 13 Outlines",
-    parent: 1,
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 1,
-        k: [
-          {
-            i: {
-              x: 0,
-              y: 1
-            },
-            o: {
-              x: 0.167,
-              y: 0.167
-            },
-            t: 20,
-            s: [
-              -8.183,
-              15.355,
-              0
-            ],
-            to: [
-              1.589,
-              -2.292,
-              0
-            ],
-            ti: [
-              -1.589,
-              2.292,
-              0
-            ]
-          },
-          {
-            t: 40.0000016292334,
-            s: [
-              1.353,
-              1.605,
-              0
-            ]
-          }
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          10,
-          10,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    3.907,
-                    -3.907
-                  ],
-                  [
-                    3.907,
-                    3.908
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    -3.903,
-                    3.903
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    3.907,
-                    3.908
-                  ]
-                ],
-                v: [
-                  [
-                    5.117,
-                    5.122
-                  ],
-                  [
-                    -9.024,
-                    5.117
-                  ],
-                  [
-                    5.117,
-                    -9.024
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "fl",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 4
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 5
-            },
-            r: 1,
-            bm: 0,
-            nm: "Fill 1",
-            mn: "ADBE Vector Graphic - Fill",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                10.135,
-                10.133
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 2,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      }
-    ],
-    ip: 20.0000008146167,
-    op: 78.0000031770051,
-    st: 20.0000008146167,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 3,
-    ty: 4,
-    nm: "Layer 14 Outlines",
-    parent: 1,
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 1,
-        k: [
-          {
-            i: {
-              x: 0,
-              y: 1
-            },
-            o: {
-              x: 0.167,
-              y: 0.167
-            },
-            t: 20,
-            s: [
-              13.103,
-              -13.645,
-              0
-            ],
-            to: [
-              -2.208,
-              2.292,
-              0
-            ],
-            ti: [
-              2.208,
-              -2.292,
-              0
-            ]
-          },
-          {
-            t: 40.0000016292334,
-            s: [
-              -0.147,
-              0.105,
-              0
-            ]
-          }
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          11.5,
-          10.5,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    hasMask: true,
-    masksProperties: [
-      {
-        inv: false,
-        mode: "a",
-        pt: {
-          a: 0,
-          k: {
-            i: [
-              [
-                0,
-                0
-              ],
-              [
-                0,
-                0
-              ],
-              [
-                0,
-                0
-              ],
-              [
-                0,
-                0.25
-              ]
-            ],
-            o: [
-              [
-                0,
-                0
-              ],
-              [
-                0,
-                0
-              ],
-              [
-                0,
-                0
-              ],
-              [
-                0,
-                -0.25
-              ]
-            ],
-            v: [
-              [
-                11.647,
-                -12.855
-              ],
-              [
-                -12.103,
-                10.395
-              ],
-              [
-                -4.103,
-                26.645
-              ],
-              [
-                23.397,
-                -2.105
-              ]
-            ],
-            c: true
-          },
-          ix: 1
-        },
-        o: {
-          a: 0,
-          k: 100,
-          ix: 3
-        },
-        x: {
-          a: 0,
-          k: 0,
-          ix: 4
-        },
-        nm: "Mask 1"
-      }
-    ],
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    2.56,
-                    0
-                  ],
-                  [
-                    1.952,
-                    -1.952
-                  ],
-                  [
-                    -3.905,
-                    -3.905
-                  ],
-                  [
-                    -2.559,
-                    0
-                  ],
-                  [
-                    -1.952,
-                    1.952
-                  ],
-                  [
-                    3.906,
-                    3.905
-                  ]
-                ],
-                o: [
-                  [
-                    -2.559,
-                    0
-                  ],
-                  [
-                    -3.906,
-                    3.904
-                  ],
-                  [
-                    1.953,
-                    1.953
-                  ],
-                  [
-                    2.559,
-                    0
-                  ],
-                  [
-                    3.905,
-                    -3.905
-                  ],
-                  [
-                    -1.952,
-                    -1.953
-                  ]
-                ],
-                v: [
-                  [
-                    0,
-                    -10
-                  ],
-                  [
-                    -7.07,
-                    -7.071
-                  ],
-                  [
-                    -7.07,
-                    7.07
-                  ],
-                  [
-                    0,
-                    10
-                  ],
-                  [
-                    7.071,
-                    7.071
-                  ],
-                  [
-                    7.07,
-                    -7.071
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ind: 1,
-            ty: "sh",
-            ix: 2,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    -2.494,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    -1.763,
-                    -1.763
-                  ],
-                  [
-                    3.638,
-                    -3.64
-                  ],
-                  [
-                    2.493,
-                    0
-                  ],
-                  [
-                    1.763,
-                    1.763
-                  ],
-                  [
-                    0,
-                    2.493
-                  ],
-                  [
-                    -1.763,
-                    1.763
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    2.492,
-                    0
-                  ],
-                  [
-                    3.639,
-                    3.64
-                  ],
-                  [
-                    -1.763,
-                    1.762
-                  ],
-                  [
-                    -2.493,
-                    0
-                  ],
-                  [
-                    -1.763,
-                    -1.763
-                  ],
-                  [
-                    0,
-                    -2.494
-                  ],
-                  [
-                    1.763,
-                    -1.763
-                  ]
-                ],
-                v: [
-                  [
-                    0,
-                    -9.333
-                  ],
-                  [
-                    0,
-                    -9.333
-                  ],
-                  [
-                    6.6,
-                    -6.6
-                  ],
-                  [
-                    6.601,
-                    6.6
-                  ],
-                  [
-                    0,
-                    9.333
-                  ],
-                  [
-                    -6.6,
-                    6.599
-                  ],
-                  [
-                    -9.333,
-                    0
-                  ],
-                  [
-                    -6.6,
-                    -6.6
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 2",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "mm",
-            mm: 1,
-            nm: "Merge Paths 1",
-            mn: "ADBE Vector Filter - Merge",
-            hd: false
-          },
-          {
-            ty: "fl",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 4
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 5
-            },
-            r: 1,
-            bm: 0,
-            nm: "Fill 1",
-            mn: "ADBE Vector Graphic - Fill",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                11.5,
-                10.5
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 4,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      },
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    2.581,
-                    0
-                  ],
-                  [
-                    1.826,
-                    1.826
-                  ],
-                  [
-                    1e-3,
-                    2.582
-                  ],
-                  [
-                    -1.825,
-                    1.826
-                  ],
-                  [
-                    -2.582,
-                    0
-                  ],
-                  [
-                    -1.826,
-                    -1.826
-                  ],
-                  [
-                    3.769,
-                    -3.769
-                  ]
-                ],
-                o: [
-                  [
-                    -2.582,
-                    0
-                  ],
-                  [
-                    -1.825,
-                    -1.826
-                  ],
-                  [
-                    0,
-                    -2.582
-                  ],
-                  [
-                    1.826,
-                    -1.826
-                  ],
-                  [
-                    2.582,
-                    0
-                  ],
-                  [
-                    3.769,
-                    3.769
-                  ],
-                  [
-                    -1.826,
-                    1.826
-                  ]
-                ],
-                v: [
-                  [
-                    -0.468,
-                    9.667
-                  ],
-                  [
-                    -7.304,
-                    6.835
-                  ],
-                  [
-                    -10.136,
-                    0
-                  ],
-                  [
-                    -7.305,
-                    -6.835
-                  ],
-                  [
-                    -0.47,
-                    -9.667
-                  ],
-                  [
-                    6.366,
-                    -6.835
-                  ],
-                  [
-                    6.367,
-                    6.835
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "fl",
-            c: {
-              a: 0,
-              k: [
-                1,
-                1,
-                1,
-                1
-              ],
-              ix: 4
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 5
-            },
-            r: 1,
-            bm: 0,
-            nm: "Fill 1",
-            mn: "ADBE Vector Graphic - Fill",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                11.969,
-                10.5
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 2",
-        np: 2,
-        cix: 2,
-        bm: 0,
-        ix: 2,
-        mn: "ADBE Vector Group",
-        hd: false
-      }
-    ],
-    ip: 20.0000008146167,
-    op: 78.0000031770051,
-    st: 20.0000008146167,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 4,
-    ty: 4,
-    nm: "Layer 8 Outlines",
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 1,
-        k: [
-          {
-            i: {
-              x: 0,
-              y: 1
-            },
-            o: {
-              x: 0.167,
-              y: 0.167
-            },
-            t: 118,
-            s: [
-              87.966,
-              108,
-              0
-            ],
-            to: [
-              0,
-              -4.083,
-              0
-            ],
-            ti: [
-              0,
-              4.083,
-              0
-            ]
-          },
-          {
-            i: {
-              x: 0.833,
-              y: 0.833
-            },
-            o: {
-              x: 0.167,
-              y: 0.167
-            },
-            t: 147,
-            s: [
-              87.966,
-              83.5,
-              0
-            ],
-            to: [
-              0,
-              0,
-              0
-            ],
-            ti: [
-              0,
-              0,
-              0
-            ]
-          },
-          {
-            i: {
-              x: 0,
-              y: 1
-            },
-            o: {
-              x: 0.167,
-              y: 0.167
-            },
-            t: 150,
-            s: [
-              87.966,
-              83.5,
-              0
-            ],
-            to: [
-              0,
-              -3.333,
-              0
-            ],
-            ti: [
-              0,
-              3.333,
-              0
-            ]
-          },
-          {
-            t: 171.000006964973,
-            s: [
-              87.966,
-              63.5,
-              0
-            ]
-          }
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          10.5,
-          5.5,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    0,
-                    -5
-                  ],
-                  [
-                    -10,
-                    5
-                  ],
-                  [
-                    10,
-                    5
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ind: 1,
-            ty: "sh",
-            ix: 2,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    0,
-                    -4.058
-                  ],
-                  [
-                    8.391,
-                    4.333
-                  ],
-                  [
-                    -8.391,
-                    4.333
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 2",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "mm",
-            mm: 1,
-            nm: "Merge Paths 1",
-            mn: "ADBE Vector Filter - Merge",
-            hd: false
-          },
-          {
-            ty: "fl",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 4
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 5
-            },
-            r: 1,
-            bm: 0,
-            nm: "Fill 1",
-            mn: "ADBE Vector Graphic - Fill",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                10.534,
-                5.5
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 4,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      },
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    -9.195,
-                    4.598
-                  ],
-                  [
-                    0,
-                    -4.598
-                  ],
-                  [
-                    9.195,
-                    4.598
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "fl",
-            c: {
-              a: 0,
-              k: [
-                1,
-                1,
-                1,
-                1
-              ],
-              ix: 4
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 5
-            },
-            r: 1,
-            bm: 0,
-            nm: "Fill 1",
-            mn: "ADBE Vector Graphic - Fill",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                10.534,
-                5.569
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 2",
-        np: 2,
-        cix: 2,
-        bm: 0,
-        ix: 2,
-        mn: "ADBE Vector Group",
-        hd: false
-      }
-    ],
-    ip: 119.000004846969,
-    op: 159.000006476203,
-    st: 118.000004806239,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 5,
-    ty: 4,
-    nm: "Layer 9 Outlines",
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 1,
-        k: [
-          {
-            i: {
-              x: 0,
-              y: 1
-            },
-            o: {
-              x: 0.167,
-              y: 0.167
-            },
-            t: 118,
-            s: [
-              87.966,
-              108,
-              0
-            ],
-            to: [
-              0,
-              -3.25,
-              0
-            ],
-            ti: [
-              0,
-              3.25,
-              0
-            ]
-          },
-          {
-            i: {
-              x: 0.833,
-              y: 0.833
-            },
-            o: {
-              x: 0.167,
-              y: 0.167
-            },
-            t: 147,
-            s: [
-              87.966,
-              88.5,
-              0
-            ],
-            to: [
-              0,
-              0,
-              0
-            ],
-            ti: [
-              0,
-              0,
-              0
-            ]
-          },
-          {
-            i: {
-              x: 0,
-              y: 1
-            },
-            o: {
-              x: 0.167,
-              y: 0.167
-            },
-            t: 150,
-            s: [
-              87.966,
-              88.5,
-              0
-            ],
-            to: [
-              0,
-              -3.333,
-              0
-            ],
-            ti: [
-              0,
-              3.333,
-              0
-            ]
-          },
-          {
-            t: 181.000007372281,
-            s: [
-              87.966,
-              68.5,
-              0
-            ]
-          }
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          10.5,
-          5.5,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    -10,
-                    5
-                  ],
-                  [
-                    0,
-                    -5
-                  ],
-                  [
-                    10,
-                    5
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "fl",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 4
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 5
-            },
-            r: 1,
-            bm: 0,
-            nm: "Fill 1",
-            mn: "ADBE Vector Graphic - Fill",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                10.534,
-                5.5
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 2,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      }
-    ],
-    ip: 119.000004846969,
-    op: 159.000006476203,
-    st: 118.000004806239,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 6,
-    ty: 4,
-    nm: "Layer 11 Outlines",
-    sr: 1,
-    ks: {
-      o: {
-        a: 1,
-        k: [
-          {
-            t: 111,
-            s: [
-              100
-            ],
-            h: 1
-          },
-          {
-            t: 113.334,
-            s: [
-              0
-            ],
-            h: 1
-          },
-          {
-            t: 115.666,
-            s: [
-              100
-            ],
-            h: 1
-          },
-          {
-            t: 118.000004806239,
-            s: [
-              0
-            ],
-            h: 1
-          }
-        ],
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 1,
-        k: [
-          {
-            i: {
-              x: 0,
-              y: 1
-            },
-            o: {
-              x: 0.4,
-              y: 0
-            },
-            t: 74,
-            s: [
-              68.793,
-              65.885,
-              0
-            ],
-            to: [
-              3.243,
-              3.352,
-              0
-            ],
-            ti: [
-              -3.243,
-              -3.352,
-              0
-            ]
-          },
-          {
-            t: 100.000004073084,
-            s: [
-              88.25,
-              86,
-              0
-            ]
-          }
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          11,
-          10.5,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    -10,
-                    -10
-                  ],
-                  [
-                    10,
-                    10
-                  ],
-                  [
-                    -10,
-                    10
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "fl",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 4
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 5
-            },
-            r: 1,
-            bm: 0,
-            nm: "Fill 1",
-            mn: "ADBE Vector Graphic - Fill",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                11.207,
-                10.615
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 2,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      }
-    ],
-    ip: 78.0000031770051,
-    op: 119.000004846969,
-    st: 78.0000031770051,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 7,
-    ty: 4,
-    nm: "Layer 12 Outlines",
-    sr: 1,
-    ks: {
-      o: {
-        a: 1,
-        k: [
-          {
-            t: 111,
-            s: [
-              100
-            ],
-            h: 1
-          },
-          {
-            t: 113.334,
-            s: [
-              0
-            ],
-            h: 1
-          },
-          {
-            t: 115.666,
-            s: [
-              100
-            ],
-            h: 1
-          },
-          {
-            t: 118.000004806239,
-            s: [
-              0
-            ],
-            h: 1
-          }
-        ],
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 1,
-        k: [
-          {
-            i: {
-              x: 0,
-              y: 1
-            },
-            o: {
-              x: 0.4,
-              y: 0
-            },
-            t: 74,
-            s: [
-              105.793,
-              103.885,
-              0
-            ],
-            to: [
-              -2.924,
-              -2.981,
-              0
-            ],
-            ti: [
-              2.924,
-              2.981,
-              0
-            ]
-          },
-          {
-            t: 100.000004073084,
-            s: [
-              88.25,
-              86,
-              0
-            ]
-          }
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          11,
-          10.5,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    10,
-                    -10
-                  ],
-                  [
-                    -10,
-                    -10
-                  ],
-                  [
-                    10,
-                    10
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ind: 1,
-            ty: "sh",
-            ix: 2,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    9.334,
-                    9.334
-                  ],
-                  [
-                    -9.333,
-                    -9.333
-                  ],
-                  [
-                    9.334,
-                    -9.333
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 2",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "mm",
-            mm: 1,
-            nm: "Merge Paths 1",
-            mn: "ADBE Vector Filter - Merge",
-            hd: false
-          },
-          {
-            ty: "fl",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 4
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 5
-            },
-            r: 1,
-            bm: 0,
-            nm: "Fill 1",
-            mn: "ADBE Vector Graphic - Fill",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                11.207,
-                10.615
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 4,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      }
-    ],
-    ip: 78.0000031770051,
-    op: 119.000004846969,
-    st: 78.0000031770051,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 8,
-    ty: 4,
-    nm: "Layer 19 Outlines",
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 0,
-        k: [
-          113.75,
-          110.961,
-          0
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          26.5,
-          26.5,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    -25.054,
-                    -25.054
-                  ],
-                  [
-                    25.054,
-                    25.054
-                  ]
-                ],
-                c: false
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "st",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 3
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 4
-            },
-            w: {
-              a: 0,
-              k: 2,
-              ix: 5
-            },
-            lc: 1,
-            lj: 1,
-            ml: 10,
-            bm: 0,
-            nm: "Stroke 1",
-            mn: "ADBE Vector Graphic - Stroke",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                26.401,
-                26.44
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 2,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      },
-      {
-        ty: "tm",
-        s: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 100,
-              s: [
-                56
-              ]
-            },
-            {
-              t: 119.000004846969,
-              s: [
-                100
-              ]
-            }
-          ],
-          ix: 1
-        },
-        e: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 78,
-              s: [
-                55
-              ]
-            },
-            {
-              t: 99.0000040323527,
-              s: [
-                100
-              ]
-            }
-          ],
-          ix: 2
-        },
-        o: {
-          a: 0,
-          k: 0,
-          ix: 3
-        },
-        m: 1,
-        ix: 2,
-        nm: "Trim Paths 1",
-        mn: "ADBE Vector Filter - Trim",
-        hd: false
-      }
-    ],
-    ip: 78.0000031770051,
-    op: 120.0000048877,
-    st: 78.0000031770051,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 9,
-    ty: 4,
-    nm: "Layer 20 Outlines",
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 0,
-        k: [
-          63.75,
-          110.961,
-          0
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          26.5,
-          26.5,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    25.086,
-                    -25.087
-                  ],
-                  [
-                    -25.086,
-                    25.087
-                  ]
-                ],
-                c: false
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "st",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 3
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 4
-            },
-            w: {
-              a: 0,
-              k: 2,
-              ix: 5
-            },
-            lc: 1,
-            lj: 1,
-            ml: 10,
-            bm: 0,
-            nm: "Stroke 1",
-            mn: "ADBE Vector Graphic - Stroke",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                26.261,
-                26.473
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 2,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      },
-      {
-        ty: "tm",
-        s: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 100,
-              s: [
-                57
-              ]
-            },
-            {
-              t: 119.000004846969,
-              s: [
-                100
-              ]
-            }
-          ],
-          ix: 1
-        },
-        e: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 78,
-              s: [
-                56
-              ]
-            },
-            {
-              t: 99.0000040323527,
-              s: [
-                100
-              ]
-            }
-          ],
-          ix: 2
-        },
-        o: {
-          a: 0,
-          k: 0,
-          ix: 3
-        },
-        m: 1,
-        ix: 2,
-        nm: "Trim Paths 1",
-        mn: "ADBE Vector Filter - Trim",
-        hd: false
-      }
-    ],
-    ip: 78.0000031770051,
-    op: 120.0000048877,
-    st: 78.0000031770051,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 10,
-    ty: 4,
-    nm: "Layer 21 Outlines",
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 0,
-        k: [
-          88.75,
-          115.961,
-          0
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          1.5,
-          31.5,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    1.347,
-                    1.386
-                  ],
-                  [
-                    1.347,
-                    61.749
-                  ]
-                ],
-                c: false
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "st",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 3
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 4
-            },
-            w: {
-              a: 0,
-              k: 2,
-              ix: 5
-            },
-            lc: 1,
-            lj: 1,
-            ml: 10,
-            bm: 0,
-            nm: "Stroke 1",
-            mn: "ADBE Vector Graphic - Stroke",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 2,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      },
-      {
-        ty: "tm",
-        s: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 100,
-              s: [
-                47
-              ]
-            },
-            {
-              t: 119.000004846969,
-              s: [
-                100
-              ]
-            }
-          ],
-          ix: 1
-        },
-        e: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 78,
-              s: [
-                47
-              ]
-            },
-            {
-              t: 99.0000040323527,
-              s: [
-                100
-              ]
-            }
-          ],
-          ix: 2
-        },
-        o: {
-          a: 0,
-          k: 0,
-          ix: 3
-        },
-        m: 1,
-        ix: 2,
-        nm: "Trim Paths 1",
-        mn: "ADBE Vector Filter - Trim",
-        hd: false
-      }
-    ],
-    ip: 78.0000031770051,
-    op: 120.0000048877,
-    st: 78.0000031770051,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 11,
-    ty: 4,
-    nm: "Layer 22 Outlines",
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 0,
-        k: [
-          88.75,
-          55.961,
-          0
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          1.5,
-          31.5,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    1.347,
-                    1.692
-                  ],
-                  [
-                    1.347,
-                    61.386
-                  ]
-                ],
-                c: false
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "st",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 3
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 4
-            },
-            w: {
-              a: 0,
-              k: 2,
-              ix: 5
-            },
-            lc: 1,
-            lj: 1,
-            ml: 10,
-            bm: 0,
-            nm: "Stroke 1",
-            mn: "ADBE Vector Graphic - Stroke",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 2,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      },
-      {
-        ty: "tm",
-        s: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 78,
-              s: [
-                49
-              ]
-            },
-            {
-              t: 99.0000040323527,
-              s: [
-                0
-              ]
-            }
-          ],
-          ix: 1
-        },
-        e: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 100,
-              s: [
-                53
-              ]
-            },
-            {
-              t: 119.000004846969,
-              s: [
-                0
-              ]
-            }
-          ],
-          ix: 2
-        },
-        o: {
-          a: 0,
-          k: 0,
-          ix: 3
-        },
-        m: 1,
-        ix: 2,
-        nm: "Trim Paths 1",
-        mn: "ADBE Vector Filter - Trim",
-        hd: false
-      }
-    ],
-    ip: 78.0000031770051,
-    op: 120.0000048877,
-    st: 78.0000031770051,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 12,
-    ty: 4,
-    nm: "Layer 10 Outlines",
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 1,
-        k: [
-          {
-            i: {
-              x: [
-                0
-              ],
-              y: [
-                1
-              ]
-            },
-            o: {
-              x: [
-                0.167
-              ],
-              y: [
-                0.167
-              ]
-            },
-            t: 46,
-            s: [
-              0
-            ]
-          },
-          {
-            t: 79.000003217736,
-            s: [
-              180
-            ]
-          }
-        ],
-        ix: 10
-      },
-      p: {
-        a: 0,
-        k: [
-          87.5,
-          86.484,
-          0
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          30.5,
-          35.5,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    0,
-                    33.302
-                  ],
-                  [
-                    -28.774,
-                    16.653
-                  ],
-                  [
-                    -28.774,
-                    -16.653
-                  ],
-                  [
-                    0,
-                    -33.302
-                  ],
-                  [
-                    28.774,
-                    -16.653
-                  ],
-                  [
-                    28.774,
-                    16.653
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "st",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 3
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 4
-            },
-            w: {
-              a: 0,
-              k: 2,
-              ix: 5
-            },
-            lc: 1,
-            lj: 1,
-            ml: 4,
-            bm: 0,
-            nm: "Stroke 1",
-            mn: "ADBE Vector Graphic - Stroke",
-            hd: false
-          },
-          {
-            ty: "fl",
-            c: {
-              a: 0,
-              k: [
-                1,
-                1,
-                1,
-                1
-              ],
-              ix: 4
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 5
-            },
-            r: 1,
-            bm: 0,
-            nm: "Fill 1",
-            mn: "ADBE Vector Graphic - Fill",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                30.5,
-                35.734
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 2",
-        np: 3,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      },
-      {
-        ty: "tm",
-        s: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.26
-                ],
-                y: [
-                  0
-                ]
-              },
-              t: 0,
-              s: [
-                0
-              ]
-            },
-            {
-              t: 46.0000018736184,
-              s: [
-                100
-              ]
-            }
-          ],
-          ix: 1
-        },
-        e: {
-          a: 0,
-          k: 0,
-          ix: 2
-        },
-        o: {
-          a: 0,
-          k: 0,
-          ix: 3
-        },
-        m: 1,
-        ix: 2,
-        nm: "Trim Paths 1",
-        mn: "ADBE Vector Filter - Trim",
-        hd: false
-      }
-    ],
-    ip: 0,
-    op: 54.0000021994651,
-    st: 0,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 13,
-    ty: 4,
-    nm: "Layer 17 Outlines 2",
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 1,
-        k: [
-          {
-            i: {
-              x: [
-                0
-              ],
-              y: [
-                1
-              ]
-            },
-            o: {
-              x: [
-                0.167
-              ],
-              y: [
-                0.167
-              ]
-            },
-            t: 53,
-            s: [
-              -90
-            ]
-          },
-          {
-            i: {
-              x: [
-                0.833
-              ],
-              y: [
-                1
-              ]
-            },
-            o: {
-              x: [
-                0.167
-              ],
-              y: [
-                0
-              ]
-            },
-            t: 79,
-            s: [
-              0
-            ]
-          },
-          {
-            i: {
-              x: [
-                0.01
-              ],
-              y: [
-                1
-              ]
-            },
-            o: {
-              x: [
-                0.167
-              ],
-              y: [
-                0.167
-              ]
-            },
-            t: 182,
-            s: [
-              0
-            ]
-          },
-          {
-            t: 211.000008594206,
-            s: [
-              180
-            ]
-          }
-        ],
-        ix: 10
-      },
-      p: {
-        a: 0,
-        k: [
-          88.6,
-          85.833,
-          0
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          30.5,
-          31,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    27.603,
-                    27.604
-                  ],
-                  [
-                    -27.603,
-                    27.604
-                  ],
-                  [
-                    -27.603,
-                    -27.602
-                  ],
-                  [
-                    27.603,
-                    -27.602
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 2",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "mm",
-            mm: 1,
-            nm: "Merge Paths 1",
-            mn: "ADBE Vector Filter - Merge",
-            hd: false
-          },
-          {
-            ty: "st",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 3
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 4
-            },
-            w: {
-              a: 0,
-              k: 2,
-              ix: 5
-            },
-            lc: 1,
-            lj: 1,
-            ml: 4,
-            bm: 0,
-            nm: "Stroke 1",
-            mn: "ADBE Vector Graphic - Stroke",
-            hd: false
-          },
-          {
-            ty: "fl",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 4
-            },
-            o: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            r: 1,
-            bm: 0,
-            nm: "Fill 1",
-            mn: "ADBE Vector Graphic - Fill",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                30.455,
-                30.722
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 4,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      },
-      {
-        ty: "tm",
-        s: {
-          a: 0,
-          k: 0,
-          ix: 1
-        },
-        e: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0.01
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 182,
-              s: [
-                100
-              ]
-            },
-            {
-              t: 211.000008594206,
-              s: [
-                0
-              ]
-            }
-          ],
-          ix: 2
-        },
-        o: {
-          a: 0,
-          k: 0,
-          ix: 3
-        },
-        m: 1,
-        ix: 2,
-        nm: "Trim Paths 1",
-        mn: "ADBE Vector Filter - Trim",
-        hd: false
-      }
-    ],
-    ip: 54.0000021994651,
-    op: 212.000008634937,
-    st: 53.0000021587343,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 14,
-    ty: 4,
-    nm: "Layer 17 Outlines",
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 0,
-        k: [
-          88.6,
-          85.833,
-          0
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          30.5,
-          31,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ty: "rc",
-            d: 1,
-            s: {
-              a: 0,
-              k: [
-                57,
-                58
-              ],
-              ix: 2
-            },
-            p: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            nm: "Rectangle Path 1",
-            mn: "ADBE Vector Shape - Rect",
-            hd: false
-          },
-          {
-            ty: "fl",
-            c: {
-              a: 0,
-              k: [
-                1,
-                1,
-                1,
-                1
-              ],
-              ix: 4
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 5
-            },
-            r: 1,
-            bm: 0,
-            nm: "Fill 1",
-            mn: "ADBE Vector Graphic - Fill",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                29.4,
-                30.167
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Rectangle 1",
-        np: 3,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      },
-      {
-        ty: "gr",
-        it: [
-          {
-            ty: "fl",
-            c: {
-              a: 0,
-              k: [
-                1,
-                1,
-                1,
-                1
-              ],
-              ix: 4
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 5
-            },
-            r: 1,
-            bm: 0,
-            nm: "Fill 1",
-            mn: "ADBE Vector Graphic - Fill",
-            hd: false
-          },
-          {
-            ty: "mm",
-            mm: 1,
-            nm: "Merge Paths 1",
-            mn: "ADBE Vector Filter - Merge",
-            hd: false
-          },
-          {
-            ty: "fl",
-            c: {
-              a: 0,
-              k: [
-                1,
-                0,
-                0,
-                1
-              ],
-              ix: 4
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 5
-            },
-            r: 1,
-            bm: 0,
-            nm: "Fill 2",
-            mn: "ADBE Vector Graphic - Fill",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                30.455,
-                30.722
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 3,
-        cix: 2,
-        bm: 0,
-        ix: 2,
-        mn: "ADBE Vector Group",
-        hd: false
-      }
-    ],
-    ip: 123.000005009893,
-    op: 181.000007372281,
-    st: 53.0000021587343,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 15,
-    ty: 4,
-    nm: "Layer 4 Outlines",
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 0,
-        k: [
-          108.109,
-          96.395,
-          0
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          41.5,
-          41.5,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    -40.01,
-                    40.01
-                  ],
-                  [
-                    40.01,
-                    -40.01
-                  ]
-                ],
-                c: false
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "st",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 3
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 4
-            },
-            w: {
-              a: 0,
-              k: 2,
-              ix: 5
-            },
-            lc: 1,
-            lj: 1,
-            ml: 10,
-            bm: 0,
-            nm: "Stroke 1",
-            mn: "ADBE Vector Graphic - Stroke",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                41.391,
-                41.105
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 2,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      },
-      {
-        ty: "tm",
-        s: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 153,
-              s: [
-                0
-              ]
-            },
-            {
-              t: 184.000007494474,
-              s: [
-                100
-              ]
-            }
-          ],
-          ix: 1
-        },
-        e: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 119,
-              s: [
-                0
-              ]
-            },
-            {
-              t: 148.000006028164,
-              s: [
-                100
-              ]
-            }
-          ],
-          ix: 2
-        },
-        o: {
-          a: 0,
-          k: 0,
-          ix: 3
-        },
-        m: 1,
-        ix: 2,
-        nm: "Trim Paths 1",
-        mn: "ADBE Vector Filter - Trim",
-        hd: false
-      }
-    ],
-    ip: 119.000004846969,
-    op: 178.000007250089,
-    st: 119.000004846969,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 16,
-    ty: 4,
-    nm: "Layer 5 Outlines",
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 0,
-        k: [
-          98.109,
-          106.395,
-          0
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          51.5,
-          1.5,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          100,
-          100,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    1.403,
-                    1.291
-                  ],
-                  [
-                    101.401,
-                    1.291
-                  ]
-                ],
-                c: false
-              },
-              ix: 2
-            },
-            nm: "Path 1",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "st",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 3
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 4
-            },
-            w: {
-              a: 0,
-              k: 2,
-              ix: 5
-            },
-            lc: 1,
-            lj: 1,
-            ml: 10,
-            bm: 0,
-            nm: "Stroke 1",
-            mn: "ADBE Vector Graphic - Stroke",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 2,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      },
-      {
-        ty: "tm",
-        s: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 153,
-              s: [
-                0
-              ]
-            },
-            {
-              t: 184.000007494474,
-              s: [
-                100
-              ]
-            }
-          ],
-          ix: 1
-        },
-        e: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 119,
-              s: [
-                0
-              ]
-            },
-            {
-              t: 148.000006028164,
-              s: [
-                100
-              ]
-            }
-          ],
-          ix: 2
-        },
-        o: {
-          a: 0,
-          k: 0,
-          ix: 3
-        },
-        m: 1,
-        ix: 2,
-        nm: "Trim Paths 1",
-        mn: "ADBE Vector Filter - Trim",
-        hd: false
-      }
-    ],
-    ip: 119.000004846969,
-    op: 178.000007250089,
-    st: 119.000004846969,
-    bm: 0
-  },
-  {
-    ddd: 0,
-    ind: 17,
-    ty: 4,
-    nm: "Layer 6 Outlines",
-    sr: 1,
-    ks: {
-      o: {
-        a: 0,
-        k: 100,
-        ix: 11
-      },
-      r: {
-        a: 0,
-        k: 0,
-        ix: 10
-      },
-      p: {
-        a: 0,
-        k: [
-          117.609,
-          85.395,
-          0
-        ],
-        ix: 2,
-        l: 2
-      },
-      a: {
-        a: 0,
-        k: [
-          21,
-          30.5,
-          0
-        ],
-        ix: 1,
-        l: 2
-      },
-      s: {
-        a: 0,
-        k: [
-          96,
-          96,
-          100
-        ],
-        ix: 6,
-        l: 2
-      }
-    },
-    ao: 0,
-    shapes: [
-      {
-        ty: "gr",
-        it: [
-          {
-            ind: 0,
-            ty: "sh",
-            ix: 1,
-            ks: {
-              a: 0,
-              k: {
-                i: [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    -15.897
-                  ],
-                  [
-                    15.897,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                o: [
-                  [
-                    15.897,
-                    0
-                  ],
-                  [
-                    0,
-                    15.897
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    0,
-                    0
-                  ]
-                ],
-                v: [
-                  [
-                    -9.74,
-                    -28.83
-                  ],
-                  [
-                    19.09,
-                    0
-                  ],
-                  [
-                    -9.74,
-                    28.83
-                  ],
-                  [
-                    -19.09,
-                    28.83
-                  ],
-                  [
-                    -19.09,
-                    -28.83
-                  ]
-                ],
-                c: true
-              },
-              ix: 2
-            },
-            nm: "Path 2",
-            mn: "ADBE Vector Shape - Group",
-            hd: false
-          },
-          {
-            ty: "st",
-            c: {
-              a: 0,
-              k: [
-                0,
-                0,
-                0,
-                1
-              ],
-              ix: 3
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 4
-            },
-            w: {
-              a: 0,
-              k: 2,
-              ix: 5
-            },
-            lc: 1,
-            lj: 1,
-            ml: 4,
-            bm: 0,
-            nm: "Stroke 1",
-            mn: "ADBE Vector Graphic - Stroke",
-            hd: false
-          },
-          {
-            ty: "tr",
-            p: {
-              a: 0,
-              k: [
-                21.176,
-                30.318
-              ],
-              ix: 2
-            },
-            a: {
-              a: 0,
-              k: [
-                0,
-                0
-              ],
-              ix: 1
-            },
-            s: {
-              a: 0,
-              k: [
-                100,
-                100
-              ],
-              ix: 3
-            },
-            r: {
-              a: 0,
-              k: 0,
-              ix: 6
-            },
-            o: {
-              a: 0,
-              k: 100,
-              ix: 7
-            },
-            sk: {
-              a: 0,
-              k: 0,
-              ix: 4
-            },
-            sa: {
-              a: 0,
-              k: 0,
-              ix: 5
-            },
-            nm: "Transform"
-          }
-        ],
-        nm: "Group 1",
-        np: 2,
-        cix: 2,
-        bm: 0,
-        ix: 1,
-        mn: "ADBE Vector Group",
-        hd: false
-      },
-      {
-        ty: "tm",
-        s: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 153,
-              s: [
-                0
-              ]
-            },
-            {
-              t: 203.000008268359,
-              s: [
-                100
-              ]
-            }
-          ],
-          ix: 1
-        },
-        e: {
-          a: 1,
-          k: [
-            {
-              i: {
-                x: [
-                  0
-                ],
-                y: [
-                  1
-                ]
-              },
-              o: {
-                x: [
-                  0.167
-                ],
-                y: [
-                  0.167
-                ]
-              },
-              t: 119,
-              s: [
-                0
-              ]
-            },
-            {
-              t: 159.000006476203,
-              s: [
-                100
-              ]
-            }
-          ],
-          ix: 2
-        },
-        o: {
-          a: 0,
-          k: 0,
-          ix: 3
-        },
-        m: 1,
-        ix: 2,
-        nm: "Trim Paths 1",
-        mn: "ADBE Vector Filter - Trim",
-        hd: false
-      }
-    ],
-    ip: 119.000004846969,
-    op: 162.000006598395,
-    st: 119.000004846969,
-    bm: 0
-  }
-];
-const markers = [];
-const loadingLottie = {
-  v,
-  fr,
-  ip,
-  op,
-  w,
-  h,
-  nm,
-  ddd,
-  assets,
-  layers,
-  markers
-};
 const css = {
   code: ".loading.svelte-manu88{position:absolute;z-index:1000;top:0;left:0;width:100%;height:100%;background:white;display:flex;justify-content:center;align-items:center}",
-  map: `{"version":3,"file":"LoadingScreen.svelte","sources":["LoadingScreen.svelte"],"sourcesContent":["<script>\\n  import { LottiePlayer } from '@lottiefiles/svelte-lottie-player';\\n  import { scale } from 'svelte/transition';\\n  import loadingLottie from \\"$lib/loadingLottie.json\\";\\n\\n  import { width, height } from '$lib/stores'\\n\\n  $: size =  Math.min(200, Math.min($width, $height) * ($width < 768 ? 1 : .85 ))\\n\\n<\/script>\\n\\n<section \\n  class=\\"loading\\" \\n  out:scale={{ start: 1, opacity: 0, delay: 0, duration: 500, delay: 0 }}\\n>\\n  \\n  <LottiePlayer\\n    src={loadingLottie}\\n    autoplay={true}\\n    loop={true}\\n    controls={false}\\n    renderer=\\"svg\\"\\n    background=\\"transparent\\"\\n    width={size}\\n    height={size}\\n    controlsLayout={[]}\\n  />\\n\\n</section>\\n\\n<style lang=\\"scss\\">.loading {\\n  position: absolute;\\n  z-index: 1000;\\n  top: 0;\\n  left: 0;\\n  width: 100%;\\n  height: 100%;\\n  background: white;\\n  display: flex;\\n  justify-content: center;\\n  align-items: center;\\n}</style>\\n"],"names":[],"mappings":"AA8BmB,sBAAS,CAC1B,QAAQ,CAAE,QAAQ,CAClB,OAAO,CAAE,IAAI,CACb,GAAG,CAAE,CAAC,CACN,IAAI,CAAE,CAAC,CACP,KAAK,CAAE,IAAI,CACX,MAAM,CAAE,IAAI,CACZ,UAAU,CAAE,KAAK,CACjB,OAAO,CAAE,IAAI,CACb,eAAe,CAAE,MAAM,CACvB,WAAW,CAAE,MACf"}`
+  map: `{"version":3,"file":"LoadingScreen.svelte","sources":["LoadingScreen.svelte"],"sourcesContent":["<script>\\n  import { LottiePlayer } from '@lottiefiles/svelte-lottie-player';\\n  import { scale } from 'svelte/transition';\\n\\n  import { width, height } from '$lib/stores'\\n\\n  $: size =  Math.min(200, Math.min($width, $height) * ($width < 768 ? 1 : .85 ))\\n\\n<\/script>\\n\\n<section \\n  class=\\"loading\\" \\n  out:scale={{ start: 1, opacity: 0, delay: 0, duration: 500, delay: 0 }}\\n>\\n  \\n  <LottiePlayer\\n    src=\\"/loadingLottie.json\\"\\n    autoplay={true}\\n    loop={true}\\n    controls={false}\\n    renderer=\\"svg\\"\\n    background=\\"transparent\\"\\n    width={size}\\n    height={size}\\n    controlsLayout={[]}\\n  />\\n\\n</section>\\n\\n<style lang=\\"scss\\">.loading {\\n  position: absolute;\\n  z-index: 1000;\\n  top: 0;\\n  left: 0;\\n  width: 100%;\\n  height: 100%;\\n  background: white;\\n  display: flex;\\n  justify-content: center;\\n  align-items: center;\\n}</style>\\n"],"names":[],"mappings":"AA6BmB,sBAAS,CAC1B,QAAQ,CAAE,QAAQ,CAClB,OAAO,CAAE,IAAI,CACb,GAAG,CAAE,CAAC,CACN,IAAI,CAAE,CAAC,CACP,KAAK,CAAE,IAAI,CACX,MAAM,CAAE,IAAI,CACZ,UAAU,CAAE,KAAK,CACjB,OAAO,CAAE,IAAI,CACb,eAAe,CAAE,MAAM,CACvB,WAAW,CAAE,MACf"}`
 };
 const LoadingScreen = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let size;
@@ -9613,7 +4176,7 @@ const LoadingScreen = create_ssr_component(($$result, $$props, $$bindings, slots
   return `<section class="loading svelte-manu88">${validate_component(LottiePlayer, "LottiePlayer").$$render(
     $$result,
     {
-      src: loadingLottie,
+      src: "/loadingLottie.json",
       autoplay: true,
       loop: true,
       controls: false,
@@ -9663,10 +4226,8 @@ const App = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   let layout = "block";
   let $$settled;
   let $$rendered;
-  let previous_head = $$result.head;
   do {
     $$settled = true;
-    $$result.head = previous_head;
     {
       simulation.setLayout(layout);
     }
@@ -9760,8 +4321,7 @@ const Page = create_ssr_component(($$result, $$props, $$bindings, slots) => {
   projects.set(data.projects);
   categories.set(data.categories);
   console.log(data);
-  if ($$props.data === void 0 && $$bindings.data && data !== void 0)
-    $$bindings.data(data);
+  if ($$props.data === void 0 && $$bindings.data && data !== void 0) $$bindings.data(data);
   $$unsubscribe_width();
   $$unsubscribe_height();
   $$unsubscribe_pixelRatio();

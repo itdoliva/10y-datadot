@@ -11,8 +11,17 @@ import * as d3 from "d3"
 
 export async function load({ fetch }) {
   // Get deliverables and categories from the database
-  const deliverables = await getRecords('deliverables', deliverableColumns).then(parseDeliverables)
-  const categories = await getRecords('categories', categoryColumns).then(parseCategories)
+  const deliverables = await fetch('/data/deliverables.csv')
+    .then(res => res.text())
+    .then(text => d3.csvParse(text))
+    .then(parseDeliverables)
+
+  const categories = await fetch('/data/categories.csv')
+    .then(res => res.text())
+    .then(text => d3.csvParse(text))
+    .then(parseCategories)
+  // const deliverables = await getRecords('deliverables', deliverableColumns).then(parseDeliverables)
+  // const categories = await getRecords('categories', categoryColumns).then(parseCategories)
 
   // Sort categories
   categories.sort((a, b) => categoryOrders.indexOf(a.id) - categoryOrders.indexOf(b.id))

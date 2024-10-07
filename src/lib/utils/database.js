@@ -1,4 +1,5 @@
-import { XATA_API_KEY, DATABASE_URL } from '$env/static/private';
+// import { XATA_API_KEY, DATABASE_URL } from '$env/static/private';
+import * as d3 from "d3"
 
 export const deliverableColumns = [ 
   "client", 
@@ -55,22 +56,26 @@ export const categoryOrders = [
 ]
 
 
-export async function getRecords(table, columns) {
-  const url = DATABASE_URL + `/tables/${table}/query`
+// export async function getRecords(table, columns) {
+//   const url = DATABASE_URL + `/tables/${table}/query`
 
-  return fetch(url, {
-    method: 'POST',
-    headers: { 
-      Authorization: `Bearer ${XATA_API_KEY}`, 
-      'Content-Type': 'application/json' 
-    },
-    body: JSON.stringify({
-      columns,
-      page: { size: 1000 }
-    })
-  })
-  .then(response => response.json())
-  .then(json => json.records)
+//   return fetch(url, {
+//     method: 'POST',
+//     headers: { 
+//       Authorization: `Bearer ${XATA_API_KEY}`, 
+//       'Content-Type': 'application/json' 
+//     },
+//     body: JSON.stringify({
+//       columns,
+//       page: { size: 1000 }
+//     })
+//   })
+//   .then(response => response.json())
+//   .then(json => json.records)
+// }
+
+export async function getRecords(path) {
+  return d3.csv(path)
 }
 
 

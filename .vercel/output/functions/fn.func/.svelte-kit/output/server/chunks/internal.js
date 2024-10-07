@@ -43,26 +43,17 @@ const Root = create_ssr_component(($$result, $$props, $$bindings, slots) => {
     setContext("__svelte__", stores);
   }
   afterUpdate(stores.page.notify);
-  if ($$props.stores === void 0 && $$bindings.stores && stores !== void 0)
-    $$bindings.stores(stores);
-  if ($$props.page === void 0 && $$bindings.page && page !== void 0)
-    $$bindings.page(page);
-  if ($$props.constructors === void 0 && $$bindings.constructors && constructors !== void 0)
-    $$bindings.constructors(constructors);
-  if ($$props.components === void 0 && $$bindings.components && components !== void 0)
-    $$bindings.components(components);
-  if ($$props.form === void 0 && $$bindings.form && form !== void 0)
-    $$bindings.form(form);
-  if ($$props.data_0 === void 0 && $$bindings.data_0 && data_0 !== void 0)
-    $$bindings.data_0(data_0);
-  if ($$props.data_1 === void 0 && $$bindings.data_1 && data_1 !== void 0)
-    $$bindings.data_1(data_1);
+  if ($$props.stores === void 0 && $$bindings.stores && stores !== void 0) $$bindings.stores(stores);
+  if ($$props.page === void 0 && $$bindings.page && page !== void 0) $$bindings.page(page);
+  if ($$props.constructors === void 0 && $$bindings.constructors && constructors !== void 0) $$bindings.constructors(constructors);
+  if ($$props.components === void 0 && $$bindings.components && components !== void 0) $$bindings.components(components);
+  if ($$props.form === void 0 && $$bindings.form && form !== void 0) $$bindings.form(form);
+  if ($$props.data_0 === void 0 && $$bindings.data_0 && data_0 !== void 0) $$bindings.data_0(data_0);
+  if ($$props.data_1 === void 0 && $$bindings.data_1 && data_1 !== void 0) $$bindings.data_1(data_1);
   let $$settled;
   let $$rendered;
-  let previous_head = $$result.head;
   do {
     $$settled = true;
-    $$result.head = previous_head;
     {
       stores.page.set(page);
     }
@@ -194,7 +185,7 @@ const options = {
 		<div class="error">
 			<span class="status">` + status + '</span>\n			<div class="message">\n				<h1>' + message + "</h1>\n			</div>\n		</div>\n	</body>\n</html>\n"
   },
-  version_hash: "z48vxu"
+  version_hash: "1i3l9i0"
 };
 async function get_hooks() {
   return {};

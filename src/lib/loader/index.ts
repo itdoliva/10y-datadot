@@ -1,7 +1,6 @@
 import { Loader } from "./Loader";
 
-// Min loading time in ms
-const minLoadingTime = 0//5000 
+let minLoadingTime = 2500;
 
 const loader = new Loader(minLoadingTime)
 
