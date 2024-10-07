@@ -103,36 +103,6 @@ export function parseDeliverables(values) {
   })
 }
 
-
-export function parseCategories(values) {
-  return values.map((row, i) => {
-    const dt = new Date(row.dt_start)
-  
-    if (!row.industry) {
-      return
-    }
-  
-    return {
-      id: i,
-      
-      client: row.client,
-      project: row.project,
-      description: row.description,
-      dt: dt.getTime() / 1000,
-      date: `${(dt.getUTCMonth()+1).toString().padStart(2, "0")}/${dt.getUTCFullYear()}`,
-      year: dt.getFullYear(),
-  
-      channel: "channel." + row.channel,
-      industry: "industry." + row.industry,
-      product: JSON.parse(row.product.replace(/'/g, '"')).filter(d => d !== undefined).map(d => "product." + d),
-      design: JSON.parse(row.design.replace(/'/g, '"')).filter(d => d !== undefined).map(d => "design." + d),
-      goal: JSON.parse(row.goal.replace(/'/g, '"')).filter(d => d !== undefined).map(d => "goal." + d),
-  
-      complexity: +row.complexity
-    }
-  })
-}
-
 export function parseCategories(values) {
   return values.map((row) => ({
     id: `${row.type}.${row.name}`,
