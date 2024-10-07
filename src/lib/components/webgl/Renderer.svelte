@@ -32,7 +32,7 @@
       view: canvas, 
       resizeTo: window, 
       backgroundAlpha: 0,
-      antialias: true,
+      antialias: false,
     })
 
     addMesh()
