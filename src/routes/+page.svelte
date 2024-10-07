@@ -23,7 +23,6 @@
   projects.set(data.projects)
   categories.set(data.categories)
 
-  console.log(data)
 
 
   onMount(() => {

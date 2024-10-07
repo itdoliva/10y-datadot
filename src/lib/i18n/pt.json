@@ -21,7 +21,7 @@
 
   "onboarding": {
     "desktop": {
-      "1": "Para comemorar os 10 anos de vida da Datadot, construímos essa plataforma para contar a nossa história da forma que mais gostamos: através da visualização de dados. Esperamos que gostem :)",
+      "1": "Para comemorar os 10 anos de vida da Datadot, construímos essa plataforma para contar a nossa história da forma que mais gostamos: através da&nbsp;visualização de dados. Esperamos que gostem :)",
       "2": "Cada unidade é uma entrega realizada ao longo da vida da datadot",
       "3": "Você pode interagir com as unidades",
       "4": "Explore as nossas entregas de diferentes formas através dos paineis da <span class='left'>esquerda</span> e do <span class='top'>topo</span>. O botão limpar filtros retorna ao estado inicial",
@@ -47,7 +47,7 @@
   "category": {
     "channel.digital": "Mídia digital",
     "channel.impressa": "Mídia impressa",
-    "channel.consultoria": "Consultoria",
+    "channel.consultoria": "Inteligência estratégica",
 
     "product.site-editorial": "Site editorial",
     "product.outras-interfaces": "Outras interfaces",
@@ -61,7 +61,7 @@
     "design.user-interface": "User interface",
     "design.datavis": "Datavis",
     "design.ilustracao": "Ilustração",
-    "design.design-de-servicos": "Design de serviços",
+    "design.design-de-servicos": "Design estratégico",
     "design.editorial": "Editorial",
     "design.infografia": "Infografia",
     "design.motion-graphics": "Motion graphics",

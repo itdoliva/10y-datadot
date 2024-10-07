@@ -210,7 +210,7 @@ export default class Simulation {
     const data = this.getDeliverableNodes().filter(node => node.active)
     const radialGap = s_nodeSize * 1.75
     const stackGap = s_nodeSize * 1
-    const maxStack = this.activeCount**(1/3)
+    const maxStack = this.activeCount**(1/2.5)
 
     let curSectorData
     let curSectorMetadata
@@ -383,7 +383,7 @@ export default class Simulation {
       .range([.75, 1.25])
 
     d3.groups(deliverableNodes, (d: Deliverable) => d.client).forEach(([ id, deliverables]) => {
-      const client = new DeliverableGroup(this, id, deliverables, 0x828AFA)
+      const client = new DeliverableGroup(this, id, deliverables, 0xA5AAF4)
       this.clients.push(client)
     })
 

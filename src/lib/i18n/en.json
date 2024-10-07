@@ -47,7 +47,7 @@
   "category": {
     "channel.digital": "Digital channel",
     "channel.impressa": "Print channel",
-    "channel.consultoria": "Consulting",
+    "channel.consultoria": "Strategic Intelligence",
 
     "product.site-editorial": "Editorial website",
     "product.outras-interfaces": "Other interfaces",
@@ -61,7 +61,7 @@
     "design.user-interface": "User interface",
     "design.datavis": "Datavis",
     "design.ilustracao": "Illustration",
-    "design.design-de-servicos": "Service design",
+    "design.design-de-servicos": "Strategic design",
     "design.editorial": "Editorial",
     "design.infografia": "Infography",
     "design.motion-graphics": "Motion graphics",

@@ -587,7 +587,7 @@
 
       <article 
         id="panel" bind:this={inner} 
-        class="opacity-0 w-[75vw] md:min-w-24 md:max-w-80 my-0 mx-auto pt-4 pb-3 px-4 bg-dark-gray flex flex-col gap-3 shadow"
+        class="opacity-0 w-[75vw] {index > 0 ? 'md:min-w-24 md:max-w-80' : 'md:min-w-28 md:max-w-96'} my-0 mx-auto pt-4 pb-3 px-4 bg-dark-gray flex flex-col gap-3 shadow"
       >
 
         <div class="flex justify-between h-6">

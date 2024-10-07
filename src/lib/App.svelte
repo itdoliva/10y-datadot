@@ -35,7 +35,6 @@
   $: simulation.handleLinks("projects", $linkProjectOn)
   $: simulation.handleLanguageChange($locale)
 
-  $: console.log(layout)
 
 </script>
 

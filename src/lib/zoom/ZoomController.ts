@@ -200,7 +200,6 @@ export default class ZoomController {
 // USE ZOOM IDENTITIES!
 
   public updateScaleExtent = (layout: Layout, windowWidth?: number) => {
-    console.log('UPDATESCALEEXTENT')
     if (!this.initialized) {
       return this
     }
@@ -221,7 +220,7 @@ export default class ZoomController {
       preparePinchSignal = this.curTranslateExtentExceedsViewport
     }
     else if (layout === "radial" && windowWidth >= 768) {
-      scaleExtent = [ .8, 1 ]
+      scaleExtent = [ .5, 1 ]
       k = 1
     }
 
