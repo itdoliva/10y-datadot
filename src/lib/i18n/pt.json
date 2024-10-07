@@ -46,7 +46,7 @@
 
   "category": {
     "channel.digital": "Mídia digital",
-    "channel.impresso": "Mídia impressa",
+    "channel.impressa": "Mídia impressa",
     "channel.consultoria": "Consultoria",
 
     "product.site-editorial": "Site editorial",
@@ -82,7 +82,8 @@
     "industry.imobiliario": "Imobiliário",
     "industry.comunicacao": "Comunicação",
     "industry.jornalismo": "Jornalismo",
-    "industry.pesquisa": "Pesquisa"
+    "industry.pesquisa": "Pesquisa",
+    "industry.outros": "Outros"
 
   },
 

@@ -46,7 +46,7 @@
 
   "category": {
     "channel.digital": "Digital channel",
-    "channel.impresso": "Print channel",
+    "channel.impressa": "Print channel",
     "channel.consultoria": "Consulting",
 
     "product.site-editorial": "Editorial website",
@@ -82,7 +82,8 @@
     "industry.imobiliario": "Real estate",
     "industry.comunicacao": "Communication",
     "industry.jornalismo": "Journalism",
-    "industry.pesquisa": "Research"
+    "industry.pesquisa": "Research",
+    "industry.outros": "Others"
 
   },
 

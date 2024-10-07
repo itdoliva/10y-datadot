@@ -1,4 +1,4 @@
-export default function getRegPolyPoints(cx, cy, size, sides, theta=0) {
+export function getRegPolyPoints(cx, cy, size, sides, theta=0) {
   const points = []
 
   // Circumcircle radius

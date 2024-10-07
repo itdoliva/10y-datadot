@@ -22,27 +22,28 @@ export default class DeliverableContext {
 
   private ids = {
     background: [ 
-      "design.user-interface",
-      "design.datavis",
       "design.ilustracao",
-      "design.design-de-servicos",
-      "design.editorial",
       "design.infografia",
       "design.motion-graphics",
+      "design.editorial",
+      "design.user-interface",
+      "design.datavis",
+      "design.design-de-servicos",
     ],
     base: [ 
       "channel.digital",
-      "channel.impresso",
+      "channel.impressa",
       "channel.consultoria"
     ],
     front: [ 
-      "product.site-editorial",
-      "product.outras-interfaces",
-      "product.relatorios",
-      "product.apresentacao",
-      "product.publicacao",
-      "product.site-institucional",
       "product.video",
+
+      "product.publicacao",
+      "product.apresentacao",
+      "product.site-editorial",
+      "product.site-institucional",
+      "product.relatorios",
+      "product.outras-interfaces",
     ],
     mask: [ 
       "product.infografico",
@@ -96,18 +97,23 @@ export default class DeliverableContext {
   private addGraphics = (id: string) => {
     let graphics
 
-    if (this.ids.sprite.includes(id)) {
-      graphics = templates[id](this.context)
-    }
-    else if (this.ids.mask.includes(id)) {
-      graphics = templates[id]()
-      graphics.mask = new PIXI.Graphics(this.baseGraphics.geometry)
-      graphics.addChild(graphics.mask)
+    try {
+      if (this.ids.sprite.includes(id)) {
+        graphics = templates[id](this.context)
+      }
+      else if (this.ids.mask.includes(id)) {
+        graphics = templates[id]()
+        graphics.mask = new PIXI.Graphics(this.baseGraphics.geometry)
+        graphics.addChild(graphics.mask)
 
-      this.graphics.addChild(graphics)
+        this.graphics.addChild(graphics)
+      }
+      else {
+        graphics = templates[id](this.graphics)
+      }
     }
-    else {
-      graphics = templates[id](this.graphics)
+    catch (e) {
+      console.log(id, e, this.deliverable.categories)
     }
 
     return graphics
