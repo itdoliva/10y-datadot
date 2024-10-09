@@ -10,14 +10,14 @@
 
 	import simulation from '$lib/simulation';
 
-  import { PUBLIC_AWS_SOUND_BASE_URL } from '$env/static/public';
+  import { AWS_SOUND_URL } from '$lib/utils/constants';
   import { onMount } from 'svelte';
 
   let playing
   let animation
 
   onMount(() => {
-    simulation.sound.loadPlayers(PUBLIC_AWS_SOUND_BASE_URL)
+    simulation.sound.loadPlayers(AWS_SOUND_URL)
   })
 
   function onClick() {
@@ -41,7 +41,7 @@
   on:click={onClick}
 >
   <Icon icon={playing ? "pause" : "play"} />
-  <span class="text-nowrap">play my vis!</span>
+  <span class="text-nowrap">play&nbsp;my&nbsp;vis!</span>
 
   <svg id="sound-icon" width="100%" height="100%" viewBox="0 0 32 33" xmlns="http://www.w3.org/2000/svg">
     <path d="M8.64 18.9001C10.098 18.9001 11.28 17.7181 11.28 16.2601C11.28 14.8021 10.098 13.6201 8.64 13.6201C7.18197 13.6201 6 14.8021 6 16.2601C6 17.7181 7.18197 18.9001 8.64 18.9001Z"/>

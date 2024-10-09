@@ -1,118 +1,85 @@
 // import { XATA_API_KEY, DATABASE_URL } from '$env/static/private';
-import * as d3 from "d3"
-
-export const deliverableColumns = [ 
-  "client", 
-  "industry", 
-  "project", 
-  "description", 
-  "dt_start", 
-  "channel", 
-  "product", 
-  "design", 
-  "goal", 
-  "complexity"
-]
-
-export const categoryColumns = [ "name", "data", "type" ]
-
-export const categoryOrders = [
-  'channel.digital',
-  'channel.impressa',
-  'channel.consultoria',
-
-  'goal.educacional',
-  'goal.informacional',
-  'goal.impacto-positivo',
-  'goal.jornalistico-editorial',
-  'goal.institucional',
-
-  'industry.servicos-e-tecnologia',
-  'industry.educacao',
-  'industry.financeiro',
-  'industry.ongs-orgs',
-  'industry.consultorias',
-  'industry.comunicacao',
-  'industry.jornalismo',
-  'industry.pesquisa',
-  'industry.outros',
-
-  'product.video', 
-  'product.infografico',
-  'product.publicacao',
-  'product.apresentacao',
-  'product.site-editorial',
-  'product.site-institucional',
-  'product.relatorios',
-  'product.outras-interfaces',
-
-  'design.ilustracao',
-  'design.infografia',
-  'design.motion-graphics',
-  'design.editorial',
-  'design.user-interface',
-  'design.datavis', 
-  'design.design-de-servicos',
-]
+import { sheetsClient } from "$lib/googleAuth";
+import { SHEET_ID } from '$env/static/private';
+import { CATEGORIES_ORDER } from '$lib/utils/constants';
 
 
-// export async function getRecords(table, columns) {
-//   const url = DATABASE_URL + `/tables/${table}/query`
+export async function getSheetValues(range) {
 
-//   return fetch(url, {
-//     method: 'POST',
-//     headers: { 
-//       Authorization: `Bearer ${XATA_API_KEY}`, 
-//       'Content-Type': 'application/json' 
-//     },
-//     body: JSON.stringify({
-//       columns,
-//       page: { size: 1000 }
-//     })
-//   })
-//   .then(response => response.json())
-//   .then(json => json.records)
-// }
+  if (!sheetsClient) {
+    return console.error('Google Sheets API not initialized')
+  }
 
-export async function getRecords(path) {
-  return d3.csv(path)
+	// Fetch sheet data from Google Sheets
+	const response = await sheetsClient.spreadsheets.values.get({
+		spreadsheetId: SHEET_ID,
+		range
+	});
+
+	const values = response.data.values
+
+	return values
 }
 
 
 export function parseDeliverables(values) {
-  return values.map((row, i) => {
-    const dt = new Date(row.dt_start)
-  
-    if (!row.industry) {
+  const data = []
+
+  // Remove column names
+  values.splice(0, 1)
+  values.forEach(([ client, industry, project, description, dt_start, channel, product, design, goal, complexity ], i) => {
+    const [ day, month, year ] = dt_start.split('/')
+
+    const date = new Date(year, month - 1, day)
+
+    try {
+      data.push({
+        id: i,
+      
+        client,
+        project,
+        description,
+        dt: date.getTime() / 1000,
+        date: month + '/' + year,
+        year,
+    
+        channel: "channel." + channel,
+        industry: "industry." + industry,
+        product: JSON.parse(product.replace(/'/g, '"')).map(d => "product." + d),
+        design: JSON.parse(design.replace(/'/g, '"')).map(d => "design." + d),
+        goal: JSON.parse(goal.replace(/'/g, '"')).map(d => "goal." + d),
+    
+        complexity: +complexity
+      })
+    }
+    catch (e) {
       return
     }
-  
-    return {
-      id: i,
-      
-      client: row.client,
-      project: row.project,
-      description: row.description,
-      dt: dt.getTime() / 1000,
-      date: `${(dt.getUTCMonth()+1).toString().padStart(2, "0")}/${dt.getUTCFullYear()}`,
-      year: dt.getFullYear(),
-  
-      channel: "channel." + row.channel,
-      industry: "industry." + row.industry,
-      product: JSON.parse(row.product.replace(/'/g, '"')).filter(d => d !== undefined).map(d => "product." + d),
-      design: JSON.parse(row.design.replace(/'/g, '"')).filter(d => d !== undefined).map(d => "design." + d),
-      goal: JSON.parse(row.goal.replace(/'/g, '"')).filter(d => d !== undefined).map(d => "goal." + d),
-  
-      complexity: +row.complexity
-    }
   })
+
+  return data
 }
 
 export function parseCategories(values) {
-  return values.map((row) => ({
-    id: `${row.type}.${row.name}`,
-    type: row.type,
-    name: row.name,
-    data: JSON.parse(row.data)
-  }))
+  const data = []
+
+  // Remove column names
+  values.splice(0, 1)
+  values.forEach(([ type, name, data_ ], i) => {
+
+    data.push({
+      id: type + '.' + name,
+      type,
+      name,
+      data: JSON.parse(data_.replace(/'/g, '"'))
+    })
+
+  })
+
+  data.sort((a, b) => CATEGORIES_ORDER.indexOf(a.id) - CATEGORIES_ORDER.indexOf(b.id))
+
+  return data
 }
+
+
+

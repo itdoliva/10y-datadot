@@ -46,7 +46,6 @@ export default class Simulation {
 
   private activeIds: number[] = []
   public activeCount = 0
-
   public complexityScale 
 
   // Interface

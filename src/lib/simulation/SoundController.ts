@@ -50,6 +50,8 @@ export default class SoundController {
   private reverb
   private pingPong
 
+  private lastTickTime = 0
+
 
   constructor(simulation: Simulation) {
     this.simulation = simulation

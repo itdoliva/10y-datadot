@@ -42,7 +42,7 @@
 
 <div 
   id="root"
-  class="w-full h-full relative overflow-hidden grid md:grid-rows-[auto_1fr] md:grid-cols-[240px_repeat(4,minmax(0,1fr))] xl:grid-cols-5"
+  class="w-full h-full relative overflow-hidden grid md:grid-rows-[auto_1fr] md:grid-cols-[280px_repeat(4,minmax(0,1fr))] xl:grid-cols-5"
 >
 
   <section id="top-panel" class="col-start-2 col-span-full row-start-1 row-span-1 z-20">

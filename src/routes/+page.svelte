@@ -48,15 +48,18 @@
   <title>{$_("page.title")}</title>
   <meta name="author" content="datadot + italo doliva">
 
+  <meta property="og:site_name" content="San Roque 2014 Pollos">
   <meta property="og:title" content="{$_("page.title")}">
+  <meta property="og:type" content="website">
   <meta property="og:description" content="{$_("page.description")}">
-  <!-- <meta property="og:image" content="URL-to-image.jpg"> -->
-  <!-- <meta property="og:url" content="https://example.com"> -->
+  <meta property="og:image" content="/img/share-256x256.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:url" content="https://10.datadotestudio.com">
 
-  <!-- <meta name="twitter:card" content="summary_large_image"> -->
+  <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{$_("page.title")}">
   <meta name="twitter:description" content="{$_("page.description")}">
-  <!-- <meta name="twitter:image" content="URL-to-image.jpg"> -->
+  <meta name="twitter:image" content="/img/share-256x256.png">
   
   <meta name="theme-color" content="#6D78FC">
   

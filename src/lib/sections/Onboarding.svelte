@@ -1,175 +1,15 @@
 <script>
-  import { onMount, afterUpdate } from "svelte";
+  import { afterUpdate } from "svelte";
+  import { get } from 'svelte/store'
+  import { _ } from "svelte-i18n"
   import * as PIXI from "pixi.js"
   import { gsap } from "gsap"
-  import { _ } from "svelte-i18n"
   
-  import { get } from 'svelte/store'
+  import { getSteps, getElements } from "$lib/utils/onboardingSteps"
 
-  import simulation from "$lib/simulation"
+  import { ongoing, finished, contentKeyIdx, app, width } from "$lib/stores"
+  import { ONBOARDING_PARAMS } from "$lib/utils/constants"
 
-  import { ongoing, finished, contentKeyIdx, cameraOffsetY, selected, app, width, isFilterOpen } from "$lib/stores"
-
-
-  const CONFIG = {
-    fadeoutDuration: .15,
-    fadeoutOpacity: .1,
-    offset: 12,
-  }
-
-  const SELECTORS = {
-    root: '#root',
-    header: '#mobile-header',
-    filter: '#filter-container',
-    vis: '#vis-container',
-    layout: '#layout-container',
-    playMyVis: '#play-my-vis',
-
-    shrink: "#shrink-panel",
-    activate: "#activate",
-    otherMenuItems: ":is(#sortby, #sortby-activate, #clear-all, #project-logo, #shrink-button-wrapper, #change-language)",
-    leftPanel: "#left-panel",
-  }
-
-  const DESKTOP_STEPS = [
-    {
-      contentKey: "onboarding.desktop.1",
-      positionTo: SELECTORS.root,
-      placement: "center",
-      borderPosition: "top",
-    },
-    {
-      contentKey: "onboarding.desktop.2",
-      highlight: SELECTORS.vis,
-      positionTo: SELECTORS.vis,
-      placement: "left-start",
-      borderPosition: "right",
-    },
-    {
-      contentKey: "onboarding.desktop.3",
-      highlight: SELECTORS.vis,
-      positionTo: SELECTORS.vis,
-      placement: "left-start",
-      borderPosition: "right",
-      onStart: clickAnimation,
-      onLeave: undoClickAnimation,
-    },
-    {
-      contentKey: "onboarding.desktop.4",
-      highlight: SELECTORS.leftPanel,
-      positionTo: SELECTORS.leftPanel,
-      placement: "right",
-      borderPosition: "left",
-      onStart: panelsAnimation,
-      onLeave: undoPanelsAnimation
-    },
-    {
-      contentKey: "onboarding.desktop.5",
-      highlight: SELECTORS.activate,
-      positionTo: SELECTORS.activate,
-      placement: "top",
-      borderPosition: "bottom",
-      onStart: toggleActivateDropdown,
-      onLeave: toggleActivateDropdown
-    },
-    {
-      contentKey: "onboarding.desktop.6",
-      positionTo: SELECTORS.playMyVis,
-      highlight: SELECTORS.playMyVis,
-      placement: "bottom",
-      borderPosition: "top",
-    },
-  ]
-
-  const TABLET_STEPS = [
-    {
-      contentKey: "onboarding.desktop.1",
-      positionTo: SELECTORS.root,
-      placement: "center",
-      borderPosition: "top",
-    },
-    {
-      contentKey: "onboarding.desktop.2",
-      highlight: SELECTORS.vis,
-      positionTo: SELECTORS.vis,
-      placement: "left-start",
-      borderPosition: "right",
-    },
-    {
-      contentKey: "onboarding.desktop.3",
-      highlight: SELECTORS.vis,
-      positionTo: SELECTORS.vis,
-      placement: "left-start",
-      borderPosition: "right",
-      onStart: clickAnimation,
-      onLeave: undoClickAnimation,
-    },
-    {
-      contentKey: "onboarding.desktop.4",
-      highlight: SELECTORS.leftPanel,
-      positionTo: SELECTORS.leftPanel,
-      placement: "right",
-      borderPosition: "left",
-      onStart: panelsAnimation,
-      onLeave: undoPanelsAnimation
-    },
-    {
-      contentKey: "onboarding.desktop.6",
-      positionTo: SELECTORS.playMyVis,
-      highlight: SELECTORS.playMyVis,
-      placement: "bottom",
-      borderPosition: "top",
-    },
-  ]
-
-  const MOBILE_STEPS = [
-    {
-      contentKey: "onboarding.mobile.1",
-      positionTo: SELECTORS.root,
-      placement: "center",
-      borderPosition: "top",
-    },
-    {
-      contentKey: "onboarding.mobile.2",
-      highlight: SELECTORS.vis,
-      positionTo: SELECTORS.layout,
-      placement: "top",
-      borderPosition: "top",
-    },
-    {
-      contentKey: "onboarding.mobile.3",
-      highlight: SELECTORS.vis,
-      positionTo: SELECTORS.layout,
-      placement: "top",
-      borderPosition: "top",
-      onStart: clickAnimation,
-      onLeave: undoClickAnimation,
-    },
-    {
-      contentKey: "onboarding.mobile.4",
-      highlight: SELECTORS.layout,
-      positionTo: SELECTORS.layout,
-      placement: "top",
-      borderPosition: "bottom",
-    },
-    {
-      contentKey: "onboarding.mobile.5",
-      highlight: SELECTORS.filter,
-      positionTo: "#root",
-      placement: "top-start",
-      borderPosition: "bottom",
-      onStart: openFilterPanel,
-      onLeave: closeFilterPanel,
-    },
-    {
-      contentKey: "onboarding.mobile.6",
-      positionTo: SELECTORS.playMyVis,
-      highlight: SELECTORS.playMyVis,
-      placement: "top",
-      borderPosition: "bottom",
-    },
-
-  ]
 
 
   const tl = gsap.timeline({ overwrite: true })
@@ -179,13 +19,9 @@
   let inner
 
   // Reference to cursor sprites and properties
-  let cursor 
-  let cursorTicker
-  let cursorTl
-
-  let init = false
 
   let index
+  let prvIndex
   let lastIndex = undefined
 
   let prvStep
@@ -196,13 +32,26 @@
   let el
 
 
+  //  Reactive
+  $: if ($ongoing) {
+    startOnboarding()
+  }
 
- 
-  $: if($ongoing && !init) {
-    init = true
+  // Lifecycle
+  afterUpdate(triggerFadeIn)
+
+
+  // Onboarding functions
+  function startOnboarding() {
     index = 0
+    steps = getSteps($width)
+    el = getElements($width)
+    loadCursor()
+    updateStep()
+  }
 
-    // Add cursor
+
+  function loadCursor() {
     const asset = PIXI.Assets.get('cursor')
     const sprite = new PIXI.Sprite(asset)
     sprite.renderable = false
@@ -210,23 +59,7 @@
 
     const parent = get(app).stage.getChildByName("vis-container", true)
     parent.addChild(sprite)
-
-    updateStep()
   }
-
-  onMount(() => {
-    if ($width < 768) {
-      el = [ 'header', 'vis', 'filter', 'layout', 'playMyVis' ].map(d => SELECTORS[d])
-      steps = MOBILE_STEPS
-    }
-    else {
-      el = ['shrink', 'activate', 'playMyVis', 'otherMenuItems', 'vis', 'leftPanel' ].map(d => SELECTORS[d])
-      steps = $width < 1024 ? TABLET_STEPS : DESKTOP_STEPS
-    }
-  })
-
-
-  afterUpdate(triggerFadeIn)
 
 
   function isNextStepAllowed(target) {
@@ -235,9 +68,9 @@
             target.classList.contains("onboarding-nav")
   }
   
+  
   function next(e) {
     e.stopPropagation()
-
     if (!isNextStepAllowed(e.target)) return
 
     updateIndex(1)
@@ -250,6 +83,7 @@
 
   function updateIndex(increment) {
     if (index + increment >= 0 && index + increment < steps.length) {
+      prvIndex = index
       index += increment;
       updateStep();
     } else {
@@ -283,7 +117,7 @@
   }
 
   function applyFadeOutAnimation(toFadeOut) {
-    tl.to(toFadeOut, { opacity: CONFIG.fadeoutOpacity, duration: CONFIG.fadeoutDuration });
+    tl.to(toFadeOut, { opacity: ONBOARDING_PARAMS.fadeoutOpacity, duration: ONBOARDING_PARAMS.fadeoutDuration });
   }
 
   function applyPreviousStepFadeOut(prevStep) {
@@ -293,12 +127,21 @@
       x: position.xOffset*2, 
       y: position.yOffset*2,
       opacity: 0, 
-      duration: CONFIG.fadeoutDuration 
-    }, "<");
+      duration: ONBOARDING_PARAMS.fadeoutDuration 
+    }, "<")
 
     if (settings.onLeave) {
       tl.call(settings.onLeave, [], "<");
     }
+    
+    if (prvIndex == 0) {
+      tl.call(() => {
+        inner.classList.remove("md:min-w-32", "md:max-w-96")
+        inner.classList.add("md:min-w-24", "md:max-w-80")
+      })
+    }
+
+
   }
 
 
@@ -372,7 +215,7 @@
       left += width *.5
       yPercent = -50
       xPercent = -50
-      yOffset = -CONFIG.offset
+      yOffset = -ONBOARDING_PARAMS.offset
     }
     else if (placement === "left" || placement === "right") {
       top += height * .5
@@ -385,19 +228,19 @@
 
     if (placement.includes("left")) {
       xPercent = -100
-      xOffset = -CONFIG.offset
+      xOffset = -ONBOARDING_PARAMS.offset
     }
     else if (placement.includes("right")) {
       left += width
-      xOffset = CONFIG.offset
+      xOffset = ONBOARDING_PARAMS.offset
     }
     else if (placement.includes("top")) {
       yPercent = -100
-      yOffset = -CONFIG.offset
+      yOffset = -ONBOARDING_PARAMS.offset
     }
     else if (placement.includes("bottom")) {
       top += height
-      yOffset = CONFIG.offset
+      yOffset = ONBOARDING_PARAMS.offset
     }
 
     // End placements
@@ -417,27 +260,33 @@
     const yFinal = top + (inner.clientHeight * yPercent/100) + yOffset
 
     if (xFinal <= 0)  {
-      xOffset2 = xFinal*-1 + 2*CONFIG.offset
+      xOffset2 = xFinal*-1 + 2*ONBOARDING_PARAMS.offset
     }
     else if (xFinal >= document.body.clientWidth) {
-      xOffset2 = document.body.clientWidth - (xFinal + 2*CONFIG.offset)
+      xOffset2 = document.body.clientWidth - (xFinal + 2*ONBOARDING_PARAMS.offset)
     }
 
     if (yFinal <= 0) {
-      yOffset2 = yFinal*-1 + 2*CONFIG.offset
+      yOffset2 = yFinal*-1 + 2*ONBOARDING_PARAMS.offset
     }
     else if (yFinal >= document.body.clientHeight) {
-      yOffset2 = document.body.clientHeight - (yFinal + 2*CONFIG.offset)
+      yOffset2 = document.body.clientHeight - (yFinal + 2*ONBOARDING_PARAMS.offset)
     }
 
     return { left, top, xPercent, yPercent, xOffset, yOffset, xOffset2, yOffset2 }
   }
 
   function applyFadeInAnimation({ left, top, xPercent, yPercent, xOffset, yOffset, xOffset2, yOffset2 }) {
+    if (index == 0) tl.call(() => {
+      inner.classList.remove("md:min-w-24", "md:max-w-80")
+      inner.classList.add("md:min-w-32", "md:max-w-96")
+    })
+    
     tl
       .set(outer, { left, top })
       .set(inner, { xPercent, yPercent, x: xOffset2, y: yOffset2, opacity: 0 })
-      .to(inner, { x: xOffset + xOffset2, y: yOffset + yOffset2, opacity: 1, duration: .3 }, "<");
+      .to(inner, { x: xOffset + xOffset2, y: yOffset + yOffset2, opacity: 1, duration: .3 }, "<")
+
   }
 
 
@@ -462,114 +311,6 @@
   }
 
 
-  function clickAnimation() {
-
-    const vizEl = document.querySelector("#vis-container")
-    const bbox = vizEl.getBoundingClientRect()
-
-    const x = bbox.width*.5
-    const y = bbox.height*.5
-
-    const props = { x: 0, y: 0 }
-
-    cursor = get(app).stage.getChildByName("cursor", true)
-    cursorTl = gsap.timeline()
-
-    cursorTl
-      .call(() => {
-        cursor.renderable = true
-      })
-      .set(props, { x: bbox.width * .8, y: bbox.height * .95 })
-      .to(props, { x, y, duration: 2 })
-      .set(props, { x: x - 4, y: y + 4, delay: .3 })
-      .set(props, { x, y, delay: .15 })
-      .call(() => {
-        simulation.getClosestTo(0 - 4, 0 + 4 - get(cameraOffsetY)).context.select()
-        cursor.renderable = false
-      })
-
-    cursorTicker = get(app).ticker.add(() => {
-      cursor.x = props.x
-      cursor.y = props.y
-    })
-
-  }
-
-  function undoClickAnimation() {
-    if (cursorTl.isActive()) {
-      cursorTl.kill()
-      get(app).ticker.remove(cursorTicker)
-      cursor.renderable = false
-    }
-
-    selected.set(null)
-  }
-
-  let panelsAnimationTl
-
-  function panelsAnimation() {
-    // Plays blinking animation on left and top panels
-
-    const leftEl = document.querySelector(SELECTORS.leftPanel)
-    const topEl = document.querySelector(SELECTORS.shrink)
-    const leftSpanEl = document.querySelector("#onboarding #panel span.left")
-    const topSpanEl = document.querySelector("#onboarding #panel span.top")
-
-    panelsAnimationTl = gsap.timeline()
-      .call(() => { 
-        if (leftEl) leftEl.classList.add("soft-blink")
-        if (leftSpanEl) leftSpanEl.classList.add("blink")
-      })
-      .call(() => { 
-        if (leftEl) leftEl.classList.remove("soft-blink")
-        if (leftSpanEl) leftSpanEl.classList.remove("blink")
-      }, [], "+=2")
-      .call(() => { 
-        if (topEl) topEl.classList.add("soft-blink") 
-        if (topSpanEl) topSpanEl.classList.add("blink") 
-      }, [], "<")
-      .call(() => { 
-        if (topEl) topEl.classList.remove("soft-blink") 
-        if (topSpanEl) topSpanEl.classList.remove("blink") 
-      }, [], "+=2")
-      .set(SELECTORS.shrink, { opacity: 1 })
-  }
-
-  function undoPanelsAnimation() {
-    // Force stop blinking animation on left and top panels
-
-    if (panelsAnimationTl?.isActive()) panelsAnimationTl.kill()
-    
-    const leftEl = document.querySelector(SELECTORS.leftPanel)
-    const topEl = document.querySelector(SELECTORS.shrink)
-    const leftSpanEl = document.querySelector("#onboarding #panel span.left")
-    const topSpanEl = document.querySelector("#onboarding #panel span.top")
-
-    if (leftEl) leftEl.classList.remove("soft-blink")
-    if (topEl) topEl.classList.remove("soft-blink") 
-
-    if (leftSpanEl) leftSpanEl.classList.remove("blink") 
-    if (topSpanEl) topSpanEl.classList.remove("blink") 
-  }
-
-  function toggleActivateDropdown() {
-    const wrapper = document.querySelector(SELECTORS.activate)
-    const dropdwn = wrapper.querySelector(":scope .dropdown")
-
-    const isActive = dropdwn.classList.toggle('active')
-
-    wrapper.style.borderLeft = isActive
-      ? "1px solid black"
-      : "none"
-  }
-
-  function openFilterPanel() {
-    isFilterOpen.set(true)
-  }
-
-  function closeFilterPanel() {
-    isFilterOpen.set(false)
-  }
   
 </script>
 
@@ -587,7 +328,7 @@
 
       <article 
         id="panel" bind:this={inner} 
-        class="opacity-0 w-[75vw] {index > 0 ? 'md:min-w-24 md:max-w-80' : 'md:min-w-28 md:max-w-96'} my-0 mx-auto pt-4 pb-3 px-4 bg-dark-gray flex flex-col gap-3 shadow"
+        class="opacity-0 w-[75vw] my-0 mx-auto pt-4 pb-3 px-4 bg-dark-gray flex flex-col gap-3 shadow"
       >
 
         <div class="flex justify-between h-6">

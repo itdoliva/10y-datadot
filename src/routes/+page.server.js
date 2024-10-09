@@ -1,38 +1,24 @@
-import { 
-  getRecords,
-  deliverableColumns, 
-  categoryColumns, 
-  categoryOrders, 
-  parseDeliverables, 
-  parseCategories 
-} from '$lib/utils/database'
-
 import * as d3 from "d3"
+import { authenticate } from "$lib/googleAuth";
+import { getSheetValues, parseDeliverables, parseCategories } from "$lib/utils/database";
 
-export async function load({ fetch }) {
-  // Get deliverables and categories from the database
-  const deliverables = await fetch('/data/deliverables.csv')
-    .then(res => res.text())
-    .then(text => d3.csvParse(text))
-    .then(parseDeliverables)
+import { DELIVERABLES_RANGE, CATEGORIES_RANGE } from "$lib/utils/constants";
 
-  const categories = await fetch('/data/categories.csv')
-    .then(res => res.text())
-    .then(text => d3.csvParse(text))
-    .then(parseCategories)
-  // const deliverables = await getRecords('deliverables', deliverableColumns).then(parseDeliverables)
-  // const categories = await getRecords('categories', categoryColumns).then(parseCategories)
 
-  // Sort categories
-  categories.sort((a, b) => categoryOrders.indexOf(a.id) - categoryOrders.indexOf(b.id))
-  
+export async function load() {
+  await authenticate()
+
+  // Get deliverables and categories from sheets
+  const deliverables = await getSheetValues(DELIVERABLES_RANGE).then(parseDeliverables)
+  const categories = await getSheetValues(CATEGORIES_RANGE).then(parseCategories)
+
   // Get unique projects and clients
   const projects = new Set()
   const clients = new Set()
 
-  deliverables.forEach(deliverable => {
-    projects.add(deliverable.project)
-    clients.add(deliverable.client)
+  deliverables.forEach(d => {
+    projects.add(d.project)
+    clients.add(d.client)
   })
 
   return {

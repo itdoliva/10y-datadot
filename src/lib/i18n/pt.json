@@ -1,8 +1,9 @@
 {
   "page": {
+    "name": "Datadot 10 anos",
     "title": "10 anos • datadot design studio",
     "hero": "10 anos",
-    "description": "Transformamos nossos projetos dos últimos 10 anos em uma visualização de dados. Esperamos que você aproveite a jornada e explore nossa história."
+    "description": "Em 2024 completamos 10 anos de Datadot, para comemorar criamos uma visualização com todos os projetos realizados nessa década."
   },
 
   "techsheet": {
@@ -21,7 +22,7 @@
 
   "onboarding": {
     "desktop": {
-      "1": "Para comemorar os 10 anos de vida da Datadot, construímos essa plataforma para contar a nossa história da forma que mais gostamos: através da&nbsp;visualização de dados. Esperamos que gostem :)",
+      "1": "Para comemorar os 10 anos de vida da Datadot, construímos essa plataforma para contar a nossa história da forma que mais gostamos: através&nbsp;da&nbsp;visualização de dados. Esperamos que gostem :)",
       "2": "Cada unidade é uma entrega realizada ao longo da vida da datadot",
       "3": "Você pode interagir com as unidades",
       "4": "Explore as nossas entregas de diferentes formas através dos paineis da <span class='left'>esquerda</span> e do <span class='top'>topo</span>. O botão limpar filtros retorna ao estado inicial",
