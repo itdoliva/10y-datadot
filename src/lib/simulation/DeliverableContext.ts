@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js"
-import { intersection } from "lodash"
+import intersection from "lodash/intersection"
 
 import Deliverable from "./Deliverable"
 import Simulation from "./Simulation"

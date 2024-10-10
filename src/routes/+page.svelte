@@ -10,7 +10,6 @@
   import simulation from "$lib/simulation"
   
   // Stores
-  import { loaded } from "$lib/stores/loading"
   import { categories, projects, clients } from "$lib/stores/nodes"
   import { width, height, pixelRatio } from "$lib/stores/canvas"
   
@@ -46,7 +45,12 @@
 
 <svelte:head>
   <title>{data.meta.title}</title>
+  <meta charset="UTF-8">
   <meta name="author" content="datadot + italo doliva">
+  <meta name="description" content={data.meta.description}>
+  <meta name="theme-color" content="#6D78FC">
+  <meta name="robots" content="index, follow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
   <meta property="og:site_name" content={data.meta.title}>
   <meta property="og:title" content={data.meta.title}>
@@ -60,13 +64,8 @@
   <meta name="twitter:title" content="{data.meta.title}">
   <meta name="twitter:description" content={data.meta.description}>
   <meta name="twitter:image" content="{data.meta.vercelURL}/img/share-256x256.png">
-  
-  <meta name="theme-color" content="#6D78FC">
-  
-  <meta charset="UTF-8">
-  <meta name="robots" content="index, follow">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 </svelte:head>
 
-
-<App />
+{#if typeof window !== 'undefined'}
+  <App />
+{/if}
