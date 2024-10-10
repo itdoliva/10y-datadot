@@ -1,3 +1,6 @@
+import * as PIXI from "pixi.js"
+
+
 export const AWS_SOUND_URL = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/969699'
 
 export const DELIVERABLES_RANGE = 'master!A1:J2000'
@@ -26,6 +29,16 @@ export const ONBOARDING_PARAMS = {
   offset: 12,
 }
 
+
+export const LINK_STYLES = {
+  alpha: 1,
+  alphaHover: 1,
+  lineWidth: 2,
+  lineWidthHover: 4,
+  radius: 0,
+  join: PIXI.LINE_JOIN.ROUND,
+  cap: PIXI.LINE_CAP.ROUND
+}
 
 export const CATEGORIES_ORDER = [
   'channel.digital',

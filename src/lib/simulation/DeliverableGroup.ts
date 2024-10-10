@@ -8,7 +8,7 @@ import grahamScan from "../utility/grahamScan"
 import Simulation from "./Simulation";
 import { nodeSize } from "../stores/nodes";
 
-import { LINK_STYLES } from "../utility/constants";
+import { LINK_STYLES } from "../utils/constants";
 
 
 export default class DeliverableGroup {
