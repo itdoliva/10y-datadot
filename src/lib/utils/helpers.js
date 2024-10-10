@@ -22,4 +22,3 @@ export function randomDensity(maxInteger, size=100, normalize=true) {
 
   return density
 }
-

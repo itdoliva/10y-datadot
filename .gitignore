@@ -9,6 +9,6 @@ node_modules
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 /deprecated
-scripts/datadot-10-years-3c9c9647d085.json
+scripts/service-key.json
 .vercel/
 /.vercel
