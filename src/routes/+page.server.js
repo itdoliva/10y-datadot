@@ -1,6 +1,7 @@
 import * as d3 from "d3"
 import { authenticate } from "$lib/googleAuth";
 import { getSheetValues, parseDeliverables, parseCategories } from "$lib/utils/database";
+import { VERCEL_URL } from '$env/static/private'
 
 import { DELIVERABLES_RANGE, CATEGORIES_RANGE } from "$lib/utils/constants";
 import { getLocaleFromRequest, format } from "$lib/utils/i18n";
@@ -23,6 +24,7 @@ export async function load({ request }) {
 
   const locale = getLocaleFromRequest(request.headers)
 
+
   return {
     deliverables,
     categories,
@@ -32,6 +34,7 @@ export async function load({ request }) {
     meta: {
       title: format("page.name", locale),
       description: format("page.description", locale),
+      vercelURL: VERCEL_URL ? 'https://' + VERCEL_URL : ''
     }
   }
 }

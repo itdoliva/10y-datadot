@@ -52,14 +52,14 @@
   <meta property="og:title" content={data.meta.title}>
   <meta property="og:type" content="website">
   <meta property="og:description" content={data.meta.description}>
-  <meta property="og:image" content="/img/share-256x256.png">
+  <meta property="og:image" content="{data.meta.vercelURL}/img/share-256x256.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:url" content="https://10.datadotestudio.com">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{data.meta.title}">
   <meta name="twitter:description" content={data.meta.description}>
-  <meta name="twitter:image" content="/img/share-256x256.png">
+  <meta name="twitter:image" content="{data.meta.vercelURL}/img/share-256x256.png">
   
   <meta name="theme-color" content="#6D78FC">
   
