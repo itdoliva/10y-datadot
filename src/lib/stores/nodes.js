@@ -6,6 +6,7 @@ import { width } from "./canvas"
 export const clients = writable([])
 export const projects = writable([])
 export const categories = writable([])
+export const yearRange = writable([])
 
 export const sortBy = writable('dt')
 

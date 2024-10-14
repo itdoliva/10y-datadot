@@ -1,5 +1,6 @@
 <script>
   import { _ } from 'svelte-i18n'
+  import { yearRange } from "$lib/stores/nodes";
 
   import ClearFilterButton from './ClearFilterButton.svelte';
 
@@ -10,12 +11,12 @@
     ($fdesigns.length + $fgoals.length + $findustries.length + $fproducts.length) === 0 &&
     (
       (!$fyears) || 
-      ($fyears.length === 2 && $fyears[0] === 2014 && $fyears[1] === 2023)
+      ($fyears.length === 2 && $fyears[0] === $yearRange[0] && $fyears[1] === $yearRange[1])
     )
   )
   
   function clearFilters() {
-    fyears.set([ 2014, 2023 ])
+    fyears.set($yearRange)
     fdesigns.set([])
     fgoals.set([])
     findustries.set([])

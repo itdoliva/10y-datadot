@@ -5,6 +5,7 @@
   // Store
   import { fyears } from "$lib/stores/nodes";
   import { isSwitchingLayout } from "$lib/stores/canvas"
+  import { yearRange } from "$lib/stores/nodes"
 
   // Components
 	import PanelItem from '$lib/components/dom/molecules/PanelItem.svelte';
@@ -18,8 +19,8 @@
 <PanelItem icon="period" title={$_("input.period")}>
   <YearSliderPicker 
     disabled={$isSwitchingLayout}
-    min={2014} 
-    max={2024} 
+    min={$yearRange[0]} 
+    max={$yearRange[1]} 
     bind:selected={$fyears} 
   />
 </PanelItem>

@@ -30,7 +30,7 @@ export async function load({ request }) {
     categories,
     projects: Array.from(projects),
     clients: Array.from(clients),
-    dates: d3.extent(deliverables, d => d.dt),
+    yearRange: d3.extent(deliverables, d => +d.year),
     meta: {
       title: format("page.name", locale),
       description: format("page.description", locale),

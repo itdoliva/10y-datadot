@@ -10,7 +10,7 @@
   import simulation from "$lib/simulation"
   
   // Stores
-  import { categories, projects, clients } from "$lib/stores/nodes"
+  import { categories, projects, clients, yearRange } from "$lib/stores/nodes"
   import { width, height, pixelRatio } from "$lib/stores/canvas"
   
   // Components
@@ -21,10 +21,12 @@
   clients.set(data.clients)
   projects.set(data.projects)
   categories.set(data.categories)
+  yearRange.set(data.yearRange)
 
 
 
   onMount(() => {
+    console.log(data.yearRange)
     simulation.load(data.deliverables)
   })
 
