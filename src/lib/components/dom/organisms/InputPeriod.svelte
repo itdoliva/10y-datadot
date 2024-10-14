@@ -19,7 +19,7 @@
   <YearSliderPicker 
     disabled={$isSwitchingLayout}
     min={2014} 
-    max={2023} 
+    max={2024} 
     bind:selected={$fyears} 
   />
 </PanelItem>
