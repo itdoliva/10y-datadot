@@ -45,7 +45,7 @@ export function parseDeliverables(values) {
     
         channel: "channel." + channel,
         industry: "industry." + industry,
-        product: JSON.parse(product.replace(/'/g, '"')).map(d => "product." + d),
+        product: "product." + product,
         design: JSON.parse(design.replace(/'/g, '"')).map(d => "design." + d),
         goal: JSON.parse(goal.replace(/'/g, '"')).map(d => "goal." + d),
     

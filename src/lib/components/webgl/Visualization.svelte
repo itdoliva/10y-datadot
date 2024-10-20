@@ -49,6 +49,7 @@
     scene.node.hitArea.height = nodeSize
   }
 
+
 </script>
 
 <div class="w-full h-full"

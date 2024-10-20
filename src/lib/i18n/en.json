@@ -27,7 +27,7 @@
       "3": "You can interact with the units",
       "4": "Explore our deliveries in different ways through the <span class='left text-secondary font-semibold'>left</span> and <span class='top text-secondary font-semibold'>top</span> panels. The clear filters button returns you to the initial state",
       "5": "Discover hidden properties",
-      "6": "Discover our history through other senses"
+      "6": "Discover our history through other senses. Don't forget to activate the sound of your device!"
     },
     "mobile": {
       "1": "To celebrate 10 years of Datadot's life, we built this platform to tell our story in the way we like best: through data visualization. We hope you enjoy it :)",
@@ -35,7 +35,7 @@
       "3": "You can interact with the units",
       "4": "Explore our deliveries in different layouts...",
       "5": "...and from various filters.",
-      "6": "Discover our history through other senses"
+      "6": "Discover our history through other senses. Don't forget to activate the sound of your device!"
     },
 
     "panel": {

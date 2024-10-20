@@ -26,9 +26,9 @@ export default class Deliverable {
   
   public channel: string
   public industry: string
+  public product: string
   public designs: string[]
   public goals: string[]
-  public products: string[]
   public categories: string[]
   
   public i: number
@@ -66,14 +66,14 @@ export default class Deliverable {
     this.industry = dataPoint.industry
     this.designs = dataPoint.design
     this.goals = dataPoint.goal
-    this.products = dataPoint.product
+    this.product = dataPoint.product
 
     this.categories = [
       dataPoint.channel,
       dataPoint.industry,
+      dataPoint.product,
       ...dataPoint.design,
       ...dataPoint.goal,
-      ...dataPoint.product,
     ].flat()
 
     this.attr = new AttributeController(this)
@@ -116,7 +116,7 @@ export default class Deliverable {
       (fyears && (this.year < fyears[0] || this.year > fyears[1])) ||
       (fdesigns && fdesigns.length > 0 && !this.designs.some(design => fdesigns.includes(design))) ||
       (fgoals && fgoals.length > 0 && !this.goals.some(goal => fgoals.includes(goal))) || 
-      (fproducts && fproducts.length > 0 && !this.products.some(product => fproducts.includes(product))) ||
+      (fproducts && fproducts.length > 0 && !fproducts.includes(this.product)) ||
       (findustries && findustries.length > 0 && !findustries.includes(this.industry))
     )
   }

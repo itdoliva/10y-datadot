@@ -26,7 +26,6 @@
 
 
   onMount(() => {
-    console.log(data.yearRange)
     simulation.load(data.deliverables)
   })
 
