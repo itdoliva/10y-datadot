@@ -36,7 +36,7 @@
 
     traceIds = [
       selected.channel,
-      ...selected.products,
+      selected.product,
       ...selected.designs,
       ...selected.goals
     ]
