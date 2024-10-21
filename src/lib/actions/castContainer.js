@@ -12,7 +12,8 @@ export default function castContainer(node, {
   hasMask=false,
   destroy=true,
   centered=true,
-  propagateOpacity=false
+  propagateOpacity=false, 
+  name=false
 } = {}) {
 
 
@@ -48,6 +49,10 @@ export default function castContainer(node, {
 
     const x = bbox.x - parent.x + xOffset
     const y = bbox.y - parent.y + yOffset
+
+    if (name === 'root') {
+      // console.log(bbox.x, parent.x, xOffset, x)
+    }
 
     context.x = x
     context.y = y

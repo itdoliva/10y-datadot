@@ -34,6 +34,7 @@
   let shrinkHeight
   let isShrinked = false
 
+
   function toggleTopMenuCollapse() {
     isShrinked = !isShrinked
     return 
@@ -157,7 +158,7 @@
 
   <section id="vis-container" class="col-start-2 col-span-full row-start-2 relative">
     <Signals />
-    <Visualization />
+    <Visualization {isShrinked} {shrinkHeight} />
     <File />
   </section>
 

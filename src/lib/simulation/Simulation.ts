@@ -7,8 +7,7 @@ import * as PIXI from "pixi.js"
 import loader from "../loader"
 
 // Stores
-import { figureHeight, figureWidth, isSwitchingLayout, linkClientOn, linkProjectOn } from "../stores/canvas";
-import { gap, nodeSize, sortBy, categories, categoriesEnriched } from "../stores/nodes";
+import { figureHeight, figureWidth, isSwitchingLayout, linkClientOn, linkProjectOn, gap, nodeSize, sortBy, categories, categoriesEnriched } from "../stores";
 
 // Classes, Functions & Interfaces
 import randomDensity from "../utility/randomDensity"
@@ -493,11 +492,11 @@ export default class Simulation {
 
   }
 
-  public filter = (fyears: number[], findustries: string[], fdesigns: string[], fgoals: string[], fproducts: string[]) => {
+  public filter = (filteredYears: number[], findustries: string[], filteredDesignIds: string[], fgoals: string[], fproducts: string[]) => {
     if (!this.initialized) return
 
     this.getDeliverableNodes().forEach(node => {
-      node.setActive(fyears, findustries, fdesigns, fgoals, fproducts)
+      node.setActive(filteredYears, findustries, filteredDesignIds, fgoals, fproducts)
     })
 
     const activeIds = this.getDeliverableNodes().filter(d => d.active).map(d => d.id)

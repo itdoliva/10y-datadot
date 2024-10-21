@@ -1,6 +1,7 @@
 <script>
   import { onMount, setContext } from 'svelte'
   import * as PIXI from "pixi.js"
+  import * as d3 from "d3"
   import simulation from "$lib/simulation"
   import _ from "lodash"
   
@@ -9,6 +10,17 @@
   import { cameraOffsetX, cameraOffsetY, zoom } from "$lib/stores/zoom";
   import { nodeSize } from "$lib/stores/nodes";
 
+  import { tweened } from 'svelte/motion';
+
+
+  // Workaround to adjust layout's position when the top panel is collapsed
+  export let shrinkHeight = 0
+  export let isShrinked = false
+
+  const t_shrinkOffset = tweened(0, { duration: 300, easing: d3.easeInOut})
+
+
+
   let container
 
   const root = new PIXI.Container()
@@ -16,7 +28,7 @@
   const scene = new PIXI.Container()
 
   root.name = "vis-container"
-  camera.name = "outer-scene"
+  camera.name = "camera"
   scene.name = "scene"
 
   scene.node = {
@@ -26,12 +38,14 @@
   root.addChild(camera) //, mask
   camera.addChild(scene)
 
+  $: t_shrinkOffset.set(isShrinked ? -shrinkHeight/2 : 0)
+
   $: camera.x = $cameraOffsetX
   $: camera.y = $cameraOffsetY
   $: camera.scale.set($zoom)
 
   $: scene.x = $figureWidth/2
-  $: scene.y = $figureHeight/2
+  $: scene.y = $figureHeight/2 + $t_shrinkOffset
 
   $: updateNodeHitArea($nodeSize)
 
@@ -60,6 +74,7 @@
     context: root, 
     hasMask: true, 
     centered: false,
+    name: 'root',
     propagateOpacity: "#vis-container"
   }}
 />
