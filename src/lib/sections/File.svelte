@@ -122,7 +122,7 @@
               <FileTrace {id} {context}/>
             </figure>
     
-            <p class="text-xxs md:text-xs self-center lowercase underline">
+            <p class="text-xxs md:text-xs self-center lowercase italic">
               {$_("category." + category.id)}
             </p>
           </li>

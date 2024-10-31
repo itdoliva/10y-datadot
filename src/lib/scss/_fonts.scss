@@ -14,6 +14,20 @@
 
 @font-face {
   font-family: 'Rational';
+  src: url('/fonts/Rene Bieder - Rational TW Text Light Italic.otf') format('opentype');
+  font-style: italic;
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: 'Rational';
+  src: url('/fonts/Rene Bieder - Rational TW Text Book Italic.otf') format('opentype');
+  font-style: italic;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: 'Rational';
   src: url('/fonts/Rene Bieder - RationalTWText-Medium.otf') format('opentype');
   font-style: normal;
   font-weight: 500;
